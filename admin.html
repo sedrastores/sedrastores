@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم — سيدرا ستور</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dark: #8B6914;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --dark2: #1A1A1A;
+    --sidebar-bg: #0D0D0D;
+    --card-bg: #FFFFFF;
+    --page-bg: #F4F2EE;
+    --text: #1A1A1A;
+    --text-light: #666;
+    --border: rgba(0,0,0,0.08);
+    --gold-border: rgba(201,168,76,0.3);
+    --radius: 12px;
+    --blue: #3B82F6;
+    --green: #10B981;
+    --orange: #F59E0B;
+    --red: #EF4444;
+    --purple: #8B5CF6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--page-bg);
+    color: var(--text);
+    direction: rtl;
+  }
+
+  /* LOGIN PAGE */
+  .login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--black);
+    padding: 20px;
+  }
+
+  .login-card {
+    background: var(--dark2);
+    border: 1px solid var(--gold-border);
+    border-radius: 20px;
+    padding: 48px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  .login-logo { margin-bottom: 32px; }
+  .login-logo img { width: 80px; height: 80px; object-fit: contain; }
+  .login-logo h2 { color: var(--gold); font-size: 20px; margin-top: 10px; }
+  .login-logo p { color: rgba(255,255,255,0.4); font-size: 12px; }
+
+  .login-field { margin-bottom: 16px; }
+
+  .login-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-family: 'Cairo', sans-serif;
+    direction: ltr;
+    text-align: left;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-input:focus { border-color: var(--gold); }
+
+  .login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: var(--black);
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 800;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity 0.2s;
+  }
+
+  .login-btn:hover { opacity: 0.9; }
+
+  .login-error {
+    color: #f87171;
+    font-size: 13px;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* DASHBOARD */
+  .dashboard { display: none; min-height: 100vh; }
+  .dashboard.visible { display: flex; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px;
+    background: var(--sidebar-bg);
+    border-left: 1px solid rgba(201,168,76,0.15);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sidebar-logo img { width: 40px; height: 40px; object-fit: contain; }
+  .sidebar-logo-text span { display: block; }
+  .sidebar-logo-text span:first-child { color: var(--gold); font-size: 14px; font-weight: 700; }
+  .sidebar-logo-text span:last-child { color: rgba(255,255,255,0.3); font-size: 10px; }
+
+  .sidebar-nav { padding: 16px 12px; flex: 1; }
+
+  .nav-section-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 8px 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .nav-item-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: color 0.2s;
+  }
+
+  .logout-btn:hover { color: #f87171; }
+
+  /* MAIN CONTENT */
+  .main-content {
+    flex: 1;
+    margin-right: 240px;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-title { font-size: 18px; font-weight: 800; color: var(--text); }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .admin-badge {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid var(--gold-border);
+    color: var(--gold-dark);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .content-body { padding: 32px; }
+
+  /* TAB PANELS */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* STAT CARDS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 22px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 4px; height: 100%;
+  }
+
+  .stat-card.gold::before { background: var(--gold); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.orange::before { background: var(--orange); }
+  .stat-card.purple::before { background: var(--purple); }
+  .stat-card.red::before { background: var(--red); }
+
+  .stat-icon { font-size: 24px; margin-bottom: 12px; }
+  .stat-label { font-size: 12px; color: var(--text-light); font-weight: 600; margin-bottom: 6px; }
+  .stat-value { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--text-light); margin-top: 6px; }
+
+  /* OVERVIEW CHARTS ROW */
+  .overview-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  /* STATUS RING CHART */
+  .chart-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .chart-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 20px; color: var(--text); }
+
+  .status-bars { display: flex; flex-direction: column; gap: 12px; }
+
+  .status-bar-row { display: flex; align-items: center; gap: 10px; }
+  .status-bar-label { font-size: 12px; color: var(--text-light); width: 90px; flex-shrink: 0; }
+  .status-bar-track { flex: 1; height: 8px; background: #f0ede8; border-radius: 4px; overflow: hidden; }
+  .status-bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+  .status-bar-count { font-size: 12px; font-weight: 700; color: var(--text); width: 24px; text-align: left; flex-shrink: 0; }
+
+  /* TOP DESIGNS */
+  .top-designs { display: flex; flex-direction: column; gap: 10px; }
+
+  .design-rank-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: #f9f7f4;
+    border-radius: 8px;
+  }
+
+  .design-rank-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--black);
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .design-rank-img {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .design-rank-name { font-size: 12px; font-weight: 700; flex: 1; }
+  .design-rank-count {
+    font-size: 12px;
+    color: var(--text-light);
+    background: white;
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+
+  /* TIME ON SITE */
+  .time-blocks { display: flex; flex-direction: column; gap: 8px; }
+
+  .time-block-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f9f7f4;
+    border-radius: 8px;
+  }
+
+  .time-block-label { font-size: 12px; color: var(--text-light); }
+  .time-block-val { font-size: 14px; font-weight: 800; color: var(--text); }
+  .time-block-val span { font-size: 11px; font-weight: 500; color: var(--text-light); }
+
+  /* TABLE */
+  .table-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .table-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .table-title { font-size: 16px; font-weight: 800; }
+
+  .table-actions { display: flex; gap: 10px; align-items: center; }
+
+  .search-input {
+    padding: 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Cairo', sans-serif;
+    outline: none;
+    direction: rtl;
+    width: 200px;
+  }
+
+  .search-input:focus { border-color: var(--gold); }
+
+  .filter-select {
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Cairo', sans-serif;
+    background: white;
+    cursor: pointer;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    background: #f8f7f4;
+    padding: 12px 16px;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-light);
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 14px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafaf8; }
+
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+  }
+
+  .status-new { background: rgba(59,130,246,0.1); color: #2563eb; }
+  .status-prep { background: rgba(245,158,11,0.1); color: #d97706; }
+  .status-shipped { background: rgba(139,92,246,0.1); color: #7c3aed; }
+  .status-delivered { background: rgba(16,185,129,0.1); color: #059669; }
+  .status-returned { background: rgba(239,68,68,0.1); color: #dc2626; }
+
+  .action-btn {
+    background: none;
+    border: 1px solid var(--border);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    transition: all 0.2s;
+    color: var(--text);
+  }
+
+  .action-btn:hover { border-color: var(--gold); color: var(--gold-dark); }
+
+  .action-btn.danger { color: #dc2626; }
+  .action-btn.danger:hover { border-color: #dc2626; background: #fee2e2; }
+
+  .status-select {
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: 'Cairo', sans-serif;
+    background: white;
+    cursor: pointer;
+  }
+
+  /* ORDER DETAIL MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .detail-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .detail-modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+
+  .detail-item { }
+  .detail-item label { font-size: 11px; color: var(--text-light); font-weight: 600; display: block; margin-bottom: 3px; }
+  .detail-item span { font-size: 14px; font-weight: 700; color: var(--text); }
+
+  .detail-products-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+
+  .detail-product-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f9f7f4;
+    border-radius: 8px;
+  }
+
+  .detail-product-row img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+  .detail-product-info { flex: 1; }
+  .detail-product-name { font-size: 12px; font-weight: 700; }
+  .detail-product-qty { font-size: 11px; color: var(--text-light); }
+  .detail-product-price { font-size: 13px; font-weight: 800; color: var(--gold-dark); }
+
+  .detail-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f0ede8;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .detail-modal-close {
+    background: none;
+    border: 1px solid var(--border);
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+  }
+
+  /* PRODUCTS ADMIN */
+  .products-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .product-admin-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+
+  .product-admin-card.hidden-product { opacity: 0.5; }
+  .product-admin-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; }
+  .product-admin-info { padding: 12px; }
+  .product-admin-name { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+
+  .product-admin-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .btn-small {
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    border: 1px solid var(--border);
+    background: white;
+    transition: all 0.2s;
+  }
+
+  .btn-small.danger { color: #dc2626; border-color: rgba(220,38,38,0.3); }
+  .btn-small.danger:hover { background: #fee2e2; }
+  .btn-small.warning { color: #d97706; border-color: rgba(217,119,6,0.3); }
+  .btn-small.warning:hover { background: #fef3c7; }
+
+  .add-product-btn {
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.2s;
+  }
+
+  .add-product-btn:hover { opacity: 0.85; }
+
+  /* SETTINGS */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .settings-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 1px solid var(--border);
+  }
+
+  .settings-card h3 {
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .setting-row { margin-bottom: 16px; }
+
+  .setting-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+
+  .setting-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+    outline: none;
+  }
+
+  .setting-input:focus { border-color: var(--gold); }
+
+  .color-row { display: flex; gap: 10px; align-items: center; }
+
+  .color-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .save-settings-btn {
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: opacity 0.2s;
+  }
+
+  .save-settings-btn:hover { opacity: 0.85; }
+
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--text-light); }
+  .empty-state p { font-size: 14px; }
+
+  /* ANALYTICS */
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .analytics-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+
+  .analytics-card h3 { font-size: 13px; font-weight: 800; color: var(--text-light); margin-bottom: 16px; letter-spacing: 0.5px; }
+
+  .funnel-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0ede8;
+  }
+
+  .funnel-row:last-child { border-bottom: none; }
+
+  .funnel-icon { font-size: 16px; width: 24px; text-align: center; }
+  .funnel-label { flex: 1; font-size: 12px; color: var(--text-light); }
+  .funnel-val { font-size: 14px; font-weight: 800; color: var(--text); }
+
+  .mini-chart { margin-top: 12px; }
+  .mini-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .mini-bar-label { font-size: 11px; color: var(--text-light); width: 70px; text-align: right; flex-shrink: 0; }
+  .mini-bar-wrap { flex: 1; height: 6px; background: #f0ede8; border-radius: 3px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 1200px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .analytics-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 1024px) {
+    .sidebar { width: 200px; }
+    .main-content { margin-right: 200px; }
+    .settings-grid { grid-template-columns: 1fr; }
+    .overview-row { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main-content { margin-right: 0; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .content-body { padding: 16px; }
+    table { font-size: 12px; }
+    th, td { padding: 10px 12px; }
+    .analytics-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="login-page" id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="images/logo_small.png" alt="سيدرا ستور">
+      <h2>سيدرا ستور</h2>
+      <p>لوحة تحكم الأدمن</p>
+    </div>
+
+    <div class="login-field">
+      <input type="email" class="login-input" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <input type="password" class="login-input" id="loginPass" placeholder="كلمة المرور" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+
+    <button class="login-btn" onclick="doLogin()">دخول →</button>
+    <p class="login-error" id="loginError">البريد الإلكتروني أو كلمة المرور غير صحيحة</p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="images/logo_small.png" alt="سيدرا">
+      <div class="sidebar-logo-text">
+        <span>سيدرا ستور</span>
+        <span>لوحة التحكم</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">الرئيسية</div>
+      <div class="nav-item active" onclick="showTab('overview')">
+        <span class="nav-item-icon">📊</span> نظرة عامة
+      </div>
+
+      <div class="nav-section-label">الأوردرات</div>
+      <div class="nav-item" onclick="showTab('orders')">
+        <span class="nav-item-icon">🛍️</span> إدارة الأوردرات
+      </div>
+
+      <div class="nav-section-label">المنتجات</div>
+      <div class="nav-item" onclick="showTab('products')">
+        <span class="nav-item-icon">🖼️</span> إدارة المنتجات
+      </div>
+
+      <div class="nav-section-label">التحليلات</div>
+      <div class="nav-item" onclick="showTab('analytics')">
+        <span class="nav-item-icon">📈</span> إحصائيات
+      </div>
+
+      <div class="nav-section-label">الإعدادات</div>
+      <div class="nav-item" onclick="showTab('settings')">
+        <span class="nav-item-icon">⚙️</span> إعدادات الموقع
+      </div>
+
+      <div class="nav-item" onclick="window.open('index.html', '_blank')">
+        <span class="nav-item-icon">🔗</span> زيارة المتجر
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="logout-btn" onclick="doLogout()">
+        <span>🚪</span> تسجيل الخروج
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">نظرة عامة</div>
+      <div class="topbar-right">
+        <span id="adminEmail" class="admin-badge">أدمن</span>
+      </div>
+    </div>
+
+    <div class="content-body">
+
+      <!-- ===================== OVERVIEW TAB ===================== -->
+      <div class="tab-panel active" id="tab-overview">
+        <div class="stats-grid">
+          <div class="stat-card gold">
+            <div class="stat-icon">🛍️</div>
+            <div class="stat-label">إجمالي الأوردرات</div>
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-sub">جميع الأوردرات</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">إجمالي المبيعات</div>
+            <div class="stat-value" id="statRevenue">0 ج</div>
+            <div class="stat-sub">بعد احتساب الشحن</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-icon">📦</div>
+            <div class="stat-label">أوردرات اليوم</div>
+            <div class="stat-value" id="statToday">0</div>
+            <div class="stat-sub">آخر 24 ساعة</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-label">قيد التجهيز</div>
+            <div class="stat-value" id="statPending">0</div>
+            <div class="stat-sub">أوردرات جديدة وقيد التجهيز</div>
+          </div>
+        </div>
+
+        <!-- Second row of stats -->
+        <div class="stats-grid" style="margin-bottom:28px;">
+          <div class="stat-card purple">
+            <div class="stat-icon">🚚</div>
+            <div class="stat-label">تم الشحن</div>
+            <div class="stat-value" id="statShipped">0</div>
+            <div class="stat-sub">في الطريق</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">✅</div>
+            <div class="stat-label">تم التسليم</div>
+            <div class="stat-value" id="statDelivered">0</div>
+            <div class="stat-sub">مكتملة</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-icon">↩️</div>
+            <div class="stat-label">مرتجعات</div>
+            <div class="stat-value" id="statReturned">0</div>
+            <div class="stat-sub">طلبات الإرجاع</div>
+          </div>
+          <div class="stat-card gold">
+            <div class="stat-icon">📊</div>
+            <div class="stat-label">معدل التسليم</div>
+            <div class="stat-value" id="statRate">0%</div>
+            <div class="stat-sub">من إجمالي الأوردرات</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="overview-row">
+          <div class="chart-card">
+            <h3>📊 توزيع حالات الأوردرات</h3>
+            <div class="status-bars" id="statusBars">
+              <div class="empty-state" style="padding:20px;"><p>جاري التحميل...</p></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>🏆 أكثر التصاميم طلباً</h3>
+            <div class="top-designs" id="topDesignsOverview">
+              <div class="empty-state" style="padding:20px;"><p>جاري التحميل...</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">آخر الأوردرات</div>
+            <button class="add-product-btn" onclick="showTab('orders')" style="background:transparent;color:var(--gold-dark);border:1px solid var(--gold-border);">عرض الكل ←</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>الاسم</th>
+                <th>التليفون</th>
+                <th>التصاميم</th>
+                <th>المحافظة</th>
+                <th>الإجمالي</th>
+                <th>الحالة</th>
+                <th>التاريخ</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrdersBody">
+              <tr><td colspan="7"><div class="empty-state"><p>⏳ جاري تحميل البيانات...</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===================== ORDERS TAB ===================== -->
+      <div class="tab-panel" id="tab-orders">
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">جميع الأوردرات</div>
+            <div class="table-actions">
+              <input type="text" class="search-input" id="orderSearch" placeholder="بحث بالاسم أو التليفون..." oninput="filterOrders()">
+              <select class="filter-select" id="statusFilter" onchange="filterOrders()">
+                <option value="">كل الحالات</option>
+                <option value="جديد">جديد</option>
+                <option value="قيد التجهيز">قيد التجهيز</option>
+                <option value="تم الشحن">تم الشحن</option>
+                <option value="تم التسليم">تم التسليم</option>
+                <option value="مرتجع">مرتجع</option>
+              </select>
+              <button onclick="resetAllOrders()" style="background:#ef4444;color:white;border:none;padding:8px 14px;border-radius:8px;font-family:Cairo,sans-serif;font-weight:700;font-size:12px;cursor:pointer;" title="مسح كل الأوردرات وإعادة الكود من 001">🗑️ مسح كل البيانات</button>
+            </div>
+          </div>
+          <!-- زوار الموقع الآن -->
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 0 4px;font-size:13px;color:#666;border-bottom:1px solid rgba(0,0,0,0.06);margin-bottom:8px;">
+            <span style="width:8px;height:8px;background:#22c55e;border-radius:50%;display:inline-block;box-shadow:0 0 6px #22c55e;"></span>
+            <span id="adminVisitorCount" style="font-weight:800;color:#111;">—</span>
+            <span>زائر على الموقع الآن</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>الاسم</th>
+                  <th>التليفون</th>
+                  <th>التصاميم والكميات</th>
+                  <th>المحافظة</th>
+                  <th>المدينة</th>
+                  <th>الإجمالي</th>
+                  <th>الدفع</th>
+                  <th>الجهاز</th>
+                  <th>الحالة</th>
+                  <th>التاريخ</th>
+                  <th>إجراء</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <tr><td colspan="13"><div class="empty-state"><p>⏳ جاري تحميل الأوردرات...</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== PRODUCTS TAB ===================== -->
+      <div class="tab-panel" id="tab-products">
+        <div class="table-card" style="overflow:visible;">
+          <div class="table-header">
+            <div class="table-title">المنتجات (التصاميم)</div>
+            <button class="add-product-btn" onclick="alert('لإضافة منتج جديد: ارفع الصورة على Firebase Storage وأضف بيانات المنتج في Firestore')">
+              + إضافة تصميم
+            </button>
+          </div>
+          <div class="products-admin-grid" id="productsAdminGrid"></div>
+        </div>
+      </div>
+
+      <!-- ===================== ANALYTICS TAB ===================== -->
+      <div class="tab-panel" id="tab-analytics">
+
+        <div class="analytics-grid">
+          <!-- Top Designs -->
+          <div class="analytics-card">
+            <h3>🏆 أكثر التصاميم طلباً</h3>
+            <div id="analyticsTopDesigns">
+              <div class="empty-state" style="padding:16px;"><p>جاري الحساب...</p></div>
+            </div>
+          </div>
+
+          <!-- Orders by Governorate -->
+          <div class="analytics-card">
+            <h3>📍 أكثر المحافظات طلباً</h3>
+            <div id="analyticsTopGovs">
+              <div class="empty-state" style="padding:16px;"><p>جاري الحساب...</p></div>
+            </div>
+          </div>
+
+          <!-- Conversion funnel -->
+          <div class="analytics-card">
+            <h3>🔄 قُمع التحويل</h3>
+            <div class="funnel-row">
+              <span class="funnel-icon">👁️</span>
+              <span class="funnel-label">زوار الموقع</span>
+              <span class="funnel-val" id="funVisitors">—</span>
+            </div>
+            <div class="funnel-row">
+              <span class="funnel-icon">🛍️</span>
+              <span class="funnel-label">فتحوا صفحة المنتج</span>
+              <span class="funnel-val" id="funProduct">—</span>
+            </div>
+            <div class="funnel-row">
+              <span class="funnel-icon">📝</span>
+              <span class="funnel-label">فتحوا نافذة الطلب</span>
+              <span class="funnel-val" id="funModal">—</span>
+            </div>
+            <div class="funnel-row">
+              <span class="funnel-icon">✅</span>
+              <span class="funnel-label">أكملوا الطلب</span>
+              <span class="funnel-val" id="funCompleted">—</span>
+            </div>
+            <div style="margin-top:14px; padding:10px 12px; background:#f0ede8; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:12px; color:var(--text-light);">معدل التحويل</span>
+              <span style="font-size:16px; font-weight:800; color:var(--green);" id="funRate">—</span>
+            </div>
+            <p style="font-size:11px; color:var(--text-light); margin-top:10px; text-align:center;">
+              * بيانات الزوار تُجمع تلقائياً من الموقع
+            </p>
+          </div>
+        </div>
+
+        <!-- Time on site -->
+        <div class="analytics-card" style="margin-bottom:24px;">
+          <h3>⏱️ متوسط الوقت على الموقع</h3>
+          <div class="time-blocks" id="analyticsTime">
+            <div class="time-block-row">
+              <span class="time-block-label">الصفحة الرئيسية</span>
+              <span class="time-block-val" id="timeHome">— <span>ثانية</span></span>
+            </div>
+            <div class="time-block-row">
+              <span class="time-block-label">صفحة المنتج</span>
+              <span class="time-block-val" id="timeProduct">— <span>ثانية</span></span>
+            </div>
+            <div class="time-block-row">
+              <span class="time-block-label">نافذة الطلب</span>
+              <span class="time-block-val" id="timeModal">— <span>ثانية</span></span>
+            </div>
+          </div>
+          <p style="font-size:11px;color:var(--text-light);margin-top:12px;text-align:center;">
+            * يُجمع الوقت تلقائياً عند زيارة العملاء. كلما طال وقت النافذة = العميل يفكر = إرسال تذكير واتساب فيد.
+          </p>
+        </div>
+
+        <!-- Status breakdown -->
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">تفصيل الحالات مع الإيرادات</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>الحالة</th>
+                <th>عدد الأوردرات</th>
+                <th>النسبة</th>
+                <th>الإيرادات المتوقعة</th>
+              </tr>
+            </thead>
+            <tbody id="analyticsStatusTable">
+              <tr><td colspan="4"><div class="empty-state"><p>جاري الحساب...</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===================== SETTINGS TAB ===================== -->
+      <div class="tab-panel" id="tab-settings">
+        <div class="settings-grid">
+          <!-- Site Settings -->
+          <div class="settings-card">
+            <h3>⚙️ إعدادات الموقع</h3>
+            <div class="setting-row">
+              <div class="setting-label">اسم المتجر</div>
+              <input type="text" class="setting-input" id="settingName" value="سيدرا ستور">
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">رقم واتساب</div>
+              <input type="text" class="setting-input" id="settingWA" value="01033035681" dir="ltr">
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">سعر المنتج (جنيه)</div>
+              <input type="number" class="setting-input" id="settingPrice" value="450">
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">رسوم الشحن (جنيه)</div>
+              <input type="number" class="setting-input" id="settingShipping" value="75">
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">شركة الشحن</div>
+              <input type="text" class="setting-input" id="settingShipCo" value="">
+            </div>
+            <button class="save-settings-btn" onclick="saveSettings()">حفظ الإعدادات</button>
+          </div>
+
+          <!-- Theme Settings -->
+          <div class="settings-card">
+            <h3>🎨 الألوان والثيم</h3>
+            <div class="setting-row">
+              <div class="setting-label">اللون الذهبي الرئيسي</div>
+              <div class="color-row">
+                <input type="color" class="color-swatch" value="#C9A84C" onchange="document.documentElement.style.setProperty('--gold', this.value)">
+                <input type="text" class="setting-input" value="#C9A84C" style="flex:1">
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">نص الهيرو</div>
+              <input type="text" class="setting-input" placeholder="صلِّ بكل راحة وأناقة">
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">وصف المتجر</div>
+              <textarea class="setting-input" rows="3" placeholder="وصف مختصر للمتجر..."></textarea>
+            </div>
+            <button class="save-settings-btn">حفظ الثيم</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="detail-modal">
+    <h2>🛍️ تفاصيل الأوردر</h2>
+    <div class="detail-grid" id="detailGrid"></div>
+    <div id="detailProductsList" class="detail-products-list"></div>
+    <div class="detail-total" id="detailTotal"></div>
+    <button class="detail-modal-close" onclick="document.getElementById('detailModal').classList.remove('open')">إغلاق</button>
+  </div>
+</div>
+
+<script>
+// ============================
+// FIREBASE CONFIG — يُحدَّث بمجرد ما تعطينا بيانات Firebase
+// ============================
+const firebaseConfig = {
+  apiKey: "AIzaSyB3WGGZhM1_rYVEENVw_CIa8fLcoWpkgu0",
+  authDomain: "new-sedra.firebaseapp.com",
+  projectId: "new-sedra",
+  storageBucket: "new-sedra.firebasestorage.app",
+  messagingSenderId: "582683278164",
+  appId: "1:582683278164:web:e630144e0a0f9b8c0866c1"
+};
+
+const TELEGRAM_BOT_TOKEN = "8607316328:AAGK9h27liYMqwFzj5oiWgrYNPT4ktxT4_8";
+const TELEGRAM_CHAT_ID = "8288843086";
+
+let db, auth;
+let allOrders = [];
+
+const DEMO_MODE = false;
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  auth = firebase.auth();
+} catch(e) { console.log('Firebase init error:', e); }
+
+// ============================
+// PRODUCTS DATA
+// ============================
+const products = [
+  { id: 1, name: 'تصميم الزهور الكلاسيكي', img: 'images/product1_thumb.jpg', visible: true },
+  { id: 2, name: 'تصميم البوستان الزاهر', img: 'images/product2_thumb.jpg', visible: true },
+  { id: 3, name: 'تصميم الأعمدة الإسلامية', img: 'images/product3_thumb.jpg', visible: true },
+  { id: 4, name: 'تصميم النقش المغربي', img: 'images/product4_thumb.jpg', visible: true },
+  { id: 5, name: 'تصميم زهور الربيع', img: 'images/product5_thumb.jpg', visible: true },
+  { id: 6, name: 'تصميم المسجد الأزرق', img: 'images/product6_thumb.jpg', visible: true },
+  { id: 7, name: 'تصميم قبة الأقصى', img: 'images/product7_thumb.jpg', visible: true },
+  { id: 8, name: 'تصميم الخط العربي', img: 'images/product8_thumb.jpg', visible: true },
+];
+
+// ============================
+// AUTH
+// ============================
+const DEMO_EMAIL = "admin@sedra.com";
+const DEMO_PASS  = "sedra2024";
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+
+  if (DEMO_MODE) {
+    if (email === DEMO_EMAIL && pass === DEMO_PASS) {
+      showDashboard(email);
+    } else {
+      errEl.style.display = 'block';
+    }
+    return;
+  }
+
+  try {
+    const cred = await auth.signInWithEmailAndPassword(email, pass);
+    showDashboard(cred.user.email);
+  } catch(e) {
+    errEl.style.display = 'block';
+  }
+}
+
+function showDashboard(email) {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('dashboard').classList.add('visible');
+  document.getElementById('adminEmail').textContent = email || 'أدمن';
+  loadData();
+}
+
+function doLogout() {
+  if (!DEMO_MODE && auth) auth.signOut();
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('dashboard').classList.remove('visible');
+}
+
+if (!DEMO_MODE && auth) {
+  auth.onAuthStateChanged(user => { if (user) showDashboard(user.email); });
+}
+
+// ============================
+// DATA LOADING — No demo orders, real Firebase only
+// ============================
+async function loadData() {
+  if (DEMO_MODE) {
+    // No demo orders — show empty state until Firebase connected
+    allOrders = [];
+    updateStats();
+    renderOrdersTable();
+    renderRecentOrders();
+    renderProductsAdmin();
+    renderAnalytics();
+    renderStatusBars();
+    renderTopDesignsOverview();
+    loadAnalyticsData();
+    return;
+  }
+
+  try {
+    const snap = await db.collection('orders').orderBy('createdAt', 'desc').get();
+    allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Real-time listener for updates
+    db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snap => {
+      allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      updateStats();
+      renderOrdersTable();
+      renderRecentOrders();
+      renderAnalytics();
+      renderStatusBars();
+      renderTopDesignsOverview();
+    });
+
+  } catch(e) {
+    console.log('Load error:', e);
+    allOrders = [];
+  }
+
+  updateStats();
+  renderOrdersTable();
+  renderRecentOrders();
+  renderProductsAdmin();
+  renderAnalytics();
+  renderStatusBars();
+  renderTopDesignsOverview();
+  loadAnalyticsData();
+}
+
+// ============================
+// STATS — calculated from real orders
+// ============================
+function updateStats() {
+  const total    = allOrders.length;
+  const revenue  = allOrders.filter(o => o.status === 'تم التسليم').reduce((s, o) => s + (o.total || 525), 0);
+  const today    = allOrders.filter(o => {
+    const d = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+    return d && d.toDateString() === new Date().toDateString();
+  }).length;
+  const pending   = allOrders.filter(o => ['جديد','قيد التجهيز'].includes(o.status)).length;
+  const shipped   = allOrders.filter(o => o.status === 'تم الشحن').length;
+  const delivered = allOrders.filter(o => o.status === 'تم التسليم').length;
+  const returned  = allOrders.filter(o => o.status === 'مرتجع').length;
+  const rate      = total ? Math.round((delivered / total) * 100) : 0;
+
+  document.getElementById('statTotal').textContent     = total;
+  document.getElementById('statRevenue').textContent   = revenue.toLocaleString('ar-EG') + ' ج';
+  document.getElementById('statToday').textContent     = today;
+  document.getElementById('statPending').textContent   = pending;
+  document.getElementById('statShipped').textContent   = shipped;
+  document.getElementById('statDelivered').textContent = delivered;
+  document.getElementById('statReturned').textContent  = returned;
+  document.getElementById('statRate').textContent      = rate + '%';
+}
+
+function getStatusClass(s) {
+  const m = { 'جديد':'new','قيد التجهيز':'prep','تم الشحن':'shipped','تم التسليم':'delivered','مرتجع':'returned' };
+  return 'status-badge status-' + (m[s] || 'new');
+}
+
+function formatDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('ar-EG', { year:'numeric', month:'short', day:'numeric' });
+}
+
+// ============================
+// STATUS BARS (Overview)
+// ============================
+function renderStatusBars() {
+  const statuses = ['جديد','قيد التجهيز','تم الشحن','تم التسليم','مرتجع'];
+  const colors   = ['#3B82F6','#F59E0B','#8B5CF6','#10B981','#EF4444'];
+  const total    = allOrders.length;
+  const container = document.getElementById('statusBars');
+
+  if (!total) {
+    container.innerHTML = '<div class="empty-state" style="padding:16px;"><p>لا توجد أوردرات بعد</p></div>';
+    return;
+  }
+
+  container.innerHTML = statuses.map((s, i) => {
+    const count = allOrders.filter(o => o.status === s).length;
+    const pct   = total ? Math.round((count / total) * 100) : 0;
+    return `
+      <div class="status-bar-row">
+        <span class="status-bar-label">${s}</span>
+        <div class="status-bar-track">
+          <div class="status-bar-fill" style="width:${pct}%;background:${colors[i]};"></div>
+        </div>
+        <span class="status-bar-count">${count}</span>
+      </div>`;
+  }).join('');
+}
+
+// ============================
+// TOP DESIGNS (Overview)
+// ============================
+function renderTopDesignsOverview() {
+  const container = document.getElementById('topDesignsOverview');
+  const counts = {};
+  allOrders.forEach(o => {
+    // Handle both single product and multi-product (items array)
+    if (o.items && Array.isArray(o.items)) {
+      o.items.forEach(item => {
+        counts[item.name] = (counts[item.name] || 0) + (item.qty || 1);
+      });
+    } else if (o.product) {
+      counts[o.product] = (counts[o.product] || 0) + 1;
+    }
+  });
+
+  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,5);
+
+  if (!sorted.length) {
+    container.innerHTML = '<div class="empty-state" style="padding:16px;"><p>لا توجد بيانات بعد</p></div>';
+    return;
+  }
+
+  container.innerHTML = sorted.map(([name, cnt], i) => {
+    const p = products.find(x => x.name === name) || {};
+    return `
+      <div class="design-rank-row">
+        <span class="design-rank-num">${i+1}</span>
+        ${p.img ? `<img src="${p.img}" class="design-rank-img" alt="${name}">` : ''}
+        <span class="design-rank-name">${name}</span>
+        <span class="design-rank-count">${cnt} طلب</span>
+      </div>`;
+  }).join('');
+}
+
+// ============================
+// ORDERS TABLE
+// ============================
+function buildProductsCell(o) {
+  if (o.items && Array.isArray(o.items)) {
+    return o.items.map(item => `${item.name} ×${item.qty||1}`).join('<br>');
+  }
+  return o.product || '—';
+}
+
+function renderOrdersTable(filtered) {
+  const orders = filtered !== undefined ? filtered : allOrders;
+  const body   = document.getElementById('ordersTableBody');
+
+  if (!orders.length) {
+    body.innerHTML = '<tr><td colspan="13"><div class="empty-state"><p>لا توجد أوردرات بعد 📭</p></div></td></tr>';
+    return;
+  }
+
+  body.innerHTML = orders.map((o, i) => `
+    <tr>
+      <td style="color:#999;">${i+1}</td>
+      <td><strong>${o.name}</strong></td>
+      <td dir="ltr">${o.phone}</td>
+      <td style="max-width:180px;font-size:12px;">${buildProductsCell(o)}</td>
+      <td>${o.governorate || '—'}</td>
+      <td>${o.city || '—'}</td>
+      <td><strong>${o.total || 525} ج</strong></td>
+      <td>
+        <span style="font-size:11px;background:rgba(0,0,0,0.05);padding:2px 8px;border-radius:10px;">
+          ${o.paymentMethod || 'عند الاستلام'}
+        </span>
+      </td>
+      <td style="font-size:12px;">${o.deviceType || '—'}</td>
+      <td>
+        <select class="status-select" onchange="updateOrderStatus('${o.id}', this.value)">
+          ${['جديد','قيد التجهيز','تم الشحن','تم التسليم','مرتجع']
+            .map(s => `<option ${o.status===s?'selected':''} value="${s}">${s}</option>`).join('')}
+        </select>
+      </td>
+      <td style="font-size:11px;color:#999;">${formatDate(o.createdAt)}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap;">
+        <button class="action-btn" onclick="showOrderDetail('${o.id}')">👁️ تفاصيل</button>
+        ${o.gps ? `<a href="${o.gps}" target="_blank" class="action-btn">📍</a>` : ''}
+        <button class="action-btn danger" onclick="deleteOrder('${o.id}')">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderRecentOrders() {
+  const recent = allOrders.slice(0, 6);
+  const body   = document.getElementById('recentOrdersBody');
+
+  if (!recent.length) {
+    body.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>لا توجد أوردرات بعد 📭</p></div></td></tr>';
+    return;
+  }
+
+  body.innerHTML = recent.map(o => `
+    <tr onclick="showOrderDetail('${o.id}')" style="cursor:pointer;">
+      <td><strong>${o.name}</strong></td>
+      <td dir="ltr">${o.phone}</td>
+      <td style="font-size:12px;">${buildProductsCell(o)}</td>
+      <td>${o.governorate || '—'}</td>
+      <td><strong>${o.total || 525} ج</strong></td>
+      <td><span class="${getStatusClass(o.status)}">${o.status}</span></td>
+      <td style="font-size:11px;color:#999;">${formatDate(o.createdAt)}</td>
+    </tr>
+  `).join('');
+}
+
+function filterOrders() {
+  const search = document.getElementById('orderSearch').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const filtered = allOrders.filter(o => {
+    const matchSearch = !search || o.name?.toLowerCase().includes(search) || o.phone?.includes(search);
+    const matchStatus = !status || o.status === status;
+    return matchSearch && matchStatus;
+  });
+  renderOrdersTable(filtered);
+}
+
+async function updateOrderStatus(id, status) {
+  const order = allOrders.find(o => o.id === id);
+  if (order) order.status = status;
+  updateStats();
+  renderStatusBars();
+  renderRecentOrders(); // sync overview
+  renderAnalytics();
+
+  if (!DEMO_MODE && db) {
+    try { await db.collection('orders').doc(id).update({ status }); }
+    catch(e) { console.log('Update error:', e); }
+  }
+}
+
+async function deleteOrder(id) {
+  if (!confirm('هل تريد حذف هذا الأوردر نهائياً؟')) return;
+  allOrders = allOrders.filter(o => o.id !== id);
+  updateStats();
+  renderOrdersTable();
+  renderRecentOrders();
+  renderAnalytics();
+  renderStatusBars();
+  renderTopDesignsOverview();
+
+  if (!DEMO_MODE && db) {
+    try { await db.collection('orders').doc(id).delete(); }
+    catch(e) { console.log('Delete error:', e); }
+  }
+}
+
+// ============================
+// ORDER DETAIL MODAL
+// ============================
+function showOrderDetail(id) {
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+
+  document.getElementById('detailGrid').innerHTML = `
+    <div class="detail-item"><label>الاسم</label><span>${o.name}</span></div>
+    <div class="detail-item"><label>التليفون</label><span dir="ltr">${o.phone}</span></div>
+    <div class="detail-item"><label>المحافظة</label><span>${o.governorate || '—'}</span></div>
+    <div class="detail-item"><label>المدينة</label><span>${o.city || '—'}</span></div>
+    <div class="detail-item"><label>الحالة</label><span class="${getStatusClass(o.status)}">${o.status}</span></div>
+    <div class="detail-item"><label>طريقة الدفع</label><span>${o.paymentMethod || 'عند الاستلام'}</span></div>
+    <div class="detail-item"><label>نوع الجهاز</label><span>${o.deviceType || '—'}</span></div>
+    <div class="detail-item"><label>التاريخ</label><span>${formatDate(o.createdAt)}</span></div>
+    ${o.gps ? `<div class="detail-item"><label>الموقع</label><a href="${o.gps}" target="_blank" style="color:var(--gold-dark);">📍 عرض الخريطة</a></div>` : ''}
+  `;
+
+  const items = o.items && Array.isArray(o.items) ? o.items : [{ name: o.product || '—', img: '', qty: 1, price: 450 }];
+
+  document.getElementById('detailProductsList').innerHTML = items.map(item => {
+    const p = products.find(x => x.name === item.name) || {};
+    const imgSrc = item.img || p.img || '';
+    return `
+      <div class="detail-product-row">
+        ${imgSrc ? `<img src="${imgSrc}" alt="${item.name}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;">` : '<div style="width:56px;height:56px;background:#f0ece4;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;">🖼️</div>'}
+        <div class="detail-product-info">
+          <div class="detail-product-name">${item.name}</div>
+          <div class="detail-product-qty">الكمية: ${item.qty || 1}</div>
+        </div>
+        <span class="detail-product-price">${(item.price || 450) * (item.qty || 1)} ج</span>
+      </div>`;
+  }).join('');
+
+  document.getElementById('detailTotal').innerHTML = `<span>الإجمالي</span><span>${o.total || 525} ج</span>`;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+document.getElementById('detailModal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+// ============================
+// PRODUCTS ADMIN
+// ============================
+function renderProductsAdmin() {
+  const grid = document.getElementById('productsAdminGrid');
+  grid.innerHTML = products.map(p => `
+    <div class="product-admin-card ${p.visible ? '' : 'hidden-product'}" id="padmin-${p.id}">
+      <img src="${p.img}" alt="${p.name}">
+      <div class="product-admin-info">
+        <div class="product-admin-name">${p.name}</div>
+        <div class="product-admin-actions">
+          <button class="btn-small warning" onclick="toggleProduct(${p.id})">
+            ${p.visible ? '👁️ إخفاء' : '👁️‍🗨️ إظهار'}
+          </button>
+          <button class="btn-small danger" onclick="if(confirm('حذف هذا المنتج؟'))alert('يتطلب حذف يدوي من Firestore')">🗑️ حذف</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleProduct(id) {
+  const p = products.find(x => x.id === id);
+  if (p) { p.visible = !p.visible; renderProductsAdmin(); }
+}
+
+// ============================
+// ANALYTICS
+// ============================
+function renderAnalytics() {
+  // Top Designs
+  const counts = {};
+  allOrders.forEach(o => {
+    if (o.items && Array.isArray(o.items)) {
+      o.items.forEach(item => { counts[item.name] = (counts[item.name]||0) + (item.qty||1); });
+    } else if (o.product) {
+      counts[o.product] = (counts[o.product]||0) + 1;
+    }
+  });
+
+  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  const maxCount = sorted[0]?.[1] || 1;
+  const colors = ['#C9A84C','#3B82F6','#10B981','#F59E0B','#8B5CF6','#EF4444','#14B8A6','#F97316'];
+
+  const topDesignsEl = document.getElementById('analyticsTopDesigns');
+  if (!sorted.length) {
+    topDesignsEl.innerHTML = '<div class="empty-state" style="padding:16px;"><p>لا توجد بيانات بعد</p></div>';
+  } else {
+    topDesignsEl.innerHTML = `<div class="mini-chart">${sorted.map(([name, cnt], i) => `
+      <div class="mini-bar-row">
+        <span class="mini-bar-label">${name.replace('تصميم ','')}</span>
+        <div class="mini-bar-wrap">
+          <div class="mini-bar-fill" style="width:${Math.round((cnt/maxCount)*100)}%;background:${colors[i%colors.length]};"></div>
+        </div>
+        <span style="font-size:11px;font-weight:700;width:30px;text-align:left;">${cnt}</span>
+      </div>`).join('')}</div>`;
+  }
+
+  // Top Governorates
+  const govCounts = {};
+  allOrders.forEach(o => { if (o.governorate) govCounts[o.governorate] = (govCounts[o.governorate]||0)+1; });
+  const govSorted = Object.entries(govCounts).sort((a,b) => b[1]-a[1]).slice(0,8);
+  const maxGov = govSorted[0]?.[1] || 1;
+
+  const topGovsEl = document.getElementById('analyticsTopGovs');
+  if (!govSorted.length) {
+    topGovsEl.innerHTML = '<div class="empty-state" style="padding:16px;"><p>لا توجد بيانات بعد</p></div>';
+  } else {
+    topGovsEl.innerHTML = `<div class="mini-chart">${govSorted.map(([gov, cnt], i) => `
+      <div class="mini-bar-row">
+        <span class="mini-bar-label">${gov}</span>
+        <div class="mini-bar-wrap">
+          <div class="mini-bar-fill" style="width:${Math.round((cnt/maxGov)*100)}%;background:${colors[i%colors.length]};"></div>
+        </div>
+        <span style="font-size:11px;font-weight:700;width:30px;text-align:left;">${cnt}</span>
+      </div>`).join('')}</div>`;
+  }
+
+  // Status breakdown table
+  const statuses = ['جديد','قيد التجهيز','تم الشحن','تم التسليم','مرتجع'];
+  const total = allOrders.length || 1;
+  const statusTableEl = document.getElementById('analyticsStatusTable');
+  statusTableEl.innerHTML = statuses.map(s => {
+    const cnt  = allOrders.filter(o => o.status === s).length;
+    const pct  = Math.round((cnt / total) * 100);
+    const rev  = s === 'تم التسليم' ? allOrders.filter(o => o.status === s).reduce((a, o) => a + (o.total||525), 0) : 0;
+    return `<tr>
+      <td><span class="${getStatusClass(s)}">${s}</span></td>
+      <td>${cnt}</td>
+      <td>${pct}%</td>
+      <td>${rev ? rev.toLocaleString('ar-EG') + ' ج' : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Load analytics (time on site, funnel) from Firestore analytics collection
+async function loadAnalyticsData() {
+  // Funnel data from real orders
+  const total = allOrders.length;
+  document.getElementById('funCompleted').textContent = total;
+
+  if (!DEMO_MODE && db) {
+    try {
+      const analyticsSnap = await db.collection('analytics').doc('summary').get();
+      if (analyticsSnap.exists) {
+        const d = analyticsSnap.data();
+        document.getElementById('funVisitors').textContent  = d.visitors  || '—';
+        document.getElementById('funProduct').textContent   = d.productViews || '—';
+        document.getElementById('funModal').textContent     = d.modalOpens  || '—';
+        document.getElementById('timeHome').textContent     = (d.avgTimeHome    || '—') + ' ث';
+        document.getElementById('timeProduct').textContent  = (d.avgTimeProduct || '—') + ' ث';
+        document.getElementById('timeModal').textContent    = (d.avgTimeModal   || '—') + ' ث';
+        const rate = d.visitors ? Math.round((total/d.visitors)*100) + '%' : '—';
+        document.getElementById('funRate').textContent = rate;
+      }
+    } catch(e) { console.log('Analytics load error:', e); }
+  } else {
+    document.getElementById('funVisitors').textContent  = '—';
+    document.getElementById('funProduct').textContent   = '—';
+    document.getElementById('funModal').textContent     = '—';
+    document.getElementById('funRate').textContent      = '—';
+    document.getElementById('timeHome').textContent     = '—';
+    document.getElementById('timeProduct').textContent  = '—';
+    document.getElementById('timeModal').textContent    = '—';
+  }
+}
+
+// ============================
+// TAB NAVIGATION
+// ============================
+function showTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  const labels = { overview:'نظرة عامة', orders:'إدارة الأوردرات', products:'إدارة المنتجات', settings:'الإعدادات', analytics:'إحصائيات' };
+  document.getElementById('pageTitle').textContent = labels[tab] || tab;
+
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.trim().includes(labels[tab])) n.classList.add('active');
+  });
+
+  if (tab === 'analytics') {
+    renderAnalytics();
+    loadAnalyticsData();
+  }
+}
+
+// ============================
+// SETTINGS
+// ============================
+function saveSettings() {
+  if (!DEMO_MODE && db) {
+    db.collection('settings').doc('store').set({
+      name: document.getElementById('settingName').value,
+      whatsapp: document.getElementById('settingWA').value,
+      price: parseInt(document.getElementById('settingPrice').value),
+      shipping: parseInt(document.getElementById('settingShipping').value),
+      shippingCompany: document.getElementById('settingShipCo').value,
+    }).then(() => alert('✅ تم حفظ الإعدادات!'))
+      .catch(e => alert('خطأ في الحفظ: ' + e.message));
+  } else {
+    alert('✅ تم حفظ الإعدادات! (وضع عرض — سيُحفظ بعد ربط Firebase)');
+  }
+}
+
+// ============================
+// مسح كل البيانات وإعادة العداد
+// ============================
+async function resetAllOrders() {
+  const confirmed = confirm('⚠️ هل أنت متأكد؟\nسيتم حذف كل الأوردرات وإعادة الكود من 001.\nهذا الإجراء لا يمكن التراجع عنه!');
+  if (!confirmed) return;
+  const confirmed2 = confirm('تأكيد أخير: حذف كل الأوردرات نهائياً؟');
+  if (!confirmed2) return;
+
+  try {
+    // حذف كل الأوردرات
+    const snapshot = await db.collection('orders').get();
+    const batch = db.batch();
+    snapshot.docs.forEach(doc => batch.delete(doc.ref));
+    // إعادة العداد للصفر
+    batch.set(db.collection('meta').doc('orderCounter'), { count: 0 });
+    await batch.commit();
+
+    allOrders = [];
+    updateStats();
+    renderOrdersTable();
+    renderRecentOrders();
+    renderStatusBars();
+    renderTopDesignsOverview();
+    renderAnalytics();
+    alert('✅ تم مسح كل البيانات. الكود التالي سيكون ORD-001');
+  } catch(e) {
+    alert('خطأ: ' + e.message);
+  }
+}
+
+// ============================
+// عداد الزوار الحقيقي في الأدمن
+// ============================
+(function listenAdminVisitors() {
+  if (!db) return;
+  db.collection('meta').doc('visitors').onSnapshot(doc => {
+    const n = doc.exists ? (doc.data().active || 0) : 0;
+    const el = document.getElementById('adminVisitorCount');
+    if (el) el.textContent = n;
+  }, () => {});
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2333 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سيدرا ستور - مصليات إسفنج فاخرة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dark: #8B6914;
+    --black: #0A0A0A;
+    --dark: #111111;
+    --dark2: #1A1A1A;
+    --cream: #F5F0E8;
+    --cream-dark: #EDE4D4;
+    --text: #2C2C2C;
+    --text-light: #666;
+    --white: #FFFFFF;
+    --border: rgba(201,168,76,0.25);
+    --shadow: 0 8px 40px rgba(0,0,0,0.12);
+    --radius: 12px;
+    --green: #25D366;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    direction: rtl;
+    overflow-x: clip;
+  }
+
+  /* ======== HEADER ======== */
+  header {
+    background: var(--black);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+  }
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+  }
+
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .logo-img { width: 44px; height: 44px; object-fit: contain; }
+
+  .logo-text { display: flex; flex-direction: column; line-height: 1; }
+  .logo-text span:first-child { font-size: 19px; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
+  .logo-text span:last-child  { font-size: 10px; color: rgba(201,168,76,0.6); letter-spacing: 3px; text-transform: uppercase; }
+
+  .header-right { display: flex; align-items: center; gap: 12px; }
+
+  .header-badge {
+    background: rgba(201,168,76,0.15);
+    border: 1px solid var(--border);
+    color: var(--gold-light);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ======== COUNTDOWN BANNER ======== */
+  .countdown-banner {
+    background: linear-gradient(90deg, #7a5c0f, #C9A84C, #7a5c0f);
+    padding: 7px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .countdown-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 18px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+
+
+  .countdown-banner::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -40%;
+    width: 30%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.13), transparent);
+    animation: bannerSweep 4s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes bannerSweep {
+    0%   { left: -40%; }
+    100% { left: 130%; }
+  }
+
+  .countdown-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    z-index: 1;
+  }
+
+  .countdown-label {
+    font-size: 12px;
+    color: rgba(0,0,0,0.75);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .countdown-price { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .price-old { font-size: 12px; color: rgba(0,0,0,0.45); text-decoration: line-through; font-weight: 700; white-space: nowrap; }
+  .price-new { font-size: 13px; color: var(--black); font-weight: 900; white-space: nowrap; }
+
+  .countdown-timer { display: flex; align-items: center; gap: 3px; direction: ltr; }
+
+  .timer-block {
+    background: rgba(0,0,0,0.32);
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 5px;
+    padding: 2px 7px;
+    text-align: center;
+    min-width: 34px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.07);
+  }
+
+  .timer-block::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -120%;
+    width: 70%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 2.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .timer-block:nth-child(3)::after { animation-delay: 0.5s; }
+  .timer-block:nth-child(5)::after { animation-delay: 1s; }
+
+  @keyframes shimmer {
+    0%   { left: -120%; }
+    100% { left: 200%; }
+  }
+
+  .timer-num {
+    font-size: 15px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    display: inline;
+    text-shadow: 0 0 10px rgba(255,255,255,0.45);
+  }
+
+  .timer-unit {
+    font-size: 8px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    display: inline;
+    margin-right: 1px;
+  }
+
+  .timer-sep {
+    font-size: 14px;
+    font-weight: 900;
+    color: rgba(0,0,0,0.45);
+    animation: blink 1s step-start infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.1; }
+  }
+
+  /* RED HURRY BUTTON */
+  .btn-hurry {
+    background: linear-gradient(135deg, #e8342a, #b81f17);
+    color: #fff;
+    border: none;
+    padding: 5px 14px 5px 16px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 10px rgba(200,40,30,0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: pulseRed 2s ease-in-out infinite;
+    position: relative;
+  }
+
+  .btn-hurry::after {
+    content: none;
+  }
+
+  .btn-hurry:hover { transform: scale(1.06); }
+
+  @keyframes pulseRed {
+    0%, 100% { box-shadow: 0 2px 10px rgba(200,40,30,0.45); }
+    50%       { box-shadow: 0 3px 18px rgba(200,40,30,0.8); }
+  }
+
+  /* ======== HERO ======== */
+  .hero {
+    background: var(--black);
+    padding: 72px 24px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% -20%, rgba(201,168,76,0.2) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
+  }
+
+  .hero-ornament {
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0.9;
+    position: relative;
+  }
+
+  .hero-ornament::before,
+  .hero-ornament::after {
+    content: '——';
+    color: rgba(201,168,76,0.3);
+    margin: 0 8px;
+  }
+
+  .hero h1 {
+    font-size: clamp(36px, 7vw, 64px);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #fff 0%, var(--gold-light) 40%, var(--gold) 70%, var(--gold-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.55);
+    max-width: 440px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+    position: relative;
+  }
+
+  .hero-cta {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 52px;
+    position: relative;
+  }
+
+  .hero-btn-main {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+    color: var(--black);
+    border: none;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-btn-main:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,168,76,0.4); }
+
+  .hero-btn-wa {
+    background: rgba(37,211,102,0.15);
+    color: #4ade80;
+    border: 1.5px solid rgba(37,211,102,0.3);
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-btn-wa:hover { background: rgba(37,211,102,0.25); border-color: rgba(37,211,102,0.5); }
+
+  .hero-divider {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 40px;
+    position: relative;
+  }
+
+  .hero-divider::before {
+    content: '✦';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--gold);
+    font-size: 14px;
+    background: transparent;
+    padding: 0 4px;
+    text-shadow: 0 0 12px rgba(201,168,76,0.6);
+  }
+
+  .hero-trust {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .trust-item span:first-child { font-size: 16px; }
+
+  /* ======== SCROLL HINT ======== */
+  .hero-scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 48px;
+    position: relative;
+  }
+
+  .scroll-icon { opacity: 0.7; }
+
+  .scroll-text {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  @keyframes scrollBounce {
+    0%, 100% { cy: 8px; opacity: 1; }
+    50% { cy: 16px; opacity: 0.3; }
+  }
+
+  .scroll-dot {
+    animation: scrollBounce 1.6s ease-in-out infinite;
+  }
+
+  /* ======== PRODUCTS STRIP CAROUSEL ======== */
+  .strip-section {
+    background: var(--dark2);
+    padding: 48px 0;
+    overflow: hidden;
+    border-top: 1px solid rgba(201,168,76,0.15);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .strip-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 0 24px;
+  }
+
+  .strip-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .strip-header h3 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--white);
+  }
+
+  .strip-track-wrap {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+  }
+
+  /* fade edges */
+  .strip-track-wrap::before,
+  .strip-track-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 80px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .strip-track-wrap::before { left: 0; background: linear-gradient(to right, var(--dark2), transparent); }
+  .strip-track-wrap::after  { right: 0; background: linear-gradient(to left,  var(--dark2), transparent); }
+
+  .strip-track {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    animation: stripScroll 30s linear infinite;
+  }
+
+  .strip-track:hover { animation-play-state: paused; }
+
+  @keyframes stripScroll {
+    0%   { transform: translateX(50%); }
+    100% { transform: translateX(0); }
+  }
+
+  .strip-card {
+    flex: 0 0 180px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  }
+
+  .strip-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    border-color: var(--gold);
+    box-shadow: 0 12px 32px rgba(201,168,76,0.2);
+  }
+
+  .strip-img-wrap {
+    width: 100%;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: rgba(0,0,0,0.2);
+  }
+
+  .strip-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    opacity: 0.85;
+  }
+
+  .strip-card:hover .strip-img-wrap img {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+
+  .strip-info {
+    padding: 10px 12px;
+  }
+
+  .strip-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .strip-color {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* ======== REVIEWS STRIP ======== */
+  .reviews-strip-section {
+    background: var(--dark2);
+    padding: 28px 0;
+    border-top: 1px solid rgba(201,168,76,0.15);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .reviews-strip-header {
+    text-align: center;
+    padding: 0 24px 24px;
+  }
+
+  .reviews-strip-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .reviews-strip-title {
+    font-size: 28px;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-light), var(--gold), var(--gold-light), var(--gold-dark));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: goldShimmer 3s linear infinite;
+    margin-bottom: 10px;
+  }
+
+  @keyframes goldShimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+
+  .reviews-strip-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  .reviews-strip-track-wrap {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+  }
+
+  /* fade edges — same as strip */
+  .reviews-strip-track-wrap::before,
+  .reviews-strip-track-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 80px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .reviews-strip-track-wrap::before { left: 0;  background: linear-gradient(to right, var(--dark2), transparent); }
+  .reviews-strip-track-wrap::after  { right: 0; background: linear-gradient(to left,  var(--dark2), transparent); }
+
+  /* عكس المصليات: translateX(-50%) → translateX(0) = بيخش لليمين */
+  .reviews-strip-track {
+    display: flex;
+    gap: 20px;
+    width: max-content;
+    animation: reviewsScroll 30s linear infinite;
+  }
+
+  .reviews-strip-track:hover { animation-play-state: paused; }
+
+  @keyframes reviewsScroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(50%); }
+  }
+
+  /* نفس شكل strip-card بالضبط */
+  .review-strip-card {
+    flex: 0 0 180px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,168,76,0.18);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  }
+
+  .review-strip-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    border-color: var(--gold);
+    box-shadow: 0 12px 32px rgba(201,168,76,0.2);
+  }
+
+  .review-strip-img-wrap {
+    width: 100%;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: rgba(0,0,0,0.2);
+  }
+
+  .review-strip-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    opacity: 0.9;
+  }
+
+  .review-strip-card:hover .review-strip-img-wrap img {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+
+  /* ======== MAT SPECS SECTION ======== */
+  .mat-specs-section {
+    background: var(--cream);
+    padding: 72px 24px;
+  }
+
+  .mat-specs-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+
+  .mat-specs-img-col {
+    position: relative;
+  }
+
+  .mat-specs-img-col img {
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    display: block;
+  }
+
+  .mat-specs-img-col::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    pointer-events: none;
+  }
+
+  .mat-specs-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .mat-specs-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .mat-specs-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--dark);
+    line-height: 1.3;
+  }
+
+  .mat-specs-desc {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.9;
+  }
+
+  .specs-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .spec-item {
+    background: var(--white);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .spec-item-icon { font-size: 20px; margin-bottom: 4px; }
+  .spec-item-label { font-size: 11px; color: var(--text-light); font-weight: 500; }
+  .spec-item-value { font-size: 15px; font-weight: 800; color: var(--dark); }
+
+  .mat-specs-cta {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+    color: var(--black);
+    border: none;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+  }
+
+  .mat-specs-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,168,76,0.4); }
+
+  /* ======== PRODUCTS SECTION ======== */
+  .products-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 24px;
+  }
+
+  .section-head { text-align: center; margin-bottom: 48px; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .section-head h2 { font-size: 32px; font-weight: 800; color: var(--dark); }
+
+  .section-line {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    margin: 14px auto 0;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 28px;
+  }
+
+  .product-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.06);
+    position: relative;
+  }
+
+  .product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+
+  .product-img-wrap {
+    position: relative;
+    overflow: hidden;
+    background: var(--cream);
+    aspect-ratio: 3/4;
+  }
+
+  .product-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .product-card:hover .product-img-wrap img { transform: scale(1.05); }
+
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--gold);
+    color: var(--black);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .product-info { padding: 18px; }
+  .product-name { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+  .product-specs { font-size: 12px; color: var(--text-light); margin-bottom: 14px; line-height: 1.6; }
+  .product-footer { display: flex; justify-content: space-between; align-items: center; }
+  .product-price { font-size: 20px; font-weight: 800; color: var(--gold-dark); }
+  .product-price span { font-size: 12px; font-weight: 500; color: var(--text-light); margin-right: 2px; }
+
+  .btn-order {
+    background: var(--black);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-order:hover { background: var(--gold); color: var(--black); }
+
+  /* ======== MAT SPECS ANNOTATED ======== */
+  .mat-specs-section {
+    background: var(--cream);
+    padding: 80px 24px 60px;
+    overflow: visible;
+  }
+
+  .mat-specs-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .mat-specs-header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .mat-specs-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .mat-specs-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--dark);
+  }
+
+  /* Annotation wrapper */
+  .mat-annot-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    overflow: visible;
+  }
+
+  .mat-annot-img-holder {
+    position: relative;
+    width: 360px;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  .mat-annot-img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+    display: block;
+  }
+
+  /* Individual annotation */
+  .annot {
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .annot.visible {
+    opacity: 1;
+  }
+
+  .annot-line {
+    background: var(--gold);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 1px;
+  }
+
+  .annot.visible .annot-line {
+    transform: scaleX(1);
+  }
+
+  .annot-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark);
+    background: var(--white);
+    border: 1.5px solid rgba(201,168,76,0.4);
+    border-radius: 6px;
+    padding: 5px 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.5s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  .annot.visible .annot-label {
+    opacity: 1;
+  }
+
+  /* Annotation 1 - top right (المقاس) */
+  .annot-1 {
+    top: 6%;
+    right: -52%;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-direction: row-reverse;
+  }
+  .annot-1 .annot-line {
+    width: 90px;
+    height: 1.5px;
+    transform-origin: 100% 50%;
+  }
+  .annot-1 .annot-label { margin-left: 0; margin-right: 8px; }
+
+  /* Annotation 2 - top left (الإسفنج) */
+  .annot-2 {
+    top: 6%;
+    left: -55%;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .annot-2 .annot-line {
+    width: 90px;
+    height: 1.5px;
+    transform-origin: 0 50%;
+  }
+  .annot-2 .annot-label { margin-left: 8px; }
+
+  /* Annotation 3 - right middle (السماكة) */
+  .annot-3 {
+    top: 38%;
+    right: -52%;
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    gap: 0;
+  }
+  .annot-3 .annot-line {
+    width: 90px;
+    height: 1.5px;
+    transform-origin: 100% 50%;
+  }
+  .annot-3 .annot-label { margin-right: 8px; }
+
+  /* Annotation 4 - bottom right (الشراشيب) */
+  .annot-4 {
+    bottom: 5%;
+    right: -50%;
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    gap: 0;
+  }
+  .annot-4 .annot-line {
+    width: 85px;
+    height: 1.5px;
+    transform-origin: 100% 50%;
+  }
+  .annot-4 .annot-label { margin-right: 8px; }
+
+  /* Annotation 5 - bottom left (سهل الحمل) */
+  .annot-5 {
+    bottom: 5%;
+    left: -52%;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .annot-5 .annot-line {
+    width: 85px;
+    height: 1.5px;
+    transform-origin: 0 50%;
+  }
+  .annot-5 .annot-label { margin-left: 8px; }
+
+  /* Annotation 6 - left middle (التصميم) */
+  .annot-6 {
+    top: 38%;
+    left: -55%;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .annot-6 .annot-line {
+    width: 90px;
+    height: 1.5px;
+    transform-origin: 0 50%;
+  }
+  .annot-6 .annot-label { margin-left: 8px; }
+
+  .annot-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease 0.3s;
+  }
+
+  .annot.visible .annot-dot {
+    opacity: 1;
+  }
+
+  .mat-specs-bottom-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
+  }
+
+  .mat-specs-cta {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+    color: var(--black);
+    border: none;
+    padding: 14px 36px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+  }
+
+  .mat-specs-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(201,168,76,0.4);
+  }
+
+  /* Mobile: stack annotations below image */
+  @media (max-width: 700px) {
+    .mat-specs-section {
+      overflow-x: hidden;
+    }
+    .mat-annot-wrap {
+      padding: 80px 80px 80px;
+      flex-direction: column;
+      overflow: visible;
+    }
+    .mat-annot-img-holder {
+      width: 200px;
+    }
+    /* Reposition annotations to fit mobile — all inline below/above */
+    .annot-1 {
+      top: 6%;
+      bottom: auto;
+      right: -58%;
+      flex-direction: row-reverse;
+    }
+    .annot-1 .annot-line { width: 50px; transform-origin: 100% 50%; }
+    .annot-1 .annot-label { margin-right: 6px; font-size: 11px; }
+
+    .annot-2 {
+      top: 6%;
+      bottom: auto;
+      left: -62%;
+      flex-direction: row;
+    }
+    .annot-2 .annot-line { width: 50px; transform-origin: 0 50%; }
+    .annot-2 .annot-label { margin-left: 6px; font-size: 11px; }
+
+    .annot-3 {
+      top: 30%;
+      right: -58%;
+      flex-direction: row-reverse;
+    }
+    .annot-3 .annot-line { width: 50px; transform-origin: 100% 50%; }
+    .annot-3 .annot-label { margin-right: 6px; font-size: 11px; }
+
+    .annot-4 {
+      bottom: 8%;
+      right: -58%;
+      flex-direction: row-reverse;
+    }
+    .annot-4 .annot-line { width: 50px; transform-origin: 100% 50%; }
+    .annot-4 .annot-label { margin-right: 6px; font-size: 11px; }
+
+    .annot-5 {
+      bottom: 8%;
+      left: -60%;
+      flex-direction: row;
+    }
+    .annot-5 .annot-line { width: 50px; transform-origin: 0 50%; }
+    .annot-5 .annot-label { margin-left: 6px; font-size: 11px; }
+
+    .annot-6 {
+      top: 30%;
+      left: -62%;
+      flex-direction: row;
+    }
+    .annot-6 .annot-line { width: 50px; transform-origin: 0 50%; }
+    .annot-6 .annot-label { margin-left: 6px; font-size: 11px; }
+
+    .mat-mobile-specs {
+      display: none !important;
+    }
+  }
+
+  .mat-mobile-specs {
+    display: none;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  .mat-mobile-spec-item {
+    background: var(--white);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+
+  /* ======== VIDEO SECTION ======== */
+  .video-section {
+    background: var(--black);
+    padding: 48px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .video-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 100%, rgba(201,168,76,0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .video-section-inner {
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .video-text-col {
+    width: 100%;
+    text-align: center;
+  }
+
+  .video-media-col {
+    width: 300px;
+  }
+
+  .video-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .video-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .video-subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  .video-frame {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(201,168,76,0.25),
+      0 0 30px rgba(201,168,76,0.15),
+      0 20px 50px rgba(0,0,0,0.5);
+  }
+
+  .video-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    border: 1px solid rgba(201,168,76,0.3);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .video-frame video {
+    width: 300px;
+    height: 400px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border-radius: 16px;
+    background: var(--dark2);
+  }
+
+  /* Gold corner accents */
+  .video-corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .video-corner-tl { top: -1px; right: -1px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); border-radius: 0 4px 0 0; }
+  .video-corner-tr { top: -1px; left: -1px;  border-top: 2px solid var(--gold); border-left: 2px solid var(--gold);  border-radius: 4px 0 0 0; }
+  .video-corner-bl { bottom: -1px; right: -1px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); border-radius: 0 0 0 4px; }
+  .video-corner-br { bottom: -1px; left: -1px;  border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold);  border-radius: 0 0 4px 0; }
+
+  .video-eyebrow { text-align: center; }
+  .video-title { text-align: center; }
+  .video-subtitle { text-align: center; margin-bottom: 0; }
+
+  .video-badges {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .video-badge {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.25);
+    color: var(--gold-light);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    .video-section { padding: 32px 16px; }
+    .video-media-col { width: 220px; }
+    .video-frame video { width: 220px; height: 293px; }
+    .video-title { font-size: 20px; }
+  }
+
+
+  /* Fullscreen button */
+  .video-fullscreen-btn {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 10;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    backdrop-filter: blur(4px);
+  }
+
+  .video-fullscreen-btn:hover {
+    background: rgba(201,168,76,0.7);
+    transform: scale(1.1);
+  }
+
+  .video-fullscreen-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: white;
+  }
+
+  /* Native controls overlay on hover */
+  .video-frame:hover video {
+    cursor: pointer;
+  }
+
+  /* ======== FOOTER ======== */
+  footer {
+    background: var(--black);
+    padding: 48px 24px 24px;
+    border-top: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .footer-col h4 { color: var(--gold); font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+
+  .footer-col p, .footer-col a {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    line-height: 2;
+    display: block;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover { color: var(--gold-light); }
+  .footer-bottom { text-align: center; padding-top: 24px; color: rgba(255,255,255,0.3); font-size: 12px; }
+
+  /* ======== WHATSAPP FLOAT ======== */
+  .whatsapp-float {
+    position: fixed;
+    bottom: 28px;
+    left: 28px;
+    width: 58px;
+    height: 58px;
+    background: #25D366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.5);
+    cursor: pointer;
+    z-index: 999;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+  }
+
+  .whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(37,211,102,0.6); }
+  .whatsapp-float svg { width: 30px; height: 30px; fill: white; }
+
+  /* ======== CHATBOT ======== */
+  .chatbot-toggle {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 58px;
+    height: 58px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.5);
+    border: none;
+    transition: transform 0.2s;
+    font-size: 24px;
+  }
+
+  .chatbot-toggle:hover { transform: scale(1.1); }
+
+  .chatbot-window {
+    position: fixed;
+    bottom: 100px;
+    right: 28px;
+    width: 320px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    z-index: 998;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    max-height: 480px;
+  }
+
+  .chatbot-window.open { display: flex; }
+
+  .chatbot-header {
+    background: var(--black);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chatbot-avatar {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .chatbot-name  { color: var(--white); font-size: 14px; font-weight: 700; }
+  .chatbot-status { font-size: 11px; color: #25D366; }
+
+  .chatbot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f9f7f4;
+  }
+
+  .msg {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .msg-bot  { background: var(--white); border: 1px solid rgba(0,0,0,0.08); align-self: flex-start; border-bottom-right-radius: 4px; }
+  .msg-user { background: var(--gold); color: var(--black); align-self: flex-end; border-bottom-left-radius: 4px; font-weight: 600; }
+
+  .chatbot-quick {
+    padding: 10px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    background: var(--white);
+  }
+
+  .quick-btn {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid var(--border);
+    color: var(--gold-dark);
+    padding: 5px 10px;
+    border-radius: 14px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .quick-btn:hover { background: var(--gold); color: var(--black); border-color: var(--gold); }
+
+  .chatbot-input-wrap {
+    display: flex;
+    padding: 10px 14px;
+    gap: 8px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    background: var(--white);
+  }
+
+  .chatbot-input {
+    flex: 1;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-family: 'Cairo', sans-serif;
+    outline: none;
+    direction: rtl;
+  }
+
+  .chatbot-send {
+    background: var(--gold);
+    border: none;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .chatbot-send:hover { background: var(--gold-dark); }
+
+  /* ======== ANIMATIONS ======== */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero > * { animation: fadeInUp 0.7s ease both; }
+  .hero-ornament { animation-delay: 0.05s; }
+  .hero h1       { animation-delay: 0.15s; }
+  .hero-sub      { animation-delay: 0.25s; }
+  .hero-cta      { animation-delay: 0.35s; }
+  .hero-divider  { animation-delay: 0.4s; }
+  .hero-trust    { animation-delay: 0.45s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .strip-track { animation: none; }
+    .hero > * { animation: none; }
+  }
+
+  /* ======== RESPONSIVE ======== */
+  @media (max-width: 900px) {
+    .products-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .footer-inner  { grid-template-columns: 1fr; gap: 24px; }
+    .mat-specs-inner { grid-template-columns: 1fr; gap: 40px; }
+    .mat-specs-img-col { max-width: 420px; margin: 0 auto; }
+  }
+
+  @media (max-width: 600px) {
+    /* === BANNER === */
+    .countdown-banner { padding: 6px 10px; }
+    .countdown-inner { gap: 6px; flex-wrap: nowrap; justify-content: center; }
+    .countdown-label { display: none; }
+    .countdown-price { gap: 4px; }
+    .price-old { font-size: 11px; }
+    .price-new { font-size: 12px; }
+    .timer-block { min-width: 28px; padding: 2px 5px; }
+    .timer-num { font-size: 13px; }
+    .timer-sep { font-size: 13px; }
+    .btn-hurry { font-size: 11px; padding: 4px 10px; gap: 3px; }
+
+    /* === HERO === */
+    .hero { padding: 40px 16px 36px; }
+    .hero h1 { font-size: 32px; }
+    .hero-sub { font-size: 13px; margin-bottom: 28px; }
+    .hero-trust { gap: 14px; }
+    .hero-btn-main, .hero-btn-wa { padding: 11px 18px; font-size: 13px; }
+    .hero-scroll-hint { margin-top: 32px; }
+
+    /* === PRODUCTS === */
+    .products-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .product-info { padding: 12px; }
+    .header-badge { display: none; }
+    .chatbot-window { width: 290px; right: 12px; }
+    .specs-list { grid-template-columns: 1fr 1fr; }
+    .strip-card { flex: 0 0 140px; }
+  }
+
+  @media (max-width: 380px) {
+    .products-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 26px; }
+    .countdown-label { display: none; }
+    .btn-hurry { font-size: 10px; padding: 4px 8px; }
+    .timer-block { min-width: 24px; padding: 2px 4px; }
+    .timer-num { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo-wrap">
+      <img src="images/logo_small.png" alt="سيدرا ستور" class="logo-img">
+      <div class="logo-text">
+        <span>سيدرا ستور</span>
+        <span>SEDRA STORE</span>
+      </div>
+    </a>
+    <div class="header-right">
+      <div class="header-badge">🚚 شحن لجميع المحافظات</div>
+    </div>
+  </div>
+</header>
+
+<!-- COUNTDOWN BANNER -->
+<div class="countdown-banner">
+  <div class="countdown-inner">
+    <a href="#products" class="btn-hurry">🔴 الحق العرض</a>
+    <span class="countdown-label">🔥 عرض محدود — ينتهي خلال</span>
+    <div class="countdown-timer" id="countdownTimer">
+      <div class="timer-block"><span class="timer-num" id="cdHours">23</span><span class="timer-unit">س</span></div>
+      <span class="timer-sep">:</span>
+      <div class="timer-block"><span class="timer-num" id="cdMins">00</span><span class="timer-unit">د</span></div>
+      <span class="timer-sep">:</span>
+      <div class="timer-block"><span class="timer-num" id="cdSecs">00</span><span class="timer-unit">ث</span></div>
+    </div>
+    <div class="countdown-price">
+      <span class="price-old">600 ج</span>
+      <span class="price-new">450 ج فقط</span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-ornament">✦ مصليات اسفنج فاخرة ✦</div>
+
+  <h1>صلِّ بكل<br><em>راحة وخشوع</em></h1>
+
+  <p class="hero-sub">
+    مصليات إسفنج عالية الجودة بتصاميم إسلامية فريدة<br>
+    مقاس 120×68 سم · سماكة 2 سم · شحن لجميع محافظات مصر
+  </p>
+
+  <div class="hero-cta">
+    <a href="#products" class="hero-btn-main">
+      🛍️ اطلب الآن
+    </a>
+    <a href="https://wa.me/201033035681?text=السلام+عليكم+عايز+أستفسر+عن+المصليات" target="_blank" class="hero-btn-wa">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c 0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      استفسر الآن
+    </a>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <div class="scroll-icon">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="18" height="26" rx="9" stroke="rgba(201,168,76,0.5)" stroke-width="1.5"/>
+        <circle class="scroll-dot" cx="10" cy="8" r="2.5" fill="#C9A84C"/>
+      </svg>
+    </div>
+    <span class="scroll-text">scroll</span>
+  </div>
+</section>
+
+<!-- PRODUCTS STRIP CAROUSEL -->
+<section class="strip-section">
+  <div class="strip-header">
+    <div class="strip-label">تشكيلتنا</div>
+    <h3>تصاميم تليق بكل لحظة صلاة</h3>
+  </div>
+  <div class="strip-track-wrap">
+    <div class="strip-track">
+      
+    <div class="strip-card" onclick="window.location.href='product.html?id=1'">
+      <div class="strip-img-wrap">
+        <img src="images/product1_thumb.jpg" alt="تصميم الزهور الكلاسيكي" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم الزهور الكلاسيكي</div>
+        <div class="strip-color">أزرق ملكي</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=2'">
+      <div class="strip-img-wrap">
+        <img src="images/product2_thumb.jpg" alt="تصميم البوستان الزاهر" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم البوستان الزاهر</div>
+        <div class="strip-color">كريمي وأخضر</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=3'">
+      <div class="strip-img-wrap">
+        <img src="images/product3_thumb.jpg" alt="تصميم الأعمدة الإسلامية" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم الأعمدة الإسلامية</div>
+        <div class="strip-color">ذهبي وبيج</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=4'">
+      <div class="strip-img-wrap">
+        <img src="images/product4_thumb.jpg" alt="تصميم النقش المغربي" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم النقش المغربي</div>
+        <div class="strip-color">بيج وذهبي</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=5'">
+      <div class="strip-img-wrap">
+        <img src="images/product5_thumb.jpg" alt="تصميم زهور الربيع" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم زهور الربيع</div>
+        <div class="strip-color">ألوان متعددة</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=6'">
+      <div class="strip-img-wrap">
+        <img src="images/product6_thumb.jpg" alt="تصميم المسجد الأزرق" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم المسجد الأزرق</div>
+        <div class="strip-color">أزرق وذهبي</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=7'">
+      <div class="strip-img-wrap">
+        <img src="images/product7_thumb.jpg" alt="تصميم قبة الأقصى" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم قبة الأقصى</div>
+        <div class="strip-color">نيلي وذهبي</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=8'">
+      <div class="strip-img-wrap">
+        <img src="images/product8_thumb.jpg" alt="تصميم الخط العربي" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم الخط العربي</div>
+        <div class="strip-color">أسود وذهبي</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=1'">
+      <div class="strip-img-wrap">
+        <img src="images/product1_thumb.jpg" alt="تصميم الزهور الكلاسيكي" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم الزهور الكلاسيكي</div>
+        <div class="strip-color">أزرق ملكي</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=2'">
+      <div class="strip-img-wrap">
+        <img src="images/product2_thumb.jpg" alt="تصميم البوستان الزاهر" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم البوستان الزاهر</div>
+        <div class="strip-color">كريمي وأخضر</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=3'">
+      <div class="strip-img-wrap">
+        <img src="images/product3_thumb.jpg" alt="تصميم الأعمدة الإسلامية" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم الأعمدة الإسلامية</div>
+        <div class="strip-color">ذهبي وبيج</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=4'">
+      <div class="strip-img-wrap">
+        <img src="images/product4_thumb.jpg" alt="تصميم النقش المغربي" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم النقش المغربي</div>
+        <div class="strip-color">بيج وذهبي</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=5'">
+      <div class="strip-img-wrap">
+        <img src="images/product5_thumb.jpg" alt="تصميم زهور الربيع" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم زهور الربيع</div>
+        <div class="strip-color">ألوان متعددة</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=6'">
+      <div class="strip-img-wrap">
+        <img src="images/product6_thumb.jpg" alt="تصميم المسجد الأزرق" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم المسجد الأزرق</div>
+        <div class="strip-color">أزرق وذهبي</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=7'">
+      <div class="strip-img-wrap">
+        <img src="images/product7_thumb.jpg" alt="تصميم قبة الأقصى" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم قبة الأقصى</div>
+        <div class="strip-color">نيلي وذهبي</div>
+      </div>
+    </div>
+    <div class="strip-card" onclick="window.location.href='product.html?id=8'">
+      <div class="strip-img-wrap">
+        <img src="images/product8_thumb.jpg" alt="تصميم الخط العربي" loading="lazy">
+      </div>
+      <div class="strip-info">
+        <div class="strip-name">تصميم الخط العربي</div>
+        <div class="strip-color">أسود وذهبي</div>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS STRIP -->
+<div class="reviews-strip-section">
+  <div class="reviews-strip-header">
+    <div class="reviews-strip-label">✦ العملاء يتكلمون ✦</div>
+    <div class="reviews-strip-title">آراء عملائنا</div>
+    <div class="reviews-strip-sub">كل مصلى بيوصل معاه رضا حقيقي — وده مش كلامنا، ده كلام عملائنا 🤍</div>
+  </div>
+  <div class="reviews-strip-track-wrap">
+    <div class="reviews-strip-track">
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review1.jpg" alt="تقييم عميلة 1" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review2.jpg" alt="تقييم عميلة 2" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review3.jpg" alt="تقييم عميلة 3" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review4.jpg" alt="تقييم عميلة 4" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review5.jpg" alt="تقييم عميلة 5" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review6.jpg" alt="تقييم عميلة 6" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review7.jpg" alt="تقييم عميلة 7" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review8.jpg" alt="تقييم عميلة 8" loading="lazy"></div></div>
+      <!-- duplicate for seamless loop -->
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review1.jpg" alt="تقييم عميلة 1" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review2.jpg" alt="تقييم عميلة 2" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review3.jpg" alt="تقييم عميلة 3" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review4.jpg" alt="تقييم عميلة 4" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review5.jpg" alt="تقييم عميلة 5" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review6.jpg" alt="تقييم عميلة 6" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review7.jpg" alt="تقييم عميلة 7" loading="lazy"></div></div>
+      <div class="review-strip-card"><div class="review-strip-img-wrap"><img src="reviews/review8.jpg" alt="تقييم عميلة 8" loading="lazy"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAT SPECS SECTION -->
+<section class="mat-specs-section" id="mat-specs">
+  <div class="mat-specs-container">
+    
+    <!-- Section header -->
+    <div class="mat-specs-header">
+      <div class="mat-specs-eyebrow">✦ مواصفات المصلى</div>
+      <h2 class="mat-specs-title">تفصيلة فيها معنى</h2>
+    </div>
+
+    <!-- Annotated image area -->
+    <div class="mat-annot-wrap" id="matAnnotWrap">
+      <div class="mat-annot-img-holder">
+        <img src="images/product9_lifestyle.jpg" alt="مصلى سيدرا" class="mat-annot-img" id="matImg">
+        
+        <!-- Annotation lines + labels - each has a line and a label -->
+        <!-- Top right -->
+        <div class="annot annot-1" data-delay="0">
+          <div class="annot-line"></div>
+          <div class="annot-label">مقاس 120 × 68 سم</div>
+        </div>
+        <!-- Top left -->
+        <div class="annot annot-2" data-delay="0.15">
+          <div class="annot-line"></div>
+          <div class="annot-label">إسفنج فاخر مرن</div>
+        </div>
+        <!-- Right middle -->
+        <div class="annot annot-3" data-delay="0.3">
+          <div class="annot-line"></div>
+          <div class="annot-label">سماكة 2 سم</div>
+        </div>
+        <!-- Bottom right -->
+        <div class="annot annot-4" data-delay="0.45">
+          <div class="annot-line"></div>
+          <div class="annot-label">سهل اللف والحمل</div>
+        </div>
+        <!-- Bottom left -->
+        <div class="annot annot-5" data-delay="0.6">
+          <div class="annot-line"></div>
+          <div class="annot-label">شراشيب أنيقة</div>
+        </div>
+        <!-- Left middle -->
+        <div class="annot annot-6" data-delay="0.75">
+          <div class="annot-line"></div>
+          <div class="annot-label">تصميم إسلامي حصري</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile fallback specs -->
+    <div class="mat-mobile-specs">
+      <div class="mat-mobile-spec-item">📐 مقاس 120×68 سم</div>
+      <div class="mat-mobile-spec-item">🧲 سماكة 2 سم</div>
+      <div class="mat-mobile-spec-item">🌿 إسفنج فاخر مرن</div>
+      <div class="mat-mobile-spec-item">🎀 شراشيب أنيقة</div>
+      <div class="mat-mobile-spec-item">🚚 توصيل سريع</div>
+      <div class="mat-mobile-spec-item">💳 دفع عند الاستلام</div>
+    </div>
+
+    <div class="mat-specs-bottom-cta">
+      <a href="#products" class="mat-specs-cta">🛍️ اختر تصميمك الآن</a>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- VIDEO SECTION -->
+<section class="video-section">
+  <div class="video-section-inner">
+    <div class="video-eyebrow">✦ شوف بنفسك ✦</div>
+    <h2 class="video-title">جودة تحسها<br><span style="background: linear-gradient(135deg, #E8C97A, #C9A84C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">قبل ما تطلب</span></h2>
+    <p class="video-subtitle">إسفنج ناعم · خامة راقية · تصميم يليق بكل لحظة صلاة</p>
+
+    <div class="video-frame">
+      <div class="video-corner video-corner-tl"></div>
+      <div class="video-corner video-corner-tr"></div>
+      <div class="video-corner video-corner-bl"></div>
+      <div class="video-corner video-corner-br"></div>
+      <video
+        id="sedraVideo"
+        src="product_video.mov"
+        autoplay
+        muted
+        loop
+        playsinline
+        poster="images/product9_lifestyle.jpg"
+        onclick="toggleVideoPlay()"
+        style="cursor:pointer;"
+      ></video>
+      <button class="video-fullscreen-btn" onclick="openFullscreen()" title="تكبير الفيديو">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 3h6v2H5v4H3V3zm12 0h6v6h-2V5h-4V3zM3 13h2v4h4v2H3v-6zm16 4h-4v2h6v-6h-2v4z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="video-badges">
+      <span class="video-badge">✦ إسفنج عالي الجودة</span>
+      <span class="video-badge">📐 120 × 68 سم</span>
+      <span class="video-badge">🎨 تصاميم حصرية</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS SECTION -->
+<section class="products-section" id="products">
+  <div class="section-head">
+    <div class="section-label">تشكيلتنا</div>
+    <h2>اختر تصميمك المفضل</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="products-grid">
+    
+    <div class="product-card" onclick="goToProduct(1)">
+      <div class="product-img-wrap">
+        <img src="images/product1_thumb.jpg" alt="تصميم الزهور الكلاسيكي" loading="lazy">
+        <div class="product-badge">✦ إسفنج</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">تصميم الزهور الكلاسيكي</div>
+        <div class="product-specs">120×68 سم | سماكة 2 سم | أزرق ملكي</div>
+        <div class="product-footer">
+          <div class="product-price">450 <span>ج</span></div>
+          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(1)">اطلب الآن</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card" onclick="goToProduct(2)">
+      <div class="product-img-wrap">
+        <img src="images/product2_thumb.jpg" alt="تصميم البوستان الزاهر" loading="lazy">
+        <div class="product-badge">✦ إسفنج</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">تصميم البوستان الزاهر</div>
+        <div class="product-specs">120×68 سم | سماكة 2 سم | كريمي وأخضر</div>
+        <div class="product-footer">
+          <div class="product-price">450 <span>ج</span></div>
+          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(2)">اطلب الآن</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card" onclick="goToProduct(3)">
+      <div class="product-img-wrap">
+        <img src="images/product3_thumb.jpg" alt="تصميم الأعمدة الإسلامية" loading="lazy">
+        <div class="product-badge">✦ إسفنج</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">تصميم الأعمدة الإسلامية</div>
+        <div class="product-specs">120×68 سم | سماكة 2 سم | ذهبي وبيج</div>
+        <div class="product-footer">
+          <div class="product-price">450 <span>ج</span></div>
+          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(3)">اطلب الآن</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card" onclick="goToProduct(4)">
+      <div class="product-img-wrap">
+        <img src="images/product4_thumb.jpg" alt="تصميم النقش المغربي" loading="lazy">
+        <div class="product-badge">✦ إسفنج</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">تصميم النقش المغربي</div>
+        <div class="product-specs">120×68 سم | سماكة 2 سم | بيج وذهبي</div>
+        <div class="product-footer">
+          <div class="product-price">450 <span>ج</span></div>
+          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(4)">اطلب الآن</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card" onclick="goToProduct(5)">
+      <div class="product-img-wrap">
+        <img src="images/product5_thumb.jpg" alt="تصميم زهور الربيع" loading="lazy">
+        <div class="product-badge">✦ إسفنج</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">تصميم زهور الربيع</div>
+        <div class="product-specs">120×68 سم | سماكة 2 سم | ألوان متعددة</div>
+        <div class="product-footer">
+          <div class="product-price">450 <span>ج</span></div>
+          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(5)">اطلب الآن</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card" onclick="goToProduct(6)">
+      <div class="product-img-wrap">
+        <img src="images/product6_thumb.jpg" alt="تصميم المسجد الأزرق" loading="lazy">
+        <div class="product-badge">✦ إسفنج</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">تصميم المسجد الأزرق</div>
+        <div class="product-specs">120×68 سم | سماكة 2 سم | أزرق وذهبي</div>
+        <div class="product-footer">
+          <div class="product-price">450 <span>ج</span></div>
+          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(6)">اطلب الآن</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card" onclick="goToProduct(7)">
+      <div class="product-img-wrap">
+        <img src="images/product7_thumb.jpg" alt="تصميم قبة الأقصى" loading="lazy">
+        <div class="product-badge">✦ إسفنج</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">تصميم قبة الأقصى</div>
+        <div class="product-specs">120×68 سم | سماكة 2 سم | نيلي وذهبي</div>
+        <div class="product-footer">
+          <div class="product-price">450 <span>ج</span></div>
+          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(7)">اطلب الآن</button>
+        </div>
+      </div>
+    </div>
+    <div class="product-card" onclick="goToProduct(8)">
+      <div class="product-img-wrap">
+        <img src="images/product8_thumb.jpg" alt="تصميم الخط العربي" loading="lazy">
+        <div class="product-badge">✦ إسفنج</div>
+      </div>
+      <div class="product-info">
+        <div class="product-name">تصميم الخط العربي</div>
+        <div class="product-specs">120×68 سم | سماكة 2 سم | أسود وذهبي</div>
+        <div class="product-footer">
+          <div class="product-price">450 <span>ج</span></div>
+          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(8)">اطلب الآن</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col">
+      <h4>سيدرا ستور</h4>
+      <p>متخصصون في مصليات الإسفنج الفاخرة بتصاميم إسلامية راقية. جودة لا تُضاهى بسعر مناسب.</p>
+    </div>
+    <div class="footer-col">
+      <h4>معلومات الشحن</h4>
+      <p>شركة الشحن: شحن سريع</p>
+      <p>رسوم الشحن: 75 جنيه</p>
+      <p>التوصيل: 2-5 أيام عمل</p>
+      <p>الدفع: عند الاستلام أو إلكتروني</p>
+    </div>
+    <div class="footer-col">
+      <h4>تواصل معنا</h4>
+      <a href="https://wa.me/201033035681">واتساب: 01033035681</a>
+      <p>سياسة الإرجاع: عيب صناعي فقط</p>
+      <p>المقاس: 120×68 سم | السماكة: 2 سم</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 سيدرا ستور — جميع الحقوق محفوظة</p>
+  </div>
+</footer>
+
+<!-- WhatsApp Float -->
+<a href="https://wa.me/201033035681" class="whatsapp-float" target="_blank" title="تواصل عبر واتساب">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c 0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+</a>
+
+<!-- Chatbot -->
+<button class="chatbot-toggle" onclick="toggleChat()" title="مساعد سيدرا">🤖</button>
+<div class="chatbot-window" id="chatWindow">
+  <div class="chatbot-header">
+    <div class="chatbot-avatar">✨</div>
+    <div>
+      <div class="chatbot-name">مساعد سيدرا</div>
+      <div class="chatbot-status">● متاح الآن</div>
+    </div>
+  </div>
+  <div class="chatbot-messages" id="chatMessages">
+    <div class="msg msg-bot">أهلاً بك في سيدرا ستور! 🌟 كيف يمكنني مساعدتك؟</div>
+  </div>
+  <div class="chatbot-quick">
+    <button class="quick-btn" onclick="askBot('المواصفات')">المواصفات</button>
+    <button class="quick-btn" onclick="askBot('الشحن')">الشحن</button>
+    <button class="quick-btn" onclick="askBot('الإرجاع')">الإرجاع</button>
+    <button class="quick-btn" onclick="askBot('الدفع')">طرق الدفع</button>
+    <button class="quick-btn" onclick="askBot('التواصل')">التواصل</button>
+  </div>
+  <div class="chatbot-input-wrap">
+    <input type="text" class="chatbot-input" id="chatInput" placeholder="اكتب سؤالك..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chatbot-send" onclick="sendChat()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+function goToProduct(id) {
+  window.location.href = 'product.html?id=' + id;
+}
+
+// ========================
+// COUNTDOWN TIMER
+// ========================
+(function() {
+  function getTarget() {
+    var t = new Date();
+    t.setHours(23, 59, 59, 999);
+    return t;
+  }
+
+  var targetStr = sessionStorage.getItem('cdTarget');
+  var target;
+  if (targetStr) {
+    target = new Date(targetStr);
+    if (target < new Date()) {
+      target = getTarget();
+      sessionStorage.setItem('cdTarget', target.toISOString());
+    }
+  } else {
+    target = getTarget();
+    sessionStorage.setItem('cdTarget', target.toISOString());
+  }
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function tick() {
+    var diff = target - new Date();
+    if (diff <= 0) {
+      target = getTarget();
+      sessionStorage.setItem('cdTarget', target.toISOString());
+    }
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('cdHours').textContent = pad(h);
+    document.getElementById('cdMins').textContent  = pad(m);
+    document.getElementById('cdSecs').textContent  = pad(s);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+
+// ========================
+// CHATBOT
+// ========================
+var botAnswers = {
+  'المواصفات': '📐 مواصفات المصلى:\n• المقاس: 120×68 سم\n• السماكة: 2 سم\n• الخامة: إسفنج عالي الجودة\n• مع شراشيب أنيقة',
+  'الشحن':     '🚚 شحن سريع لجميع المحافظات\n• رسوم الشحن: 75 جنيه\n• التوصيل: 2-5 أيام عمل\n• متاح لجميع المحافظات',
+  'الإرجاع':   '🛡️ سياسة الإرجاع:\nالاسترجاع في حالة العيب الصناعي فقط. لا يُقبل الإرجاع بعد الاستخدام.',
+  'الدفع':     '💳 طرق الدفع:\n• الدفع عند الاستلام (كاش) — الأساسي\n• تحويل إلكتروني عند تأكيد الطلب',
+  'التواصل':   '📞 تواصل معنا:\nواتساب: 01033035681\nنحن متاحون للرد على استفساراتك!',
+  'admin':      '🔐 <a href="admin.html" style="color:#C9A84C">انقر هنا للدخول للوحة التحكم</a>',
+};
+
+function toggleChat() { document.getElementById('chatWindow').classList.toggle('open'); }
+
+function addMsg(text, type) {
+  var msgs = document.getElementById('chatMessages');
+  var div  = document.createElement('div');
+  div.className = 'msg msg-' + type;
+  div.innerHTML = text.replace(/\n/g, '<br>');
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function askBot(key) {
+  addMsg(key, 'user');
+  setTimeout(function() { addMsg(botAnswers[key] || 'عذراً، لا أملك إجابة على هذا السؤال. تواصل معنا على واتساب: 01033035681', 'bot'); }, 400);
+}
+
+function sendChat() {
+  var input = document.getElementById('chatInput');
+  var text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addMsg(text, 'user');
+
+  var lower = text.toLowerCase();
+  var response = 'عذراً، لا أفهم سؤالك. جرب الأسئلة الشائعة أو تواصل معنا على واتساب: 01033035681 😊';
+
+  if (lower === 'admin')                                                    response = botAnswers['admin'];
+  else if (lower.indexOf('مقاس') > -1 || lower.indexOf('مواصف') > -1 || lower.indexOf('حجم') > -1) response = botAnswers['المواصفات'];
+  else if (lower.indexOf('شحن') > -1 || lower.indexOf('توصيل') > -1)      response = botAnswers['الشحن'];
+  else if (lower.indexOf('إرجاع') > -1 || lower.indexOf('استرجاع') > -1)  response = botAnswers['الإرجاع'];
+  else if (lower.indexOf('دفع') > -1 || lower.indexOf('سعر') > -1 || lower.indexOf('فلوس') > -1) response = botAnswers['الدفع'];
+  else if (lower.indexOf('تواصل') > -1 || lower.indexOf('واتساب') > -1)   response = botAnswers['التواصل'];
+
+  setTimeout(function() { addMsg(response, 'bot'); }, 500);
+}
+
+// ========================
+// ANALYTICS
+// ========================
+
+// ========================
+// MAT ANNOTATION SCROLL TRIGGER
+// ========================
+(function() {
+  var matSection = document.getElementById('mat-specs');
+  if (!matSection) return;
+  var annots = matSection.querySelectorAll('.annot');
+  var triggered = false;
+
+  function triggerAnnotations() {
+    if (triggered) return;
+    var rect = matSection.getBoundingClientRect();
+    var viewH = window.innerHeight || document.documentElement.clientHeight;
+    if (rect.top < viewH * 0.72) {
+      triggered = true;
+      annots.forEach(function(annot) {
+        var delay = parseFloat(annot.getAttribute('data-delay') || 0);
+        setTimeout(function() {
+          annot.classList.add('visible');
+        }, Math.round(delay * 1000));
+      });
+    }
+  }
+
+  window.addEventListener('scroll', triggerAnnotations, { passive: true });
+  triggerAnnotations();
+})();
+
+// ========================
+// VIDEO CONTROLS
+// ========================
+function toggleVideoPlay() {
+  var v = document.getElementById('sedraVideo');
+  if (!v) return;
+  if (v.paused) {
+    v.play();
+  } else {
+    v.pause();
+  }
+}
+
+function openFullscreen() {
+  var v = document.getElementById('sedraVideo');
+  if (!v) return;
+  // Pause loop, enable controls for fullscreen experience
+  v.loop = false;
+  if (v.requestFullscreen) {
+    v.requestFullscreen();
+  } else if (v.webkitRequestFullscreen) {
+    v.webkitRequestFullscreen();
+  } else if (v.mozRequestFullScreen) {
+    v.mozRequestFullScreen();
+  }
+  v.controls = true;
+  v.play();
+  // Re-enable loop and remove controls when exiting fullscreen
+  document.addEventListener('fullscreenchange', function onFsChange() {
+    if (!document.fullscreenElement) {
+      v.loop = true;
+      v.controls = false;
+      v.muted = true;
+      document.removeEventListener('fullscreenchange', onFsChange);
+    }
+  });
+}
+
+var pageStart = Date.now();
+window.addEventListener('beforeunload', function() {
+  var timeSpent = Math.round((Date.now() - pageStart) / 1000);
+  if (typeof firebase !== 'undefined' && firebase.firestore) {
+    firebase.firestore().collection('analytics').doc('pageTime').set({
+      home: firebase.firestore.FieldValue.increment(timeSpent),
+      homeVisits: firebase.firestore.FieldValue.increment(1),
+    }, { merge: true });
+  }
+});
+</script>
+
+</body>
+</html>
