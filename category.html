@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0A0A0A">
+<link rel="icon" href="images/logo_small.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sedra.css?v=3">
+<title>الأصناف — سيدرا ستور</title>
+<meta name="description" content="تصاميم مصليات سيدرا ستور حسب النوع.">
+<style>
+  .cat-hero { background: var(--black); color: #fff; position: relative; overflow: hidden; }
+  .cat-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% -30%, rgba(201,168,76,0.22), transparent 60%); pointer-events: none; }
+  .cat-hero-inner { max-width: 1200px; margin: 0 auto; padding: 34px 20px 30px; position: relative; display: grid; grid-template-columns: 1.3fr 1fr; gap: 36px; align-items: center; }
+  .cat-hero h1 { font-size: clamp(26px, 5vw, 40px); font-weight: 900; line-height: 1.3; }
+  .cat-hero h1 span { margin-left: 8px; }
+  .cat-hero .tagline { color: var(--gold-light); font-size: 16px; font-weight: 700; margin-top: 6px; }
+  .cat-hero .desc { color: rgba(255,255,255,0.62); font-size: 14px; line-height: 1.9; margin-top: 12px; max-width: 60ch; }
+  .cat-hero .price-line { margin-top: 18px; }
+  .cat-hero .price-now { color: var(--gold-light); font-size: 30px; }
+  .cat-hero .price-note { color: rgba(255,255,255,0.45); font-size: 12px; }
+  .spec-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .spec-chip { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3); border-radius: 10px; padding: 7px 12px; font-size: 12px; color: rgba(255,255,255,0.8); }
+  .spec-chip b { color: var(--gold-light); font-weight: 800; margin-right: 4px; }
+  .cat-hero-media { background: #fff; border-radius: 16px; overflow: hidden; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  .cat-hero-media img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
+  .cat-hero-media.cover img { object-fit: cover; padding: 0; }
+
+  .type-switch { background: var(--dark2); border-top: 1px solid rgba(201,168,76,0.15); border-bottom: 1px solid rgba(201,168,76,0.15); position: sticky; top: var(--header-h); z-index: 900; }
+  .type-switch-inner { max-width: 1200px; margin: 0 auto; padding: 10px 20px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+  .type-switch-inner::-webkit-scrollbar { display: none; }
+  .type-link { flex-shrink: 0; display: inline-flex; gap: 8px; align-items: center; text-decoration: none; color: rgba(255,255,255,0.75); border: 1px solid rgba(255,255,255,0.12); padding: 7px 14px; border-radius: 22px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .type-link small { color: var(--gold); font-weight: 800; }
+  .type-link:hover { border-color: var(--gold); color: var(--gold-light); }
+  .type-link.active { background: var(--gold); color: var(--black); border-color: var(--gold); }
+  .type-link.active small { color: var(--black); }
+
+  .cat-products { max-width: 1200px; margin: 0 auto; padding: 28px 20px 56px; }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .toolbar h2 { font-size: 20px; font-weight: 800; color: var(--dark); }
+  .toolbar .count { font-size: 13px; color: var(--text-light); }
+
+  .compare { max-width: 1200px; margin: 0 auto; padding: 0 20px 64px; }
+  .compare h2 { font-size: 22px; font-weight: 800; color: var(--dark); margin-bottom: 14px; }
+  .compare-scroll { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); background: #fff; }
+  .compare table { width: 100%; border-collapse: collapse; min-width: 560px; }
+  .compare th, .compare td { padding: 13px 14px; text-align: right; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+  .compare thead th { background: var(--black); color: var(--gold-light); font-weight: 800; }
+  .compare tbody th { color: var(--text-light); font-weight: 700; width: 130px; background: #fbf8f2; }
+  .compare td.current { background: rgba(201,168,76,0.08); }
+  .compare thead th.current { background: var(--gold); color: var(--black); }
+  .compare a { color: var(--gold-dark); font-weight: 800; }
+
+  .not-found { max-width: 600px; margin: 60px auto; padding: 0 20px; text-align: center; }
+  .not-found h1 { font-size: 24px; margin-bottom: 10px; }
+
+  @media (max-width: 800px) {
+    .cat-hero-inner { grid-template-columns: 1fr; gap: 20px; padding: 24px 16px; }
+    .cat-hero-media { order: -1; max-height: 260px; }
+    .cat-products { padding: 22px 12px 44px; }
+    .compare { padding: 0 12px 44px; }
+  }
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">تخطي للمحتوى</a>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-side right">
+      <button class="icon-btn" id="cartBtn" type="button" aria-label="سلة الطلب">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 016 0"/></svg>
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
+    </div>
+    <a href="index.html" class="logo-wrap" aria-label="سيدرا ستور — الرئيسية">
+      <img src="images/logo_small.png" alt="" class="logo-img" width="40" height="40">
+      <span class="logo-store-name">SEDRA STORE</span>
+    </a>
+    <div class="header-side left">
+      <button class="icon-btn hamburger-btn" id="hamburgerBtn" type="button" aria-label="القائمة" aria-expanded="false" aria-controls="siteMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <nav class="crumbs" aria-label="مسار الصفحة"><a href="index.html">الرئيسية</a><span>›</span><span id="crumbName">الأصناف</span></nav>
+  <div id="catPage">
+    <div style="max-width:1200px;margin:20px auto;padding:0 20px"><div class="skeleton" style="height:260px"></div></div>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <h4>Sedra Store</h4>
+      <p>مصليات فاخرة بتصاميم إسلامية: مبطنة إسفنج، بمسند للظهر، وميموري فوم لراحة الركبة.</p>
+    </div>
+    <div class="footer-col">
+      <h4>الأصناف</h4>
+      <div id="footerCats">
+        <a href="category.html?c=sponge">مصليات مبطنة إسفنج</a>
+        <a href="category.html?c=masnad">مصليات بمسند للظهر</a>
+        <a href="category.html?c=memory">مصليات ميموري فوم للركبة</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>الشحن والتواصل</h4>
+      <p>الشحن لكل المحافظات: <span data-shipping>75 ج</span></p>
+      <p>التوصيل: 2-5 أيام عمل</p>
+      <p>الدفع: عند الاستلام أو تحويل إلكتروني</p>
+      <a data-wa-link target="_blank" rel="noopener" href="https://wa.me/201033035681">واتساب: <span data-wa-display dir="ltr">01033035681</span></a>
+      <p>الإرجاع: في حالة العيب الصناعي فقط</p>
+    </div>
+  </div>
+  <div class="footer-bottom"><p>© <span id="yearNow">2026</span> سيدرا ستور — جميع الحقوق محفوظة</p></div>
+</footer>
+<a data-wa-link href="https://wa.me/201033035681" class="whatsapp-float" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+</a>
+
+<script src="assets/sedra-data.js?v=3"></script>
+<script src="assets/sedra-store.js?v=3"></script>
+<script>
+function renderFooterCats(cat) {
+  var el = document.getElementById('footerCats'); if (!el) return;
+  el.innerHTML = SedraData.visibleCategories(cat).map(function (c) {
+    return '<a href="category.html?c=' + encodeURIComponent(c.id) + '">' + SedraData.esc(c.name) + '</a>';
+  }).join('');
+  var y = document.getElementById('yearNow'); if (y) y.textContent = new Date().getFullYear();
+}
+
+var D = SedraData;
+var params = new URLSearchParams(location.search);
+var catId = params.get('c') || '';
+
+function renderCategory(cat) {
+  var root = document.getElementById('catPage');
+  var cats = D.visibleCategories(cat);
+  var c = D.categoryById(cat, catId);
+  if (!c && !catId && cats[0]) { c = cats[0]; catId = c.id; }
+  renderFooterCats(cat);
+  if (!c || !c.visible) {
+    document.title = 'الصنف غير متاح — سيدرا ستور';
+    document.getElementById('crumbName').textContent = 'غير متاح';
+    root.innerHTML = '<div class="not-found"><h1>الصنف ده مش متاح حالياً</h1><p style="color:var(--text-light);margin-bottom:24px">اختار من الأصناف المتاحة:</p>' +
+      '<div class="cat-grid">' + cats.map(Sedra.categoryCardHTML).join('') + '</div></div>';
+    D.hydrateMedia(root);
+    return;
+  }
+  Sedra.state.activeCategory = c.id;
+  document.title = c.name + ' — سيدرا ستور';
+  document.getElementById('crumbName').textContent = c.name;
+  var list = D.productsOf(cat, c.id);
+  var cover = c.coverImg || (list[0] && list[0].mainImg) || '';
+  var g = Sedra.gridAttrs(c);
+
+  var html =
+    '<section class="cat-hero"><div class="cat-hero-inner"><div>' +
+      '<h1><span>' + D.esc(c.icon) + '</span>' + D.esc(c.name) + '</h1>' +
+      (c.tagline ? '<div class="tagline">' + D.esc(c.tagline) + '</div>' : '') +
+      (c.description ? '<p class="desc">' + D.esc(c.description) + '</p>' : '') +
+      '<div class="price-line"><span class="price-now">' + D.money(c.price) + '</span>' +
+        (c.oldPrice && c.oldPrice > c.price ? '<span class="price-was">' + D.money(c.oldPrice) + '</span>' : '') +
+        '<span class="price-note">للمصلى + شحن <span data-shipping>' + D.money(cat.settings.shipping) + '</span> على الطلب كله</span></div>' +
+      (c.specs.length ? '<div class="spec-chips">' + c.specs.map(function (sp) { return '<span class="spec-chip">' + D.esc(sp.label) + ':<b>' + D.esc(sp.value) + '</b></span>'; }).join('') + '</div>' : '') +
+    '</div><div class="cat-hero-media' + (c.imageFit === 'cover' ? ' cover' : '') + '">' + D.imgTag(cover, { alt: c.name, loading: 'eager' }) + '</div></div></section>' +
+
+    '<nav class="type-switch" aria-label="أنواع المصليات"><div class="type-switch-inner">' + cats.map(function (x) {
+      return '<a class="type-link' + (x.id === c.id ? ' active' : '') + '" href="category.html?c=' + encodeURIComponent(x.id) + '"' + (x.id === c.id ? ' aria-current="page"' : '') + '>' + D.esc(x.icon) + ' ' + D.esc(x.name) + ' <small>' + D.money(x.price) + '</small></a>';
+    }).join('') + '</div></nav>' +
+
+    '<section class="cat-products"><div class="toolbar"><h2>كل التصاميم</h2><span class="count">' + list.length + ' تصميم متاح</span></div>' +
+      (list.length
+        ? '<div class="' + g.cls + '" style="' + g.style + '">' + list.map(function (p, i) { return Sedra.productCardHTML(p, { eager: i < 4 }); }).join('') + '</div>'
+        : '<div class="empty-note">مفيش تصاميم في الصنف ده دلوقتي. تابعنا، أو <a data-wa-link target="_blank" rel="noopener" href="#">اسألنا على واتساب</a>.</div>') +
+    '</section>';
+
+  if (cats.length > 1) {
+    var maxSpecs = 0;
+    var labels = [];
+    cats.forEach(function (x) { x.specs.forEach(function (sp) { if (labels.indexOf(sp.label) === -1) labels.push(sp.label); }); });
+    labels = labels.slice(0, 6);
+    var cell = function (x, content) { return '<td class="' + (x.id === c.id ? 'current' : '') + '">' + content + '</td>'; };
+    html += '<section class="compare"><h2>مش متأكد أي نوع يناسبك؟</h2><div class="compare-scroll"><table>' +
+      '<thead><tr><th></th>' + cats.map(function (x) { return '<th class="' + (x.id === c.id ? 'current' : '') + '">' + D.esc(x.icon) + ' ' + D.esc(x.name) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      '<tr><th>السعر</th>' + cats.map(function (x) { return cell(x, '<b>' + D.money(x.price) + '</b>'); }).join('') + '</tr>' +
+      '<tr><th>بيتميز بـ</th>' + cats.map(function (x) { return cell(x, D.esc(x.tagline || '—')); }).join('') + '</tr>' +
+      labels.map(function (lb) {
+        return '<tr><th>' + D.esc(lb) + '</th>' + cats.map(function (x) {
+          var sp = x.specs.filter(function (s) { return s.label === lb; })[0];
+          return cell(x, sp ? D.esc(sp.value) : '—');
+        }).join('') + '</tr>';
+      }).join('') +
+      '<tr><th>التصاميم</th>' + cats.map(function (x) { return cell(x, x.id === c.id ? D.productsOf(cat, x.id).length + ' تصميم' : '<a href="category.html?c=' + encodeURIComponent(x.id) + '">شوف ' + D.productsOf(cat, x.id).length + ' تصميم</a>'); }).join('') + '</tr>' +
+      '</tbody></table></div></section>';
+  }
+
+  root.innerHTML = html;
+  root.querySelectorAll('[data-wa-link]').forEach(function (a) { a.href = Sedra.waLink('السلام عليكم، عندي استفسار عن ' + c.name); });
+  D.hydrateMedia(root);
+}
+Sedra.init({ page: 'category', activeCategory: catId, onCatalog: renderCategory });
+</script>
+</body>
+</html>

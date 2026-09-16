@@ -3,81 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>سيدرا ستور - مصليات إسفنج فاخرة</title>
+<meta name="theme-color" content="#0A0A0A">
+<link rel="icon" href="images/logo_small.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/sedra.css?v=3">
+<title>سيدرا ستور — مصليات إسفنج وبمسند وميموري فوم</title>
+<meta name="description" content="مصليات فاخرة بتصاميم إسلامية: مبطنة إسفنج، بمسند للظهر، وميموري فوم 5 سم لراحة الركبة. شحن لكل محافظات مصر والدفع عند الاستلام.">
 <style>
-  :root {
-    --gold: #C9A84C;
-    --gold-light: #E8C97A;
-    --gold-dark: #8B6914;
-    --black: #0A0A0A;
-    --dark: #111111;
-    --dark2: #1A1A1A;
-    --cream: #F5F0E8;
-    --cream-dark: #EDE4D4;
-    --text: #2C2C2C;
-    --text-light: #666;
-    --white: #FFFFFF;
-    --border: rgba(201,168,76,0.25);
-    --shadow: 0 8px 40px rgba(0,0,0,0.12);
-    --radius: 12px;
-    --green: #25D366;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Cairo', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    direction: rtl;
-    overflow-x: clip;
-  }
-
-  /* ======== HEADER ======== */
-  header {
-    background: var(--black);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 1px solid rgba(201,168,76,0.3);
-  }
-
-  .header-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 68px;
-  }
-
-  .logo-wrap {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-  }
-
-  .logo-img { width: 44px; height: 44px; object-fit: contain; }
-
-  .logo-text { display: flex; flex-direction: column; line-height: 1; }
-  .logo-text span:first-child { font-size: 19px; font-weight: 700; color: var(--gold); letter-spacing: 1px; }
-  .logo-text span:last-child  { font-size: 10px; color: rgba(201,168,76,0.6); letter-spacing: 3px; text-transform: uppercase; }
-
-  .header-right { display: flex; align-items: center; gap: 12px; }
-
-  .header-badge {
-    background: rgba(201,168,76,0.15);
-    border: 1px solid var(--border);
-    color: var(--gold-light);
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-  }
 
   /* ======== COUNTDOWN BANNER ======== */
   .countdown-banner {
@@ -757,104 +692,6 @@
 
   .mat-specs-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,168,76,0.4); }
 
-  /* ======== PRODUCTS SECTION ======== */
-  .products-section {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 64px 24px;
-  }
-
-  .section-head { text-align: center; margin-bottom: 48px; }
-
-  .section-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--gold);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .section-head h2 { font-size: 32px; font-weight: 800; color: var(--dark); }
-
-  .section-line {
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(90deg, var(--gold), transparent);
-    margin: 14px auto 0;
-  }
-
-  .products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 28px;
-  }
-
-  .product-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(0,0,0,0.06);
-    position: relative;
-  }
-
-  .product-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-  }
-
-  .product-img-wrap {
-    position: relative;
-    overflow: hidden;
-    background: var(--cream);
-    aspect-ratio: 3/4;
-  }
-
-  .product-img-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-
-  .product-card:hover .product-img-wrap img { transform: scale(1.05); }
-
-  .product-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: var(--gold);
-    color: var(--black);
-    font-size: 10px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
-  }
-
-  .product-info { padding: 18px; }
-  .product-name { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
-  .product-specs { font-size: 12px; color: var(--text-light); margin-bottom: 14px; line-height: 1.6; }
-  .product-footer { display: flex; justify-content: space-between; align-items: center; }
-  .product-price { font-size: 20px; font-weight: 800; color: var(--gold-dark); }
-  .product-price span { font-size: 12px; font-weight: 500; color: var(--text-light); margin-right: 2px; }
-
-  .btn-order {
-    background: var(--black);
-    color: var(--gold);
-    border: 1px solid var(--gold);
-    padding: 8px 18px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    font-family: 'Cairo', sans-serif;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .btn-order:hover { background: var(--gold); color: var(--black); }
-
   /* ======== MAT SPECS ANNOTATED ======== */
   .mat-specs-section {
     background: var(--cream);
@@ -1351,59 +1188,6 @@
     cursor: pointer;
   }
 
-  /* ======== FOOTER ======== */
-  footer {
-    background: var(--black);
-    padding: 48px 24px 24px;
-    border-top: 1px solid rgba(201,168,76,0.2);
-  }
-
-  .footer-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 40px;
-    padding-bottom: 40px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .footer-col h4 { color: var(--gold); font-size: 14px; font-weight: 700; margin-bottom: 16px; }
-
-  .footer-col p, .footer-col a {
-    font-size: 13px;
-    color: rgba(255,255,255,0.5);
-    line-height: 2;
-    display: block;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .footer-col a:hover { color: var(--gold-light); }
-  .footer-bottom { text-align: center; padding-top: 24px; color: rgba(255,255,255,0.3); font-size: 12px; }
-
-  /* ======== WHATSAPP FLOAT ======== */
-  .whatsapp-float {
-    position: fixed;
-    bottom: 28px;
-    left: 28px;
-    width: 58px;
-    height: 58px;
-    background: #25D366;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 20px rgba(37,211,102,0.5);
-    cursor: pointer;
-    z-index: 999;
-    transition: transform 0.2s, box-shadow 0.2s;
-    text-decoration: none;
-  }
-
-  .whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(37,211,102,0.6); }
-  .whatsapp-float svg { width: 30px; height: 30px; fill: white; }
-
   /* ======== CHATBOT ======== */
   .chatbot-toggle {
     position: fixed;
@@ -1604,21 +1388,50 @@
     .timer-block { min-width: 24px; padding: 2px 4px; }
     .timer-num { font-size: 12px; }
   }
+
+  /* ======== HOME: CATEGORIES ======== */
+  .home-cats { max-width: 1200px; margin: 0 auto; padding: 64px 20px 20px; scroll-margin-top: 80px; }
+  .home-rails { max-width: 1200px; margin: 0 auto; padding: 30px 20px 64px; scroll-margin-top: 80px; }
+  .rail { margin-top: 44px; scroll-margin-top: 90px; }
+  .rail-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .rail-head h2 { font-size: clamp(20px, 3.4vw, 26px); font-weight: 800; color: var(--dark); }
+  .rail-head p { font-size: 13px; color: var(--text-light); margin-top: 2px; }
+  .rail-head p b { color: var(--gold-dark); }
+  .rail-all { flex-shrink: 0; font-size: 13px; font-weight: 800; color: var(--gold-dark); text-decoration: none; border: 1.5px solid var(--gold); padding: 7px 14px; border-radius: 20px; white-space: nowrap; }
+  .rail-all:hover { background: var(--gold); color: var(--black); }
+  .strip-card { flex: 0 0 auto; }
+  .strip-img-wrap { height: 200px; width: auto; aspect-ratio: var(--ratio, 3/4); background: #fff; }
+  .strip-img-wrap img { object-fit: var(--fit, cover); opacity: 1; }
+  .strip-card { width: calc(200px * var(--rv, .75)); text-decoration: none; }
+  @media (max-width: 600px) {
+    .strip-img-wrap { height: 150px; }
+    .strip-card { width: calc(150px * var(--rv, .75)); }
+    .rail-head { align-items: center; }
+    .rail-head p { display: none; }
+    .home-cats { padding-top: 44px; }
+  }
+
 </style>
 </head>
 <body>
 
-<header>
+<a href="#main" class="skip-link">تخطي للمحتوى</a>
+<header class="site-header">
   <div class="header-inner">
-    <a href="index.html" class="logo-wrap">
-      <img src="images/logo_small.png" alt="سيدرا ستور" class="logo-img">
-      <div class="logo-text">
-        <span>سيدرا ستور</span>
-        <span>SEDRA STORE</span>
-      </div>
+    <div class="header-side right">
+      <button class="icon-btn" id="cartBtn" type="button" aria-label="سلة الطلب">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 016 0"/></svg>
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
+    </div>
+    <a href="index.html" class="logo-wrap" aria-label="سيدرا ستور — الرئيسية">
+      <img src="images/logo_small.png" alt="" class="logo-img" width="40" height="40">
+      <span class="logo-store-name">SEDRA STORE</span>
     </a>
-    <div class="header-right">
-      <div class="header-badge">🚚 شحن لجميع المحافظات</div>
+    <div class="header-side left">
+      <button class="icon-btn hamburger-btn" id="hamburgerBtn" type="button" aria-label="القائمة" aria-expanded="false" aria-controls="siteMenu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </header>
@@ -1626,7 +1439,7 @@
 <!-- COUNTDOWN BANNER -->
 <div class="countdown-banner">
   <div class="countdown-inner">
-    <a href="#products" class="btn-hurry">🔴 الحق العرض</a>
+    <a href="#categories" class="btn-hurry">🔴 الحق العرض</a>
     <span class="countdown-label">🔥 عرض محدود — ينتهي خلال</span>
     <div class="countdown-timer" id="countdownTimer">
       <div class="timer-block"><span class="timer-num" id="cdHours">23</span><span class="timer-unit">س</span></div>
@@ -1636,28 +1449,23 @@
       <div class="timer-block"><span class="timer-num" id="cdSecs">00</span><span class="timer-unit">ث</span></div>
     </div>
     <div class="countdown-price">
-      <span class="price-old">600 ج</span>
-      <span class="price-new">450 ج فقط</span>
+      <span class="price-old" id="bannerOld">600 ج</span>
+      <span class="price-new" id="bannerNew">450 ج فقط</span>
     </div>
   </div>
 </div>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-ornament">✦ مصليات اسفنج فاخرة ✦</div>
+  <div class="hero-ornament">مصليات فاخرة بثلاث أنواع</div>
 
-  <h1>صلِّ بكل<br><em>راحة وخشوع</em></h1>
+  <h1 id="heroTitle">صلِّ بكل<br><em>راحة وخشوع</em></h1>
 
-  <p class="hero-sub">
-    مصليات إسفنج عالية الجودة بتصاميم إسلامية فريدة<br>
-    مقاس 120×68 سم · سماكة 2 سم · شحن لجميع محافظات مصر
-  </p>
+  <p class="hero-sub">مبطنة إسفنج للاستخدام اليومي، بمسند يريح ظهرك، وميموري فوم يريح ركبتك.<br>شحن لكل محافظات مصر والدفع عند الاستلام.</p>
 
   <div class="hero-cta">
-    <a href="#products" class="hero-btn-main">
-      🛍️ اطلب الآن
-    </a>
-    <a href="https://wa.me/201033035681?text=السلام+عليكم+عايز+أستفسر+عن+المصليات" target="_blank" class="hero-btn-wa">
+    <a href="#categories" class="hero-btn-main">🛍️ اختار نوع المصلى</a>
+    <a data-wa-link data-wa-text="السلام عليكم، عايز أستفسر عن المصليات" href="https://wa.me/201033035681" target="_blank" rel="noopener" class="hero-btn-wa">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c 0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
       استفسر الآن
     </a>
@@ -1674,162 +1482,36 @@
   </div>
 </section>
 
+
 <!-- PRODUCTS STRIP CAROUSEL -->
-<section class="strip-section">
+<section class="strip-section" aria-label="كل التصاميم">
   <div class="strip-header">
     <div class="strip-label">تشكيلتنا</div>
     <h3>تصاميم تليق بكل لحظة صلاة</h3>
   </div>
   <div class="strip-track-wrap">
-    <div class="strip-track">
-      
-    <div class="strip-card" onclick="window.location.href='product.html?id=1'">
-      <div class="strip-img-wrap">
-        <img src="images/product1_thumb.jpg" alt="تصميم الزهور الكلاسيكي" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم الزهور الكلاسيكي</div>
-        <div class="strip-color">أزرق ملكي</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=2'">
-      <div class="strip-img-wrap">
-        <img src="images/product2_thumb.jpg" alt="تصميم البوستان الزاهر" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم البوستان الزاهر</div>
-        <div class="strip-color">كريمي وأخضر</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=3'">
-      <div class="strip-img-wrap">
-        <img src="images/product3_thumb.jpg" alt="تصميم الأعمدة الإسلامية" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم الأعمدة الإسلامية</div>
-        <div class="strip-color">ذهبي وبيج</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=4'">
-      <div class="strip-img-wrap">
-        <img src="images/product4_thumb.jpg" alt="تصميم النقش المغربي" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم النقش المغربي</div>
-        <div class="strip-color">بيج وذهبي</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=5'">
-      <div class="strip-img-wrap">
-        <img src="images/product5_thumb.jpg" alt="تصميم زهور الربيع" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم زهور الربيع</div>
-        <div class="strip-color">ألوان متعددة</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=6'">
-      <div class="strip-img-wrap">
-        <img src="images/product6_thumb.jpg" alt="تصميم المسجد الأزرق" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم المسجد الأزرق</div>
-        <div class="strip-color">أزرق وذهبي</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=7'">
-      <div class="strip-img-wrap">
-        <img src="images/product7_thumb.jpg" alt="تصميم قبة الأقصى" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم قبة الأقصى</div>
-        <div class="strip-color">نيلي وذهبي</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=8'">
-      <div class="strip-img-wrap">
-        <img src="images/product8_thumb.jpg" alt="تصميم الخط العربي" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم الخط العربي</div>
-        <div class="strip-color">أسود وذهبي</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=1'">
-      <div class="strip-img-wrap">
-        <img src="images/product1_thumb.jpg" alt="تصميم الزهور الكلاسيكي" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم الزهور الكلاسيكي</div>
-        <div class="strip-color">أزرق ملكي</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=2'">
-      <div class="strip-img-wrap">
-        <img src="images/product2_thumb.jpg" alt="تصميم البوستان الزاهر" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم البوستان الزاهر</div>
-        <div class="strip-color">كريمي وأخضر</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=3'">
-      <div class="strip-img-wrap">
-        <img src="images/product3_thumb.jpg" alt="تصميم الأعمدة الإسلامية" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم الأعمدة الإسلامية</div>
-        <div class="strip-color">ذهبي وبيج</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=4'">
-      <div class="strip-img-wrap">
-        <img src="images/product4_thumb.jpg" alt="تصميم النقش المغربي" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم النقش المغربي</div>
-        <div class="strip-color">بيج وذهبي</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=5'">
-      <div class="strip-img-wrap">
-        <img src="images/product5_thumb.jpg" alt="تصميم زهور الربيع" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم زهور الربيع</div>
-        <div class="strip-color">ألوان متعددة</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=6'">
-      <div class="strip-img-wrap">
-        <img src="images/product6_thumb.jpg" alt="تصميم المسجد الأزرق" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم المسجد الأزرق</div>
-        <div class="strip-color">أزرق وذهبي</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=7'">
-      <div class="strip-img-wrap">
-        <img src="images/product7_thumb.jpg" alt="تصميم قبة الأقصى" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم قبة الأقصى</div>
-        <div class="strip-color">نيلي وذهبي</div>
-      </div>
-    </div>
-    <div class="strip-card" onclick="window.location.href='product.html?id=8'">
-      <div class="strip-img-wrap">
-        <img src="images/product8_thumb.jpg" alt="تصميم الخط العربي" loading="lazy">
-      </div>
-      <div class="strip-info">
-        <div class="strip-name">تصميم الخط العربي</div>
-        <div class="strip-color">أسود وذهبي</div>
-      </div>
-    </div>
-    </div>
+    <div class="strip-track" id="stripTrack"></div>
   </div>
 </section>
+
+<main id="main">
+<!-- CATEGORIES -->
+<section class="home-cats" id="categories">
+  <div class="section-head">
+    <h2>اختار نوع المصلى اللي يناسبك</h2>
+    <p>تلات أنواع، كل نوع ليه راحة مختلفة. ادخل على النوع وشوف كل تصاميمه.</p>
+    <div class="section-line"></div>
+  </div>
+  <div class="cat-grid" id="catGrid">
+    <div class="skeleton" style="height:380px"></div><div class="skeleton" style="height:380px"></div><div class="skeleton" style="height:380px"></div>
+  </div>
+</section>
+
+<!-- PRODUCTS BY CATEGORY -->
+<section class="home-rails" id="products" aria-label="المنتجات حسب الصنف">
+  <div id="rails"></div>
+</section>
+</main>
 
 <!-- REVIEWS STRIP -->
 <div class="reviews-strip-section">
@@ -1867,7 +1549,7 @@
     
     <!-- Section header -->
     <div class="mat-specs-header">
-      <div class="mat-specs-eyebrow">✦ مواصفات المصلى</div>
+      <div class="mat-specs-eyebrow">مواصفات المصلى المبطن إسفنج</div>
       <h2 class="mat-specs-title">تفصيلة فيها معنى</h2>
     </div>
 
@@ -1921,7 +1603,7 @@
     </div>
 
     <div class="mat-specs-bottom-cta">
-      <a href="#products" class="mat-specs-cta">🛍️ اختر تصميمك الآن</a>
+      <a href="category.html?c=sponge" class="mat-specs-cta">🛍️ شوف تصاميم المبطن</a>
     </div>
 
   </div>
@@ -1966,159 +1648,34 @@
   </div>
 </section>
 
-<!-- PRODUCTS SECTION -->
-<section class="products-section" id="products">
-  <div class="section-head">
-    <div class="section-label">تشكيلتنا</div>
-    <h2>اختر تصميمك المفضل</h2>
-    <div class="section-line"></div>
-  </div>
-  <div class="products-grid">
-    
-    <div class="product-card" onclick="goToProduct(1)">
-      <div class="product-img-wrap">
-        <img src="images/product1_thumb.jpg" alt="تصميم الزهور الكلاسيكي" loading="lazy">
-        <div class="product-badge">✦ إسفنج</div>
-      </div>
-      <div class="product-info">
-        <div class="product-name">تصميم الزهور الكلاسيكي</div>
-        <div class="product-specs">120×68 سم | سماكة 2 سم | أزرق ملكي</div>
-        <div class="product-footer">
-          <div class="product-price">450 <span>ج</span></div>
-          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(1)">اطلب الآن</button>
-        </div>
-      </div>
-    </div>
-    <div class="product-card" onclick="goToProduct(2)">
-      <div class="product-img-wrap">
-        <img src="images/product2_thumb.jpg" alt="تصميم البوستان الزاهر" loading="lazy">
-        <div class="product-badge">✦ إسفنج</div>
-      </div>
-      <div class="product-info">
-        <div class="product-name">تصميم البوستان الزاهر</div>
-        <div class="product-specs">120×68 سم | سماكة 2 سم | كريمي وأخضر</div>
-        <div class="product-footer">
-          <div class="product-price">450 <span>ج</span></div>
-          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(2)">اطلب الآن</button>
-        </div>
-      </div>
-    </div>
-    <div class="product-card" onclick="goToProduct(3)">
-      <div class="product-img-wrap">
-        <img src="images/product3_thumb.jpg" alt="تصميم الأعمدة الإسلامية" loading="lazy">
-        <div class="product-badge">✦ إسفنج</div>
-      </div>
-      <div class="product-info">
-        <div class="product-name">تصميم الأعمدة الإسلامية</div>
-        <div class="product-specs">120×68 سم | سماكة 2 سم | ذهبي وبيج</div>
-        <div class="product-footer">
-          <div class="product-price">450 <span>ج</span></div>
-          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(3)">اطلب الآن</button>
-        </div>
-      </div>
-    </div>
-    <div class="product-card" onclick="goToProduct(4)">
-      <div class="product-img-wrap">
-        <img src="images/product4_thumb.jpg" alt="تصميم النقش المغربي" loading="lazy">
-        <div class="product-badge">✦ إسفنج</div>
-      </div>
-      <div class="product-info">
-        <div class="product-name">تصميم النقش المغربي</div>
-        <div class="product-specs">120×68 سم | سماكة 2 سم | بيج وذهبي</div>
-        <div class="product-footer">
-          <div class="product-price">450 <span>ج</span></div>
-          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(4)">اطلب الآن</button>
-        </div>
-      </div>
-    </div>
-    <div class="product-card" onclick="goToProduct(5)">
-      <div class="product-img-wrap">
-        <img src="images/product5_thumb.jpg" alt="تصميم زهور الربيع" loading="lazy">
-        <div class="product-badge">✦ إسفنج</div>
-      </div>
-      <div class="product-info">
-        <div class="product-name">تصميم زهور الربيع</div>
-        <div class="product-specs">120×68 سم | سماكة 2 سم | ألوان متعددة</div>
-        <div class="product-footer">
-          <div class="product-price">450 <span>ج</span></div>
-          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(5)">اطلب الآن</button>
-        </div>
-      </div>
-    </div>
-    <div class="product-card" onclick="goToProduct(6)">
-      <div class="product-img-wrap">
-        <img src="images/product6_thumb.jpg" alt="تصميم المسجد الأزرق" loading="lazy">
-        <div class="product-badge">✦ إسفنج</div>
-      </div>
-      <div class="product-info">
-        <div class="product-name">تصميم المسجد الأزرق</div>
-        <div class="product-specs">120×68 سم | سماكة 2 سم | أزرق وذهبي</div>
-        <div class="product-footer">
-          <div class="product-price">450 <span>ج</span></div>
-          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(6)">اطلب الآن</button>
-        </div>
-      </div>
-    </div>
-    <div class="product-card" onclick="goToProduct(7)">
-      <div class="product-img-wrap">
-        <img src="images/product7_thumb.jpg" alt="تصميم قبة الأقصى" loading="lazy">
-        <div class="product-badge">✦ إسفنج</div>
-      </div>
-      <div class="product-info">
-        <div class="product-name">تصميم قبة الأقصى</div>
-        <div class="product-specs">120×68 سم | سماكة 2 سم | نيلي وذهبي</div>
-        <div class="product-footer">
-          <div class="product-price">450 <span>ج</span></div>
-          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(7)">اطلب الآن</button>
-        </div>
-      </div>
-    </div>
-    <div class="product-card" onclick="goToProduct(8)">
-      <div class="product-img-wrap">
-        <img src="images/product8_thumb.jpg" alt="تصميم الخط العربي" loading="lazy">
-        <div class="product-badge">✦ إسفنج</div>
-      </div>
-      <div class="product-info">
-        <div class="product-name">تصميم الخط العربي</div>
-        <div class="product-specs">120×68 سم | سماكة 2 سم | أسود وذهبي</div>
-        <div class="product-footer">
-          <div class="product-price">450 <span>ج</span></div>
-          <button class="btn-order" onclick="event.stopPropagation(); goToProduct(8)">اطلب الآن</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- FOOTER -->
-<footer>
+<footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-col">
-      <h4>سيدرا ستور</h4>
-      <p>متخصصون في مصليات الإسفنج الفاخرة بتصاميم إسلامية راقية. جودة لا تُضاهى بسعر مناسب.</p>
+      <h4>Sedra Store</h4>
+      <p>مصليات فاخرة بتصاميم إسلامية: مبطنة إسفنج، بمسند للظهر، وميموري فوم لراحة الركبة.</p>
     </div>
     <div class="footer-col">
-      <h4>معلومات الشحن</h4>
-      <p>شركة الشحن: شحن سريع</p>
-      <p>رسوم الشحن: 75 جنيه</p>
+      <h4>الأصناف</h4>
+      <div id="footerCats">
+        <a href="category.html?c=sponge">مصليات مبطنة إسفنج</a>
+        <a href="category.html?c=masnad">مصليات بمسند للظهر</a>
+        <a href="category.html?c=memory">مصليات ميموري فوم للركبة</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>الشحن والتواصل</h4>
+      <p>الشحن لكل المحافظات: <span data-shipping>75 ج</span></p>
       <p>التوصيل: 2-5 أيام عمل</p>
-      <p>الدفع: عند الاستلام أو إلكتروني</p>
-    </div>
-    <div class="footer-col">
-      <h4>تواصل معنا</h4>
-      <a href="https://wa.me/201033035681">واتساب: 01033035681</a>
-      <p>سياسة الإرجاع: عيب صناعي فقط</p>
-      <p>المقاس: 120×68 سم | السماكة: 2 سم</p>
+      <p>الدفع: عند الاستلام أو تحويل إلكتروني</p>
+      <a data-wa-link target="_blank" rel="noopener" href="https://wa.me/201033035681">واتساب: <span data-wa-display dir="ltr">01033035681</span></a>
+      <p>الإرجاع: في حالة العيب الصناعي فقط</p>
     </div>
   </div>
-  <div class="footer-bottom">
-    <p>© 2024 سيدرا ستور — جميع الحقوق محفوظة</p>
-  </div>
+  <div class="footer-bottom"><p>© <span id="yearNow">2026</span> سيدرا ستور — جميع الحقوق محفوظة</p></div>
 </footer>
-
-<!-- WhatsApp Float -->
-<a href="https://wa.me/201033035681" class="whatsapp-float" target="_blank" title="تواصل عبر واتساب">
-  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c 0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+<a data-wa-link href="https://wa.me/201033035681" class="whatsapp-float" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
 </a>
 
 <!-- Chatbot -->
@@ -2151,10 +1708,10 @@
   </div>
 </div>
 
+
 <script>
-function goToProduct(id) {
-  window.location.href = 'product.html?id=' + id;
-}
+
+
 
 // ========================
 // COUNTDOWN TIMER
@@ -2217,7 +1774,7 @@ function addMsg(text, type) {
   var msgs = document.getElementById('chatMessages');
   var div  = document.createElement('div');
   div.className = 'msg msg-' + type;
-  div.innerHTML = text.replace(/\n/g, '<br>');
+  if (type === 'user') { div.textContent = text; } else { div.innerHTML = text.replace(/\n/g, '<br>'); }
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -2317,17 +1874,81 @@ function openFullscreen() {
   });
 }
 
-var pageStart = Date.now();
-window.addEventListener('beforeunload', function() {
-  var timeSpent = Math.round((Date.now() - pageStart) / 1000);
-  if (typeof firebase !== 'undefined' && firebase.firestore) {
-    firebase.firestore().collection('analytics').doc('pageTime').set({
-      home: firebase.firestore.FieldValue.increment(timeSpent),
-      homeVisits: firebase.firestore.FieldValue.increment(1),
-    }, { merge: true });
-  }
-});
-</script>
 
+</script>
+<script src="assets/sedra-data.js?v=3"></script>
+<script src="assets/sedra-store.js?v=3"></script>
+<script>
+function renderFooterCats(cat) {
+  var el = document.getElementById('footerCats'); if (!el) return;
+  el.innerHTML = SedraData.visibleCategories(cat).map(function (c) {
+    return '<a href="category.html?c=' + encodeURIComponent(c.id) + '">' + SedraData.esc(c.name) + '</a>';
+  }).join('');
+  var y = document.getElementById('yearNow'); if (y) y.textContent = new Date().getFullYear();
+}
+
+var D = SedraData;
+function renderHome(cat) {
+  var cats = D.visibleCategories(cat);
+
+  // Categories
+  document.getElementById('catGrid').innerHTML = cats.length
+    ? cats.map(Sedra.categoryCardHTML).join('')
+    : '<div class="empty-note" style="grid-column:1/-1">مفيش أصناف متاحة حالياً</div>';
+
+  // Rails (up to 4 per category)
+  document.getElementById('rails').innerHTML = cats.map(function (c) {
+    var list = D.productsOf(cat, c.id);
+    if (!list.length) return '';
+    var g = Sedra.gridAttrs(c);
+    var shown = list.slice(0, Sedra.ratioValue(c.cardRatio) > 1.1 ? 3 : 4);
+    return '<div class="rail" id="rail-' + D.esc(c.id) + '">' +
+      '<div class="rail-head"><div><h2>' + D.esc(c.icon) + ' ' + D.esc(c.name) + '</h2>' +
+      '<p>' + D.esc(c.tagline) + (c.price ? ' — <b>' + D.money(c.price) + '</b>' : '') + '</p></div>' +
+      '<a class="rail-all" href="category.html?c=' + encodeURIComponent(c.id) + '">عرض الكل (' + list.length + ')</a></div>' +
+      '<div class="' + g.cls + '" style="' + g.style + '">' + shown.map(function (p) { return Sedra.productCardHTML(p); }).join('') + '</div></div>';
+  }).join('');
+
+  // Strip carousel (all products, each at its real image proportion)
+  var all = cat.products.filter(function (p) { return D.isProductAvailable(cat, p); });
+  var stripItem = function (p) {
+    var c = D.categoryById(cat, p.categoryId);
+    return '<a class="strip-card" href="product.html?id=' + encodeURIComponent(p.id) + '" style="--ratio:' + c.cardRatio + ';--rv:' + Sedra.ratioValue(c.cardRatio) + ';--fit:' + c.imageFit + '">' +
+      '<div class="strip-img-wrap">' + D.imgTag(p.mainImg, { alt: p.name, variant: 't' }) + '</div>' +
+      '<div class="strip-info"><div class="strip-name">' + D.esc(p.name) + '</div><div class="strip-color">' + D.esc(c.shortName || c.name) + '</div></div></a>';
+  };
+  var track = document.getElementById('stripTrack');
+  track.innerHTML = all.map(stripItem).join('') + all.map(stripItem).join('');
+  track.style.animationDuration = Math.max(30, all.length * 4) + 's';
+
+  // Banner: cheapest category with a discount
+  var promo = cats.filter(function (c) { return c.oldPrice && c.oldPrice > c.price; }).sort(function (a, b) { return a.price - b.price; })[0];
+  var cheapest = cats.slice().sort(function (a, b) { return a.price - b.price; })[0];
+  var oldEl = document.getElementById('bannerOld'), newEl = document.getElementById('bannerNew');
+  if (promo) { oldEl.hidden = false; oldEl.textContent = D.money(promo.oldPrice); newEl.textContent = D.money(promo.price) + ' فقط'; }
+  else if (cheapest) { oldEl.hidden = true; newEl.textContent = 'تبدأ من ' + D.money(cheapest.price); }
+
+  // Hero text from admin
+  var ht = cat.theme && cat.theme.heroText;
+  if (ht) {
+    var parts = String(ht).split('|');
+    document.getElementById('heroTitle').innerHTML = D.esc(parts[0]) + (parts[1] ? '<br><em>' + D.esc(parts[1]) + '</em>' : '');
+  }
+
+  // Chatbot answers
+  if (window.botAnswers) {
+    botAnswers['المواصفات'] = '📐 أنواع المصليات:\n' + cats.map(function (c) {
+      return '• ' + c.name + ': ' + D.money(c.price) + (c.tagline ? ' — ' + c.tagline : '');
+    }).join('\n') + '\n\nادخل على أي نوع من القائمة وشوف تفاصيله.';
+    botAnswers['الشحن'] = '🚚 شحن لكل المحافظات\n• رسوم الشحن: ' + D.money(cat.settings.shipping) + '\n• التوصيل: 2-5 أيام عمل';
+    botAnswers['التواصل'] = '📞 تواصل معنا على واتساب: 0' + cat.settings.whatsapp.replace(/^20/, '');
+  }
+
+  renderFooterCats(cat);
+  D.hydrateMedia(document);
+}
+Sedra.init({ page: 'home', onCatalog: renderHome });
+Sedra.on('cart', function () {});
+</script>
 </body>
 </html>
