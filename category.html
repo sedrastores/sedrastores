@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/sedra.css?v=3">
+<link rel="stylesheet" href="assets/sedra.css?v=4">
 <title>الأصناف — سيدرا ستور</title>
 <meta name="description" content="تصاميم مصليات سيدرا ستور حسب النوع.">
 <style>
@@ -55,6 +55,33 @@
   .compare thead th.current { background: var(--gold); color: var(--black); }
   .compare a { color: var(--gold-dark); font-weight: 800; }
 
+  .cat-banner { max-width: 1200px; margin: 14px auto 0; padding: 0 20px; }
+  .cat-banner img { width: 100%; aspect-ratio: 3/2; max-height: 520px; object-fit: cover; border-radius: 18px; box-shadow: 0 18px 50px rgba(0,0,0,0.18); background: #0f0d0a; }
+  .cat-info { max-width: 1200px; margin: 0 auto; padding: 22px 20px 6px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start; }
+  .cat-info h1 { font-size: clamp(24px, 4.4vw, 34px); font-weight: 900; color: var(--dark); line-height: 1.3; }
+  .cat-info .tagline { color: var(--gold-dark); font-weight: 800; font-size: 15px; margin-top: 4px; }
+  .cat-info .desc { color: var(--text); font-size: 14.5px; line-height: 1.9; margin-top: 10px; }
+  .cat-buy { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 18px; }
+  .cat-buy .price-now { font-size: 30px; }
+  .cat-buy .for { font-size: 13px; background: rgba(201,168,76,0.1); border-radius: 10px; padding: 8px 10px; margin: 10px 0; line-height: 1.7; }
+  .cat-buy .for b { color: var(--gold-dark); }
+  .cat-buy .ship { font-size: 12.5px; color: var(--text-light); line-height: 1.8; }
+  .cat-buy .ship a { color: var(--gold-dark); font-weight: 800; }
+  .cat-specs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; margin-top: 14px; }
+  .cat-spec { background: var(--white); border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; padding: 9px 12px; }
+  .cat-spec span { display: block; font-size: 11px; color: var(--text-light); font-weight: 700; }
+  .cat-spec b { font-size: 14px; color: var(--dark); font-weight: 900; }
+  .type-switch.light { background: transparent; border: none; position: static; }
+  .type-switch.light .type-link { color: var(--dark); border-color: rgba(0,0,0,0.12); background: #fff; }
+  .type-switch.light .type-link small { color: var(--gold-dark); }
+  .type-switch.light .type-link.active { background: var(--black); color: var(--gold-light); border-color: var(--black); }
+  .type-switch.light .type-link.active small { color: var(--gold); }
+  @media (max-width: 800px) {
+    .cat-banner { padding: 0 12px; margin-top: 10px; }
+    .cat-banner img { border-radius: 14px; }
+    .cat-info { grid-template-columns: 1fr; padding: 16px 14px 4px; gap: 14px; }
+    .cat-specs { grid-template-columns: 1fr 1fr; }
+  }
   .not-found { max-width: 600px; margin: 60px auto; padding: 0 20px; text-align: center; }
   .not-found h1 { font-size: 24px; margin-bottom: 10px; }
 
@@ -99,6 +126,7 @@
     <div class="footer-col">
       <h4>Sedra Store</h4>
       <p>مصليات فاخرة بتصاميم إسلامية: مبطنة إسفنج، بمسند للظهر، وميموري فوم لراحة الركبة.</p>
+      <a data-wa-link target="_blank" rel="noopener" href="https://wa.me/201033035681">واتساب: <span data-wa-display dir="ltr">01033035681</span></a>
     </div>
     <div class="footer-col">
       <h4>الأصناف</h4>
@@ -109,12 +137,10 @@
       </div>
     </div>
     <div class="footer-col">
-      <h4>الشحن والتواصل</h4>
-      <p>الشحن لكل المحافظات: <span data-shipping>75 ج</span></p>
-      <p>التوصيل: 2-5 أيام عمل</p>
-      <p>الدفع: عند الاستلام أو تحويل إلكتروني</p>
-      <a data-wa-link target="_blank" rel="noopener" href="https://wa.me/201033035681">واتساب: <span data-wa-display dir="ltr">01033035681</span></a>
-      <p>الإرجاع: في حالة العيب الصناعي فقط</p>
+      <h4>معلومات تهمك</h4>
+      <a href="shipping.html">الشحن والتوصيل (<span data-shipping>من 75 ج</span>)</a>
+      <a href="returns.html">الاستبدال والاسترجاع</a>
+      <p>معاينة قبل الاستلام، والدفع عند الاستلام</p>
     </div>
   </div>
   <div class="footer-bottom"><p>© <span id="yearNow">2026</span> سيدرا ستور — جميع الحقوق محفوظة</p></div>
@@ -123,8 +149,8 @@
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
 </a>
 
-<script src="assets/sedra-data.js?v=3"></script>
-<script src="assets/sedra-store.js?v=3"></script>
+<script src="assets/sedra-data.js?v=4"></script>
+<script src="assets/sedra-store.js?v=4"></script>
 <script>
 function renderFooterCats(cat) {
   var el = document.getElementById('footerCats'); if (!el) return;
@@ -156,51 +182,37 @@ function renderCategory(cat) {
   document.title = c.name + ' — سيدرا ستور';
   document.getElementById('crumbName').textContent = c.name;
   var list = D.productsOf(cat, c.id);
-  var cover = c.coverImg || (list[0] && list[0].mainImg) || '';
   var g = Sedra.gridAttrs(c);
 
+  var banner = !!c.coverImg;
   var html =
-    '<section class="cat-hero"><div class="cat-hero-inner"><div>' +
-      '<h1><span>' + D.esc(c.icon) + '</span>' + D.esc(c.name) + '</h1>' +
+    (banner ? '<div class="cat-banner">' + D.imgTag(c.coverImg, { alt: c.name, loading: 'eager' }) + '</div>' : '') +
+    '<section class="cat-info"><div>' +
+      '<h1>' + D.esc(c.icon) + ' ' + D.esc(c.name) + '</h1>' +
       (c.tagline ? '<div class="tagline">' + D.esc(c.tagline) + '</div>' : '') +
       (c.description ? '<p class="desc">' + D.esc(c.description) + '</p>' : '') +
+      (c.specs.length ? '<div class="cat-specs">' + c.specs.map(function (sp) { return '<div class="cat-spec"><span>' + D.esc(sp.label) + '</span><b>' + D.esc(sp.value) + '</b></div>'; }).join('') + '</div>' : '') +
+    '</div><aside class="cat-buy">' +
       '<div class="price-line"><span class="price-now">' + D.money(c.price) + '</span>' +
-        (c.oldPrice && c.oldPrice > c.price ? '<span class="price-was">' + D.money(c.oldPrice) + '</span>' : '') +
-        '<span class="price-note">للمصلى + شحن <span data-shipping>' + D.money(cat.settings.shipping) + '</span> على الطلب كله</span></div>' +
-      (c.specs.length ? '<div class="spec-chips">' + c.specs.map(function (sp) { return '<span class="spec-chip">' + D.esc(sp.label) + ':<b>' + D.esc(sp.value) + '</b></span>'; }).join('') + '</div>' : '') +
-    '</div><div class="cat-hero-media' + (c.imageFit === 'cover' ? ' cover' : '') + '">' + D.imgTag(cover, { alt: c.name, loading: 'eager' }) + '</div></div></section>' +
+        (c.oldPrice && c.oldPrice > c.price ? '<span class="price-was">' + D.money(c.oldPrice) + '</span>' : '') + '</div>' +
+      (c.bestFor ? '<div class="for"><b>مناسبة لـ:</b> ' + D.esc(c.bestFor) + '</div>' : '') +
+      '<div class="ship">🚚 الشحن حسب المحافظة (<span data-shipping>من ' + D.money(D.minShipping(cat)) + '</span>) — <a href="shipping.html">التفاصيل</a><br>👀 عاين قبل ما تستلم والدفع عند الاستلام — <a href="returns.html">الاسترجاع</a></div>' +
+      '<a class="btn btn-gold btn-block" href="#catProducts" style="margin-top:12px">شوف الـ ' + list.length + ' تصاميم</a>' +
+    '</aside></section>' +
 
-    '<nav class="type-switch" aria-label="أنواع المصليات"><div class="type-switch-inner">' + cats.map(function (x) {
+    '<nav class="type-switch light" aria-label="أنواع المصليات"><div class="type-switch-inner">' + cats.map(function (x) {
       return '<a class="type-link' + (x.id === c.id ? ' active' : '') + '" href="category.html?c=' + encodeURIComponent(x.id) + '"' + (x.id === c.id ? ' aria-current="page"' : '') + '>' + D.esc(x.icon) + ' ' + D.esc(x.name) + ' <small>' + D.money(x.price) + '</small></a>';
     }).join('') + '</div></nav>' +
 
-    '<section class="cat-products"><div class="toolbar"><h2>كل التصاميم</h2><span class="count">' + list.length + ' تصميم متاح</span></div>' +
+    '<section class="cat-products" id="catProducts" style="scroll-margin-top:80px"><div class="toolbar"><h2>كل التصاميم</h2><span class="count">' + list.length + ' تصميم متاح</span></div>' +
       (list.length
         ? '<div class="' + g.cls + '" style="' + g.style + '">' + list.map(function (p, i) { return Sedra.productCardHTML(p, { eager: i < 4 }); }).join('') + '</div>'
         : '<div class="empty-note">مفيش تصاميم في الصنف ده دلوقتي. تابعنا، أو <a data-wa-link target="_blank" rel="noopener" href="#">اسألنا على واتساب</a>.</div>') +
-    '</section>';
-
-  if (cats.length > 1) {
-    var maxSpecs = 0;
-    var labels = [];
-    cats.forEach(function (x) { x.specs.forEach(function (sp) { if (labels.indexOf(sp.label) === -1) labels.push(sp.label); }); });
-    labels = labels.slice(0, 6);
-    var cell = function (x, content) { return '<td class="' + (x.id === c.id ? 'current' : '') + '">' + content + '</td>'; };
-    html += '<section class="compare"><h2>مش متأكد أي نوع يناسبك؟</h2><div class="compare-scroll"><table>' +
-      '<thead><tr><th></th>' + cats.map(function (x) { return '<th class="' + (x.id === c.id ? 'current' : '') + '">' + D.esc(x.icon) + ' ' + D.esc(x.name) + '</th>'; }).join('') + '</tr></thead><tbody>' +
-      '<tr><th>السعر</th>' + cats.map(function (x) { return cell(x, '<b>' + D.money(x.price) + '</b>'); }).join('') + '</tr>' +
-      '<tr><th>بيتميز بـ</th>' + cats.map(function (x) { return cell(x, D.esc(x.tagline || '—')); }).join('') + '</tr>' +
-      labels.map(function (lb) {
-        return '<tr><th>' + D.esc(lb) + '</th>' + cats.map(function (x) {
-          var sp = x.specs.filter(function (s) { return s.label === lb; })[0];
-          return cell(x, sp ? D.esc(sp.value) : '—');
-        }).join('') + '</tr>';
-      }).join('') +
-      '<tr><th>التصاميم</th>' + cats.map(function (x) { return cell(x, x.id === c.id ? D.productsOf(cat, x.id).length + ' تصميم' : '<a href="category.html?c=' + encodeURIComponent(x.id) + '">شوف ' + D.productsOf(cat, x.id).length + ' تصميم</a>'); }).join('') + '</tr>' +
-      '</tbody></table></div></section>';
-  }
+    '</section>' +
+    '<div id="catCompare">' + Sedra.compareHTML({ current: c.id }) + '</div>';
 
   root.innerHTML = html;
+  Sedra.bindCompare(document.getElementById('catCompare'));
   root.querySelectorAll('[data-wa-link]').forEach(function (a) { a.href = Sedra.waLink('السلام عليكم، عندي استفسار عن ' + c.name); });
   D.hydrateMedia(root);
 }

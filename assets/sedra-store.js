@@ -12,7 +12,9 @@
   function $(sel, root) { return (root || document).querySelector(sel); }
   function on(el, ev, fn) { if (el) el.addEventListener(ev, fn); }
   function waNumber() { return (state.catalog && state.catalog.settings.whatsapp) || D.CONFIG.defaults.whatsapp; }
-  function shipping() { return state.catalog ? state.catalog.settings.shipping : D.CONFIG.defaults.shipping; }
+  function minShip() { return D.minShipping(state.catalog); }
+  function zoneFor(gov) { return D.shippingZoneFor(state.catalog, gov); }
+  function currentGov() { var g = document.getElementById('fGov'); return g ? g.value : ''; }
   function waLink(text) { return 'https://wa.me/' + waNumber() + (text ? '?text=' + encodeURIComponent(text) : ''); }
 
   var WA_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
@@ -83,6 +85,9 @@
           (c.price ? '<span class="menu-item-price">' + money(c.price) + '</span>' : '') + '</a>';
       });
     }
+    items += '<div class="menu-label">معلومات تهمك</div>' +
+      '<a class="menu-item' + (state.page === 'shipping' ? ' active' : '') + '" href="shipping.html"><span class="menu-item-icon">🚚</span><span class="menu-item-text">الشحن والتوصيل<span class="menu-item-sub">المصاريف حسب المحافظة ومدة التوصيل</span></span></a>' +
+      '<a class="menu-item' + (state.page === 'returns' ? ' active' : '') + '" href="returns.html"><span class="menu-item-icon">🔄</span><span class="menu-item-text">الاستبدال والاسترجاع<span class="menu-item-sub">عاين قبل ما تستلم</span></span></a>';
     body.innerHTML = items;
   }
 
@@ -183,8 +188,8 @@
     var sub = cartSubtotal();
     foot.innerHTML =
       '<div class="totals-row"><span>المنتجات (' + n + ' قطعة)</span><span>' + money(sub) + '</span></div>' +
-      '<div class="totals-row"><span>الشحن</span><span>' + money(shipping()) + '</span></div>' +
-      '<div class="totals-row grand"><span>الإجمالي</span><span>' + money(sub + shipping()) + '</span></div>' +
+      '<div class="totals-row"><span>الشحن</span><span>حسب المحافظة (من ' + money(minShip()) + ')</span></div>' +
+      '<div class="totals-row grand"><span>الإجمالي</span><span>' + money(sub) + ' + الشحن</span></div>' +
       '<div class="drawer-actions"><button class="btn btn-gold btn-block" type="button" data-checkout>✅ إتمام الطلب</button>' +
       '<button class="btn btn-outline btn-block btn-sm" type="button" data-close-cart>كمّل تسوق</button></div>';
     D.hydrateMedia(body);
@@ -269,8 +274,8 @@
         '<div class="modal-header"><h2 id="checkoutTitle">تفاصيل طلبك</h2><button class="round-close" type="button" data-close-checkout aria-label="إغلاق">✕</button></div>' +
         '<div class="order-summary-box" id="checkoutSummary"></div>' +
         '<div class="payment-choice"><h4>💳 طريقة الدفع</h4><div class="payment-options">' +
-          '<button type="button" class="payment-opt selected" data-pay="عند الاستلام"><div class="payment-opt-icon">💵</div><div class="payment-opt-label">الدفع عند الاستلام</div><div class="payment-opt-sub">كاش مع المندوب</div><div class="recommended-badge">الأكثر شيوعاً</div></button>' +
-          '<button type="button" class="payment-opt" data-pay="تحويل إلكتروني"><div class="payment-opt-icon">📱</div><div class="payment-opt-label">تحويل إلكتروني</div><div class="payment-opt-sub">فودافون كاش / إنستاباي</div></button>' +
+          '<button type="button" class="payment-opt selected" data-pay="عند الاستلام"><div class="payment-opt-icon">💵</div><div class="payment-opt-label">الدفع عند الاستلام</div><div class="payment-opt-sub">كاش مع المندوب</div><div class="recommended-badge">عاين قبل ما تدفع</div></button>' +
+          '<button type="button" class="payment-opt" data-pay="تحويل إلكتروني" id="payTransfer" hidden><div class="payment-opt-icon">📱</div><div class="payment-opt-label">تحويل إلكتروني</div><div class="payment-opt-sub">فودافون كاش / إنستاباي</div></button>' +
         '</div></div>' +
         '<div class="form-group" data-field="fName"><label class="form-label" for="fName">الاسم الكامل <span class="req">*</span></label><input type="text" class="form-input" id="fName" autocomplete="name" placeholder="اكتب اسمك بالكامل"><div class="field-error">اكتب اسمك</div></div>' +
         '<div class="form-group" data-field="fPhone"><label class="form-label" for="fPhone">رقم الموبايل <span class="req">*</span></label><input type="tel" class="form-input" id="fPhone" autocomplete="tel" inputmode="numeric" placeholder="01XXXXXXXXX" maxlength="14" dir="ltr" style="text-align:right"><div class="field-error">اكتب رقم موبايل مصري صحيح من 11 رقم يبدأ بـ 01</div></div>' +
@@ -282,7 +287,7 @@
         '<div class="form-group"><label class="form-label">موقعك على الخريطة <span class="opt">(اختياري)</span></label>' +
           '<button class="gps-btn" type="button" id="gpsBtn">📍 حدد موقعي تلقائياً</button><input type="hidden" id="fGPS">' +
         '</div>' +
-        '<div class="policy-box"><strong>⚠️ سياسة الاسترجاع:</strong> الإرجاع في حالة العيب الصناعي فقط، ولا يُقبل بعد الاستخدام.</div>' +
+        '<div class="policy-box"><strong>👀 معاينة قبل الاستلام:</strong> من حقك تفتح الشحنة وتعاين المصلية قدام المندوب قبل ما تدفع. لو مش عاجباك ترجّعها وتدفع مصاريف الشحن بس. <a href="returns.html" target="_blank" rel="noopener">التفاصيل</a></div>' +
         '<div class="form-alert" id="checkoutAlert"></div>' +
         '<button class="btn btn-gold btn-block" type="button" id="submitOrderBtn">✅ تأكيد الطلب</button>' +
       '</div>' +
@@ -299,7 +304,7 @@
     document.body.appendChild(holder.firstChild);
     var gov = $('#fGov');
     Object.keys(EGYPT).forEach(function (g) { var o = document.createElement('option'); o.value = g; o.textContent = g; gov.appendChild(o); });
-    on(gov, 'change', function () { fillCities(gov.value); clearFieldError('fGov'); });
+    on(gov, 'change', function () { fillCities(gov.value); clearFieldError('fGov'); renderCheckoutSummary(); });
     on($('#fCity'), 'change', function () { clearFieldError('fCity'); });
     ['fName', 'fPhone', 'fAddress'].forEach(function (id) { on($('#' + id), 'input', function () { clearFieldError(id); }); });
     on($('#gpsBtn'), 'click', getLocation);
@@ -332,8 +337,11 @@
     }).join('') +
     '<button class="summary-edit" type="button" data-edit-cart>تعديل الطلب أو إضافة تصميم</button>' +
     '<div class="totals-row"><span>المنتجات (' + n + ' قطعة)</span><span>' + money(sub) + '</span></div>' +
-    '<div class="totals-row"><span>الشحن</span><span>' + money(shipping()) + '</span></div>' +
-    '<div class="totals-row grand"><span>الإجمالي</span><span>' + money(sub + shipping()) + '</span></div>';
+    (currentGov()
+      ? '<div class="totals-row"><span>الشحن (' + esc(currentGov()) + ')</span><span>' + money(zoneFor(currentGov()).price) + '</span></div>' +
+        '<div class="totals-row grand"><span>الإجمالي</span><span>' + money(sub + zoneFor(currentGov()).price) + '</span></div>'
+      : '<div class="totals-row"><span>الشحن</span><span>اختار المحافظة تحت (من ' + money(minShip()) + ')</span></div>' +
+        '<div class="totals-row grand"><span>الإجمالي</span><span>' + money(sub) + ' + الشحن</span></div>');
     D.hydrateMedia($('#checkoutSummary'));
   }
   function openCheckout() {
@@ -342,6 +350,9 @@
     $('#checkoutForm').style.display = '';
     $('#checkoutSuccess').classList.remove('show');
     $('#checkoutAlert').classList.remove('show');
+    var allowT = !!(state.catalog && state.catalog.settings.allowTransfer);
+    $('#payTransfer').hidden = !allowT;
+    if (!allowT && selectedPayment !== 'عند الاستلام') { selectedPayment = 'عند الاستلام'; Array.prototype.forEach.call(document.querySelectorAll('[data-pay]'), function (x) { x.classList.toggle('selected', x.getAttribute('data-pay') === selectedPayment); }); }
     renderCheckoutSummary();
     $('#checkoutModal').classList.add('open');
     openLayer('checkout');
@@ -432,7 +443,7 @@
     });
     lines.push('', '📦 عدد القطع: ' + order.itemsCount,
       '💰 المنتجات: ' + order.subtotal + ' ج',
-      '🚚 الشحن: ' + order.shipping + ' ج',
+      '🚚 الشحن: ' + order.shipping + ' ج' + (order.shippingZone ? ' (' + htmlEsc(order.shippingZone) + ')' : ''),
       '💵 <b>الإجمالي: ' + order.total + ' ج</b>', '',
       '📍 <b>العنوان</b>',
       '🏙️ ' + htmlEsc(order.governorate) + ' — ' + htmlEsc(order.city),
@@ -507,14 +518,14 @@
       return { productId: i.productId, categoryId: i.categoryId, categoryName: i.categoryName, name: i.name, color: i.color || '',
         img: D.isMedia(i.img) ? i.img : (D.absoluteUrl(i.img) || i.img), qty: i.qty, price: i.price };
     });
-    var subtotal = cartSubtotal(), ship = shipping();
+    var subtotal = cartSubtotal(), zone = zoneFor(gov), ship = zone.price;
 
     nextOrderCode().then(function (code) {
       var order = {
         orderCode: code, name: name, phone: phone, phone2: /^01[0125]\d{8}$/.test(phone2) ? phone2 : null,
         address: address, governorate: gov, city: city, gps: val('fGPS') || null, notes: val('fNotes') || null,
         paymentMethod: selectedPayment, deviceType: detectDevice(), status: 'جديد',
-        items: items, itemsCount: cartCount(), subtotal: subtotal, shipping: ship, total: subtotal + ship,
+        items: items, itemsCount: cartCount(), subtotal: subtotal, shipping: ship, shippingZone: zone.name || null, total: subtotal + ship,
         product: items.map(function (i) { return i.name; }).join('، '), productId: items[0].productId,
         categories: items.map(function (i) { return i.categoryName; }).filter(function (v, i, a) { return a.indexOf(v) === i; }),
         orderDuration: checkoutOpenedAt ? Math.round((Date.now() - checkoutOpenedAt) / 1000) : null,
@@ -575,7 +586,7 @@
       if (sent) return; sent = true;
       var secs = Math.round((Date.now() - start) / 1000);
       var o = {};
-      if (secs > 0 && secs < 1800) { o[state.page + 'Time'] = secs; o[state.page + 'TimeSamples'] = 1; }
+      if (viewKey && secs > 0 && secs < 1800) { o[state.page + 'Time'] = secs; o[state.page + 'TimeSamples'] = 1; }
       track(o, true);
     }
     window.addEventListener('pagehide', leave);
@@ -605,7 +616,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-wa-link]'), function (a) {
       a.href = waLink(a.getAttribute('data-wa-text') || '');
     });
-    Array.prototype.forEach.call(document.querySelectorAll('[data-shipping]'), function (el) { el.textContent = money(shipping()); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-shipping]'), function (el) { el.textContent = 'من ' + money(minShip()); });
     Array.prototype.forEach.call(document.querySelectorAll('[data-wa-display]'), function (el) {
       el.textContent = '0' + waNumber().replace(/^20/, '');
     });
@@ -641,16 +652,67 @@
   function categoryCardHTML(c) {
     var cat = state.catalog;
     var list = D.productsOf(cat, c.id);
+    var banner = !!c.coverImg;
     var cover = c.coverImg || (list[0] && list[0].mainImg) || '';
     return '<a class="cat-card" href="category.html?c=' + encodeURIComponent(c.id) + '">' +
-      '<div class="cat-card-media' + (c.imageFit === 'cover' ? ' cover' : '') + '">' + D.imgTag(cover, { alt: c.name, variant: 't' }) +
+      '<div class="cat-card-media' + (banner ? ' banner' : '') + '">' + D.imgTag(cover, { alt: c.name, variant: 't' }) +
         '<span class="cat-card-count">' + list.length + ' تصميم</span></div>' +
       '<div class="cat-card-body"><div class="cat-card-name">' + esc(c.icon) + ' ' + esc(c.name) + '</div>' +
         '<div class="cat-card-tag">' + esc(c.tagline || c.description) + '</div>' +
+        (c.bestFor ? '<div class="cat-card-for"><b>مناسبة لـ</b> ' + esc(c.bestFor) + '</div>' : '') +
         '<div class="cat-card-foot"><div class="price-line"><span class="price-now">' + money(c.price) + '</span>' +
           (c.oldPrice && c.oldPrice > c.price ? '<span class="price-was">' + money(c.oldPrice) + '</span>' : '') + '</div>' +
-          '<span class="btn btn-dark">تسوّق الصنف</span></div>' +
+          '<span class="btn btn-dark">شوف التصاميم</span></div>' +
       '</div></a>';
+  }
+
+  /* ================= COMPARE / CHOOSER ================= */
+  function compareHTML(opts) {
+    opts = opts || {};
+    var cat = state.catalog, cats = D.visibleCategories(cat);
+    if (cats.length < 2) return '';
+    // spec rows shared by every category → no empty cells
+    var labels = [];
+    cats[0].specs.forEach(function (sp) {
+      if (cats.every(function (x) { return x.specs.some(function (y) { return y.label === sp.label && y.value; }); })) labels.push(sp.label);
+    });
+    var val = function (x, lb) { return (x.specs.filter(function (y) { return y.label === lb; })[0] || {}).value; };
+    var withChooser = cats.filter(function (x) { return x.chooser; });
+    var chips = withChooser.length === cats.length
+      ? '<div class="chooser-q" role="group" aria-label="اختار اللي بتحسه">' + cats.map(function (x) {
+          return '<button type="button" class="chooser-chip" data-choose="' + esc(x.id) + '"><span>' + esc(x.icon) + '</span>' + esc(x.chooser) + '</button>';
+        }).join('') + '</div>'
+      : '';
+    var cards = cats.map(function (x) {
+      var n = D.productsOf(cat, x.id).length, here = opts.current === x.id;
+      return '<article class="cmp-card' + (here ? ' here' : '') + '" data-cmp="' + esc(x.id) + '">' +
+        '<div class="cmp-flag">' + (here ? 'انت هنا' : '✓ ده المناسب ليك') + '</div>' +
+        '<div class="cmp-head"><span class="cmp-icon">' + esc(x.icon) + '</span><h3>' + esc(x.name) + '</h3>' +
+          '<div class="cmp-price">' + money(x.price) + (x.oldPrice && x.oldPrice > x.price ? ' <s>' + money(x.oldPrice) + '</s>' : '') + '</div></div>' +
+        (x.tagline ? '<p class="cmp-tag">' + esc(x.tagline) + '</p>' : '') +
+        '<dl class="cmp-rows">' +
+          (x.bestFor ? '<div><dt>مناسبة لـ</dt><dd>' + esc(x.bestFor) + '</dd></div>' : '') +
+          labels.map(function (lb) { return '<div><dt>' + esc(lb) + '</dt><dd>' + esc(val(x, lb)) + '</dd></div>'; }).join('') +
+        '</dl>' +
+        (here ? '<a class="btn btn-outline btn-block btn-sm" href="#catProducts">شوف الـ ' + n + ' تصاميم تحت</a>'
+              : '<a class="btn btn-gold btn-block btn-sm" href="category.html?c=' + encodeURIComponent(x.id) + '">شوف الـ ' + n + ' تصاميم</a>') +
+      '</article>';
+    }).join('');
+    return '<section class="compare-block" id="compare"><div class="section-head"><h2>مش متأكد أي نوع يناسبك؟</h2>' +
+      '<p>' + (chips ? 'دوس على اللي بتحسه، وهنقولك النوع المناسب ليك' : 'قارن بين الأنواع واختار اللي يريحك') + '</p><div class="section-line"></div></div>' +
+      chips + '<div class="cmp-grid">' + cards + '</div></section>';
+  }
+  function bindCompare(root) {
+    if (!root) return;
+    root.addEventListener('click', function (e) {
+      var chip = e.target.closest && e.target.closest('[data-choose]');
+      if (!chip) return;
+      var id = chip.getAttribute('data-choose');
+      root.querySelectorAll('[data-choose]').forEach(function (c) { c.classList.toggle('active', c === chip); });
+      root.querySelectorAll('[data-cmp]').forEach(function (c) { c.classList.toggle('picked', c.getAttribute('data-cmp') === id); c.classList.toggle('dim', c.getAttribute('data-cmp') !== id); });
+      var card = root.querySelector('[data-cmp="' + id + '"]');
+      if (card) card.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    });
   }
 
   /* ================= EVENTS ================= */
@@ -735,6 +797,9 @@
     cartCount: cartCount,
     productCardHTML: productCardHTML,
     categoryCardHTML: categoryCardHTML,
+    compareHTML: compareHTML,
+    bindCompare: bindCompare,
+    minShip: minShip,
     gridAttrs: gridAttrs,
     ratioValue: ratioValue,
     waLink: waLink,

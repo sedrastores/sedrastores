@@ -9,9 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/sedra.css?v=3">
+<link rel="stylesheet" href="assets/sedra.css?v=4">
 <title>سيدرا ستور — مصليات إسفنج وبمسند وميموري فوم</title>
-<meta name="description" content="مصليات فاخرة بتصاميم إسلامية: مبطنة إسفنج، بمسند للظهر، وميموري فوم 5 سم لراحة الركبة. شحن لكل محافظات مصر والدفع عند الاستلام.">
+<meta name="description" content="مصليات فاخرة بتصاميم إسلامية: مبطنة إسفنج، بمسند للظهر، وميموري فوم 5 سم لراحة الركبة. عاين قبل ما تستلم والدفع عند الاستلام، شحن لكل محافظات مصر.">
 <style>
 
   /* ======== COUNTDOWN BANNER ======== */
@@ -1389,26 +1389,23 @@
     .timer-num { font-size: 12px; }
   }
 
-  /* ======== HOME: CATEGORIES ======== */
-  .home-cats { max-width: 1200px; margin: 0 auto; padding: 64px 20px 20px; scroll-margin-top: 80px; }
-  .home-rails { max-width: 1200px; margin: 0 auto; padding: 30px 20px 64px; scroll-margin-top: 80px; }
-  .rail { margin-top: 44px; scroll-margin-top: 90px; }
-  .rail-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-  .rail-head h2 { font-size: clamp(20px, 3.4vw, 26px); font-weight: 800; color: var(--dark); }
-  .rail-head p { font-size: 13px; color: var(--text-light); margin-top: 2px; }
-  .rail-head p b { color: var(--gold-dark); }
-  .rail-all { flex-shrink: 0; font-size: 13px; font-weight: 800; color: var(--gold-dark); text-decoration: none; border: 1.5px solid var(--gold); padding: 7px 14px; border-radius: 20px; white-space: nowrap; }
-  .rail-all:hover { background: var(--gold); color: var(--black); }
-  .strip-card { flex: 0 0 auto; }
-  .strip-img-wrap { height: 200px; width: auto; aspect-ratio: var(--ratio, 3/4); background: #fff; }
-  .strip-img-wrap img { object-fit: var(--fit, cover); opacity: 1; }
-  .strip-card { width: calc(200px * var(--rv, .75)); text-decoration: none; }
+  /* ======== HOME: sections ======== */
+  .home-cats { max-width: 1200px; margin: 0 auto; padding: 56px 20px 12px; scroll-margin-top: 80px; }
+  .home-designs { max-width: 1200px; margin: 0 auto; padding: 56px 20px 64px; scroll-margin-top: 80px; }
+  .designs-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: -10px 0 24px; }
+  .designs-tab { border: 1.5px solid rgba(0,0,0,0.1); background: #fff; padding: 9px 16px; border-radius: 24px; font-size: 14px; font-weight: 800; cursor: pointer; color: var(--dark); }
+  .designs-tab small { color: var(--gold-dark); font-weight: 900; margin-right: 4px; }
+  .designs-tab.active { background: var(--black); color: var(--gold-light); border-color: var(--black); }
+  .designs-tab.active small { color: var(--gold); }
+  .designs-more { text-align: center; margin-top: 24px; }
+  .home-compare-wrap { background: linear-gradient(180deg, var(--cream) 0%, #efe7d7 100%); border-top: 1px solid rgba(201,168,76,0.15); border-bottom: 1px solid rgba(201,168,76,0.15); }
+  .reviews-strip-section { scroll-margin-top: 80px; }
   @media (max-width: 600px) {
-    .strip-img-wrap { height: 150px; }
-    .strip-card { width: calc(150px * var(--rv, .75)); }
-    .rail-head { align-items: center; }
-    .rail-head p { display: none; }
-    .home-cats { padding-top: 44px; }
+    .home-cats { padding-top: 40px; }
+    .home-designs { padding: 40px 12px 48px; }
+    .designs-tabs { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding: 0 4px 6px; scrollbar-width: none; }
+    .designs-tabs::-webkit-scrollbar { display: none; }
+    .designs-tab { flex-shrink: 0; }
   }
 
 </style>
@@ -1461,10 +1458,10 @@
 
   <h1 id="heroTitle">صلِّ بكل<br><em>راحة وخشوع</em></h1>
 
-  <p class="hero-sub">مبطنة إسفنج للاستخدام اليومي، بمسند يريح ظهرك، وميموري فوم يريح ركبتك.<br>شحن لكل محافظات مصر والدفع عند الاستلام.</p>
+  <p class="hero-sub">مبطنة إسفنج للاستخدام اليومي، بمسند يريّح ظهرك، وميموري فوم يريّح ركبتك.<br>عاين المصلية قبل ما تستلم، والدفع عند الاستلام.</p>
 
   <div class="hero-cta">
-    <a href="#categories" class="hero-btn-main">🛍️ اختار نوع المصلى</a>
+    <a href="#categories" class="hero-btn-main">🛍️ اختار نوع المصلية</a>
     <a data-wa-link data-wa-text="السلام عليكم، عايز أستفسر عن المصليات" href="https://wa.me/201033035681" target="_blank" rel="noopener" class="hero-btn-wa">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c 0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
       استفسر الآن
@@ -1483,38 +1480,35 @@
 </section>
 
 
-<!-- PRODUCTS STRIP CAROUSEL -->
-<section class="strip-section" aria-label="كل التصاميم">
-  <div class="strip-header">
-    <div class="strip-label">تشكيلتنا</div>
-    <h3>تصاميم تليق بكل لحظة صلاة</h3>
-  </div>
-  <div class="strip-track-wrap">
-    <div class="strip-track" id="stripTrack"></div>
+<!-- TRUST BAR -->
+<section class="trust-bar" aria-label="ليه تشتري مننا">
+  <div class="trust-inner">
+    <a class="trust-item" href="returns.html"><span class="trust-ico">👀</span><span><b>عاين قبل ما تستلم</b><small>افتح الشحنة قدام المندوب</small></span></a>
+    <div class="trust-item"><span class="trust-ico">💵</span><span><b>الدفع عند الاستلام</b><small>بعد ما تتطمن على المصلية</small></span></div>
+    <a class="trust-item" href="shipping.html"><span class="trust-ico">🚚</span><span><b>شحن لكل المحافظات</b><small data-shipping>من 75 ج</small></span></a>
+    <a class="trust-item" href="returns.html"><span class="trust-ico">🔄</span><span><b>مش عاجبك؟ رجّعه</b><small>وتدفع الشحن بس</small></span></a>
   </div>
 </section>
 
 <main id="main">
-<!-- CATEGORIES -->
+<!-- 1) CHOOSE A TYPE -->
 <section class="home-cats" id="categories">
   <div class="section-head">
-    <h2>اختار نوع المصلى اللي يناسبك</h2>
-    <p>تلات أنواع، كل نوع ليه راحة مختلفة. ادخل على النوع وشوف كل تصاميمه.</p>
+    <h2>اختار نوع المصلية</h2>
+    <p>عندنا 3 أنواع، كل نوع ليه راحة مختلفة</p>
     <div class="section-line"></div>
   </div>
   <div class="cat-grid" id="catGrid">
-    <div class="skeleton" style="height:380px"></div><div class="skeleton" style="height:380px"></div><div class="skeleton" style="height:380px"></div>
+    <div class="skeleton" style="height:420px"></div><div class="skeleton" style="height:420px"></div><div class="skeleton" style="height:420px"></div>
   </div>
 </section>
 
-<!-- PRODUCTS BY CATEGORY -->
-<section class="home-rails" id="products" aria-label="المنتجات حسب الصنف">
-  <div id="rails"></div>
-</section>
-</main>
+<!-- 2) NOT SURE? -->
+<div class="home-compare-wrap" id="compareWrap"></div>
 
+<!-- 3) TRUST: REVIEWS -->
 <!-- REVIEWS STRIP -->
-<div class="reviews-strip-section">
+<div class="reviews-strip-section" id="reviews">
   <div class="reviews-strip-header">
     <div class="reviews-strip-label">✦ العملاء يتكلمون ✦</div>
     <div class="reviews-strip-title">آراء عملائنا</div>
@@ -1543,73 +1537,21 @@
   </div>
 </div>
 
-<!-- MAT SPECS SECTION -->
-<section class="mat-specs-section" id="mat-specs">
-  <div class="mat-specs-container">
-    
-    <!-- Section header -->
-    <div class="mat-specs-header">
-      <div class="mat-specs-eyebrow">مواصفات المصلى المبطن إسفنج</div>
-      <h2 class="mat-specs-title">تفصيلة فيها معنى</h2>
-    </div>
 
-    <!-- Annotated image area -->
-    <div class="mat-annot-wrap" id="matAnnotWrap">
-      <div class="mat-annot-img-holder">
-        <img src="images/product9_lifestyle.jpg" alt="مصلى سيدرا" class="mat-annot-img" id="matImg">
-        
-        <!-- Annotation lines + labels - each has a line and a label -->
-        <!-- Top right -->
-        <div class="annot annot-1" data-delay="0">
-          <div class="annot-line"></div>
-          <div class="annot-label">مقاس 120 × 68 سم</div>
-        </div>
-        <!-- Top left -->
-        <div class="annot annot-2" data-delay="0.15">
-          <div class="annot-line"></div>
-          <div class="annot-label">إسفنج فاخر مرن</div>
-        </div>
-        <!-- Right middle -->
-        <div class="annot annot-3" data-delay="0.3">
-          <div class="annot-line"></div>
-          <div class="annot-label">سماكة 2 سم</div>
-        </div>
-        <!-- Bottom right -->
-        <div class="annot annot-4" data-delay="0.45">
-          <div class="annot-line"></div>
-          <div class="annot-label">سهل اللف والحمل</div>
-        </div>
-        <!-- Bottom left -->
-        <div class="annot annot-5" data-delay="0.6">
-          <div class="annot-line"></div>
-          <div class="annot-label">شراشيب أنيقة</div>
-        </div>
-        <!-- Left middle -->
-        <div class="annot annot-6" data-delay="0.75">
-          <div class="annot-line"></div>
-          <div class="annot-label">تصميم إسلامي حصري</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mobile fallback specs -->
-    <div class="mat-mobile-specs">
-      <div class="mat-mobile-spec-item">📐 مقاس 120×68 سم</div>
-      <div class="mat-mobile-spec-item">🧲 سماكة 2 سم</div>
-      <div class="mat-mobile-spec-item">🌿 إسفنج فاخر مرن</div>
-      <div class="mat-mobile-spec-item">🎀 شراشيب أنيقة</div>
-      <div class="mat-mobile-spec-item">🚚 توصيل سريع</div>
-      <div class="mat-mobile-spec-item">💳 دفع عند الاستلام</div>
-    </div>
-
-    <div class="mat-specs-bottom-cta">
-      <a href="category.html?c=sponge" class="mat-specs-cta">🛍️ شوف تصاميم المبطن</a>
-    </div>
-
+<!-- 4) BROWSE DESIGNS -->
+<section class="home-designs" id="products">
+  <div class="section-head">
+    <h2>تصاميمنا</h2>
+    <p>اختار النوع وشوف تصاميمه</p>
+    <div class="section-line"></div>
   </div>
+  <div class="designs-tabs" id="designsTabs" role="tablist" aria-label="أنواع المصليات"></div>
+  <div id="designsGrid"></div>
+  <div class="designs-more" id="designsMore"></div>
 </section>
+</main>
 
-
+<!-- 5) QUALITY -->
 <!-- VIDEO SECTION -->
 <section class="video-section">
   <div class="video-section-inner">
@@ -1641,12 +1583,79 @@
     </div>
 
     <div class="video-badges">
-      <span class="video-badge">✦ إسفنج عالي الجودة</span>
-      <span class="video-badge">📐 120 × 68 سم</span>
-      <span class="video-badge">🎨 تصاميم حصرية</span>
+      <span class="video-badge">👀 عاين قبل ما تستلم</span>
+      <span class="video-badge">🎨 تصاميم إسلامية فاخرة</span>
+      <span class="video-badge">🎀 تشطيب بالشراشيب</span>
     </div>
   </div>
 </section>
+
+<!-- MAT SPECS SECTION -->
+<section class="mat-specs-section" id="mat-specs">
+  <div class="mat-specs-container">
+    
+    <!-- Section header -->
+    <div class="mat-specs-header">
+      <div class="mat-specs-eyebrow">✦ مواصفات المصلى</div>
+      <h2 class="mat-specs-title">تفصيلة فيها معنى</h2>
+    </div>
+
+    <!-- Annotated image area -->
+    <div class="mat-annot-wrap" id="matAnnotWrap">
+      <div class="mat-annot-img-holder">
+        <img src="images/product9_lifestyle.jpg" alt="مصلى سيدرا" class="mat-annot-img" id="matImg">
+        
+        <!-- Annotation lines + labels - each has a line and a label -->
+        <!-- Top right -->
+        <div class="annot annot-1" data-delay="0">
+          <div class="annot-line"></div>
+          <div class="annot-label">مقاس 120 × 68 سم</div>
+        </div>
+        <!-- Top left -->
+        <div class="annot annot-2" data-delay="0.15">
+          <div class="annot-line"></div>
+          <div class="annot-label">إسفنج عالي الكثافة</div>
+        </div>
+        <!-- Right middle -->
+        <div class="annot annot-3" data-delay="0.3">
+          <div class="annot-line"></div>
+          <div class="annot-label">سماكة 2 سم</div>
+        </div>
+        <!-- Bottom right -->
+        <div class="annot annot-4" data-delay="0.45">
+          <div class="annot-line"></div>
+          <div class="annot-label">خفيفة وسهلة الحمل</div>
+        </div>
+        <!-- Bottom left -->
+        <div class="annot annot-5" data-delay="0.6">
+          <div class="annot-line"></div>
+          <div class="annot-label">تشطيب بالشراشيب</div>
+        </div>
+        <!-- Left middle -->
+        <div class="annot annot-6" data-delay="0.75">
+          <div class="annot-line"></div>
+          <div class="annot-label">تصاميم إسلامية فاخرة</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile fallback specs -->
+    <div class="mat-mobile-specs">
+      <div class="mat-mobile-spec-item">📐 مقاس 120×68 سم</div>
+      <div class="mat-mobile-spec-item">🧲 سماكة 2 سم</div>
+      <div class="mat-mobile-spec-item">🌿 إسفنج عالي الكثافة</div>
+      <div class="mat-mobile-spec-item">🎀 تشطيب بالشراشيب</div>
+      <div class="mat-mobile-spec-item">🚚 شحن لكل المحافظات</div>
+      <div class="mat-mobile-spec-item">💵 الدفع عند الاستلام</div>
+    </div>
+
+    <div class="mat-specs-bottom-cta">
+      <a href="category.html?c=sponge" class="mat-specs-cta">🛍️ شوف تصاميم المبطنة</a>
+    </div>
+
+  </div>
+</section>
+
 
 
 <footer class="site-footer">
@@ -1654,6 +1663,7 @@
     <div class="footer-col">
       <h4>Sedra Store</h4>
       <p>مصليات فاخرة بتصاميم إسلامية: مبطنة إسفنج، بمسند للظهر، وميموري فوم لراحة الركبة.</p>
+      <a data-wa-link target="_blank" rel="noopener" href="https://wa.me/201033035681">واتساب: <span data-wa-display dir="ltr">01033035681</span></a>
     </div>
     <div class="footer-col">
       <h4>الأصناف</h4>
@@ -1664,12 +1674,10 @@
       </div>
     </div>
     <div class="footer-col">
-      <h4>الشحن والتواصل</h4>
-      <p>الشحن لكل المحافظات: <span data-shipping>75 ج</span></p>
-      <p>التوصيل: 2-5 أيام عمل</p>
-      <p>الدفع: عند الاستلام أو تحويل إلكتروني</p>
-      <a data-wa-link target="_blank" rel="noopener" href="https://wa.me/201033035681">واتساب: <span data-wa-display dir="ltr">01033035681</span></a>
-      <p>الإرجاع: في حالة العيب الصناعي فقط</p>
+      <h4>معلومات تهمك</h4>
+      <a href="shipping.html">الشحن والتوصيل (<span data-shipping>من 75 ج</span>)</a>
+      <a href="returns.html">الاستبدال والاسترجاع</a>
+      <p>معاينة قبل الاستلام، والدفع عند الاستلام</p>
     </div>
   </div>
   <div class="footer-bottom"><p>© <span id="yearNow">2026</span> سيدرا ستور — جميع الحقوق محفوظة</p></div>
@@ -1760,10 +1768,10 @@
 // CHATBOT
 // ========================
 var botAnswers = {
-  'المواصفات': '📐 مواصفات المصلى:\n• المقاس: 120×68 سم\n• السماكة: 2 سم\n• الخامة: إسفنج عالي الجودة\n• مع شراشيب أنيقة',
-  'الشحن':     '🚚 شحن سريع لجميع المحافظات\n• رسوم الشحن: 75 جنيه\n• التوصيل: 2-5 أيام عمل\n• متاح لجميع المحافظات',
-  'الإرجاع':   '🛡️ سياسة الإرجاع:\nالاسترجاع في حالة العيب الصناعي فقط. لا يُقبل الإرجاع بعد الاستخدام.',
-  'الدفع':     '💳 طرق الدفع:\n• الدفع عند الاستلام (كاش) — الأساسي\n• تحويل إلكتروني عند تأكيد الطلب',
+  'المواصفات': '📐 عندنا 3 أنواع: مبطنة إسفنج، بمسند للظهر، وميموري فوم للركبة. ادخل على أي نوع من القائمة وشوف مواصفاته.',
+  'الشحن': '🚚 بنوصّل لكل محافظات مصر، والمصاريف حسب المنطقة (من 75 جنيه).\nالقاهرة والجيزة: من 1 إلى 3 أيام عمل\nباقي المحافظات: من 3 إلى 5 أيام عمل\n<a href="shipping.html" style="color:#C9A84C">تفاصيل الشحن</a>',
+  'الإرجاع': '🔄 من حقك تعاين المصلية قدام المندوب قبل ما تستلم وتدفع. لو مش عاجباك ترجّعها وتدفع مصاريف الشحن بس، ولو فيها عيب إحنا بنتحمل الشحن كله.\n<a href="returns.html" style="color:#C9A84C">تفاصيل الاستبدال والاسترجاع</a>',
+  'الدفع': '💵 الدفع عند الاستلام، وبعد ما تعاين المصلية قدام المندوب.',
   'التواصل':   '📞 تواصل معنا:\nواتساب: 01033035681\nنحن متاحون للرد على استفساراتك!',
   'admin':      '🔐 <a href="admin.html" style="color:#C9A84C">انقر هنا للدخول للوحة التحكم</a>',
 };
@@ -1876,8 +1884,8 @@ function openFullscreen() {
 
 
 </script>
-<script src="assets/sedra-data.js?v=3"></script>
-<script src="assets/sedra-store.js?v=3"></script>
+<script src="assets/sedra-data.js?v=4"></script>
+<script src="assets/sedra-store.js?v=4"></script>
 <script>
 function renderFooterCats(cat) {
   var el = document.getElementById('footerCats'); if (!el) return;
@@ -1888,67 +1896,63 @@ function renderFooterCats(cat) {
 }
 
 var D = SedraData;
+var designsTab = null;
+function renderDesigns(cat) {
+  var cats = D.visibleCategories(cat).filter(function (c) { return D.productsOf(cat, c.id).length; });
+  if (!cats.length) { document.getElementById('products').hidden = true; return; }
+  document.getElementById('products').hidden = false;
+  if (!cats.some(function (c) { return c.id === designsTab; })) designsTab = cats[0].id;
+  document.getElementById('designsTabs').innerHTML = cats.map(function (c) {
+    return '<button type="button" role="tab" class="designs-tab' + (c.id === designsTab ? ' active' : '') + '" aria-selected="' + (c.id === designsTab) + '" data-dtab="' + D.esc(c.id) + '">' + D.esc(c.icon) + ' ' + D.esc(c.shortName || c.name) + '<small>' + D.money(c.price) + '</small></button>';
+  }).join('');
+  var c = D.categoryById(cat, designsTab), list = D.productsOf(cat, c.id), g = Sedra.gridAttrs(c);
+  var limit = Sedra.ratioValue(c.cardRatio) > 1.1 ? 3 : 4;
+  document.getElementById('designsGrid').innerHTML = '<div class="' + g.cls + '" style="' + g.style + '">' + list.slice(0, limit).map(function (p) { return Sedra.productCardHTML(p); }).join('') + '</div>';
+  document.getElementById('designsMore').innerHTML = '<a class="btn btn-dark" href="category.html?c=' + encodeURIComponent(c.id) + '">شوف كل تصاميم ' + D.esc(c.name) + ' (' + list.length + ')</a>';
+  D.hydrateMedia(document.getElementById('products'));
+}
+document.getElementById('designsTabs').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-dtab]'); if (!b) return;
+  designsTab = b.getAttribute('data-dtab'); renderDesigns(Sedra.state.catalog);
+});
+
 function renderHome(cat) {
   var cats = D.visibleCategories(cat);
-
-  // Categories
   document.getElementById('catGrid').innerHTML = cats.length
     ? cats.map(Sedra.categoryCardHTML).join('')
     : '<div class="empty-note" style="grid-column:1/-1">مفيش أصناف متاحة حالياً</div>';
+  var cw = document.getElementById('compareWrap');
+  cw.innerHTML = Sedra.compareHTML();
+  if (!cw.dataset.bound) { Sedra.bindCompare(cw); cw.dataset.bound = '1'; }
+  renderDesigns(cat);
 
-  // Rails (up to 4 per category)
-  document.getElementById('rails').innerHTML = cats.map(function (c) {
-    var list = D.productsOf(cat, c.id);
-    if (!list.length) return '';
-    var g = Sedra.gridAttrs(c);
-    var shown = list.slice(0, Sedra.ratioValue(c.cardRatio) > 1.1 ? 3 : 4);
-    return '<div class="rail" id="rail-' + D.esc(c.id) + '">' +
-      '<div class="rail-head"><div><h2>' + D.esc(c.icon) + ' ' + D.esc(c.name) + '</h2>' +
-      '<p>' + D.esc(c.tagline) + (c.price ? ' — <b>' + D.money(c.price) + '</b>' : '') + '</p></div>' +
-      '<a class="rail-all" href="category.html?c=' + encodeURIComponent(c.id) + '">عرض الكل (' + list.length + ')</a></div>' +
-      '<div class="' + g.cls + '" style="' + g.style + '">' + shown.map(function (p) { return Sedra.productCardHTML(p); }).join('') + '</div></div>';
-  }).join('');
-
-  // Strip carousel (all products, each at its real image proportion)
-  var all = cat.products.filter(function (p) { return D.isProductAvailable(cat, p); });
-  var stripItem = function (p) {
-    var c = D.categoryById(cat, p.categoryId);
-    return '<a class="strip-card" href="product.html?id=' + encodeURIComponent(p.id) + '" style="--ratio:' + c.cardRatio + ';--rv:' + Sedra.ratioValue(c.cardRatio) + ';--fit:' + c.imageFit + '">' +
-      '<div class="strip-img-wrap">' + D.imgTag(p.mainImg, { alt: p.name, variant: 't' }) + '</div>' +
-      '<div class="strip-info"><div class="strip-name">' + D.esc(p.name) + '</div><div class="strip-color">' + D.esc(c.shortName || c.name) + '</div></div></a>';
-  };
-  var track = document.getElementById('stripTrack');
-  track.innerHTML = all.map(stripItem).join('') + all.map(stripItem).join('');
-  track.style.animationDuration = Math.max(30, all.length * 4) + 's';
-
-  // Banner: cheapest category with a discount
   var promo = cats.filter(function (c) { return c.oldPrice && c.oldPrice > c.price; }).sort(function (a, b) { return a.price - b.price; })[0];
   var cheapest = cats.slice().sort(function (a, b) { return a.price - b.price; })[0];
   var oldEl = document.getElementById('bannerOld'), newEl = document.getElementById('bannerNew');
   if (promo) { oldEl.hidden = false; oldEl.textContent = D.money(promo.oldPrice); newEl.textContent = D.money(promo.price) + ' فقط'; }
   else if (cheapest) { oldEl.hidden = true; newEl.textContent = 'تبدأ من ' + D.money(cheapest.price); }
 
-  // Hero text from admin
   var ht = cat.theme && cat.theme.heroText;
   if (ht) {
     var parts = String(ht).split('|');
     document.getElementById('heroTitle').innerHTML = D.esc(parts[0]) + (parts[1] ? '<br><em>' + D.esc(parts[1]) + '</em>' : '');
   }
 
-  // Chatbot answers
   if (window.botAnswers) {
     botAnswers['المواصفات'] = '📐 أنواع المصليات:\n' + cats.map(function (c) {
-      return '• ' + c.name + ': ' + D.money(c.price) + (c.tagline ? ' — ' + c.tagline : '');
+      var size = (c.specs.filter(function (s) { return s.label === 'المقاس'; })[0] || {}).value;
+      return '• ' + c.name + ': ' + D.money(c.price) + (size ? ' — مقاس ' + size : '') + (c.tagline ? ' — ' + c.tagline : '');
     }).join('\n') + '\n\nادخل على أي نوع من القائمة وشوف تفاصيله.';
-    botAnswers['الشحن'] = '🚚 شحن لكل المحافظات\n• رسوم الشحن: ' + D.money(cat.settings.shipping) + '\n• التوصيل: 2-5 أيام عمل';
+    var sh = cat.shipping;
+    botAnswers['الشحن'] = '🚚 مصاريف الشحن حسب المنطقة:\n' + sh.zones.map(function (z) { return '• ' + z.name + ': ' + z.price + ' جنيه'; }).join('\n') +
+      '\n\n' + sh.deliveryText + '\n<a href="shipping.html" style="color:#C9A84C">تفاصيل الشحن</a>';
+    botAnswers['الدفع'] = cat.settings.allowTransfer ? '💵 الدفع عند الاستلام بعد المعاينة، أو تحويل إلكتروني.' : '💵 الدفع عند الاستلام، وبعد ما تعاين المصلية قدام المندوب.';
     botAnswers['التواصل'] = '📞 تواصل معنا على واتساب: 0' + cat.settings.whatsapp.replace(/^20/, '');
   }
-
   renderFooterCats(cat);
   D.hydrateMedia(document);
 }
 Sedra.init({ page: 'home', onCatalog: renderHome });
-Sedra.on('cart', function () {});
 </script>
 </body>
 </html>

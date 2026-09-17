@@ -227,7 +227,35 @@
   function ensureCatalog() {
     var metaRef = db.collection('meta').doc('catalog');
     return metaRef.get().then(function (meta) {
-      if (meta.exists && num((meta.data() || {}).version, 0) >= D.CONFIG.catalogVersion) return false;
+      var ver = meta.exists ? num((meta.data() || {}).version, 0) : 0;
+      if (ver >= D.CONFIG.catalogVersion) return false;
+      return (ver >= 2 ? Promise.resolve() : migrateV2()).then(migrateV3).then(function () { return true; });
+    });
+  }
+  // v3: fill category details, banners and shipping zones (prices are never touched)
+  function migrateV3() {
+    return Promise.all([db.collection('categories').get(), db.collection('products').get(), db.collection('settings').doc('shipping').get()]).then(function (r) {
+      var ops = [], cats = {};
+      r[0].docs.forEach(function (d) { cats[d.id] = d.data() || {}; });
+      D.SEED_CATEGORIES.forEach(function (sc) {
+        var cur = cats[sc.id];
+        if (!cur) return; // deleted on purpose: respect it
+        var data = { shortName: sc.shortName, tagline: sc.tagline, description: sc.description, bestFor: sc.bestFor, chooser: sc.chooser, badge: sc.badge, specs: sc.specs };
+        if (!cur.coverImg || /^images\/(product\d+_thumb|masnad\/\d+\/main|memory\/\d+)\.jpg$/.test(cur.coverImg)) data.coverImg = sc.coverImg;
+        ops.push({ type: 'set', col: 'categories', id: sc.id, merge: true, data: data });
+      });
+      var m2 = r[1].docs.filter(function (d) { return d.id === 'memory-2'; })[0];
+      if (m2 && (m2.data() || {}).name === 'ميموري فوم — أسود فحمي') ops.push({ type: 'update', col: 'products', id: 'memory-2', data: { name: 'ميموري فوم — رمادي', color: 'رمادي' } });
+      if (!r[2].exists) {
+        var sh = JSON.parse(JSON.stringify(D.SEED_SHIPPING)); sh.updatedAt = serverTs();
+        ops.push({ type: 'set', col: 'settings', id: 'shipping', data: sh });
+      }
+      ops.push({ type: 'set', col: 'meta', id: 'catalog', merge: true, data: { version: 3, migratedAt: serverTs() } });
+      return commitOps(ops);
+    });
+  }
+  function migrateV2() {
+    {
       return Promise.all([db.collection('categories').get(), db.collection('products').get()]).then(function (res) {
         var cats = res[0].docs.map(function (d) { return { id: d.id, data: d.data() || {} }; });
         var prods = res[1].docs.map(function (d) { return { id: d.id, data: d.data() || {} }; });
@@ -305,10 +333,10 @@
           data.createdAt = serverTs();
           ops.push({ type: 'set', col: 'products', id: sp.id, data: data });
         });
-        ops.push({ type: 'set', col: 'meta', id: 'catalog', data: { version: D.CONFIG.catalogVersion, migratedAt: serverTs() } });
-        return commitOps(ops).then(function () { return true; });
+        ops.push({ type: 'set', col: 'meta', id: 'catalog', data: { version: 2, migratedAt: serverTs() } });
+        return commitOps(ops);
       });
-    });
+    }
   }
 
   function restoreDefaults() {
@@ -562,7 +590,7 @@
     $('#detailGrid').innerHTML =
       field('العميل', o.name) + field('الموبايل', o.phone, true) + field('موبايل تاني', o.phone2, true) +
       field('المحافظة', o.governorate) + field('المدينة', o.city) + field('العنوان', o.address) +
-      field('ملاحظات', o.notes) + field('الدفع', o.paymentMethod) + field('الجهاز', o.deviceType) +
+      field('ملاحظات', o.notes) + field('الدفع', o.paymentMethod) + field('منطقة الشحن', o.shippingZone) + field('الجهاز', o.deviceType) +
       field('التاريخ', fmtDate(o._ts, true)) + field('الحالة', st) +
       (o.gps ? '<div class="detail-item"><label>الموقع</label><span><a href="' + esc(/^https:\/\//.test(o.gps) ? o.gps : '#') + '" target="_blank" rel="noopener">📍 فتح الخريطة</a></span></div>' : '');
     $('#detailProductsList').innerHTML = orderItems(o).map(function (i) {
@@ -591,14 +619,14 @@
   function exportCsv() {
     var list = filteredOrders();
     if (!list.length) return toast('مفيش أوردرات للتصدير', 'warn');
-    var cols = ['الكود', 'التاريخ', 'الاسم', 'الموبايل', 'موبايل تاني', 'المحافظة', 'المدينة', 'العنوان', 'المنتجات', 'عدد القطع', 'المنتجات (ج)', 'الشحن', 'الإجمالي', 'الدفع', 'الحالة', 'ملاحظات', 'الموقع'];
+    var cols = ['الكود', 'التاريخ', 'الاسم', 'الموبايل', 'موبايل تاني', 'المحافظة', 'المدينة', 'العنوان', 'المنتجات', 'عدد القطع', 'المنتجات (ج)', 'الشحن', 'منطقة الشحن', 'الإجمالي', 'الدفع', 'الحالة', 'ملاحظات', 'الموقع'];
     var cell = function (v) { v = String(v == null ? '' : v); return '"' + v.replace(/"/g, '""') + '"'; };
     var rows = list.map(function (o) {
       var items = orderItems(o);
       return [o.orderCode, new Date(o._ts || Date.now()).toLocaleString('ar-EG'), o.name, o.phone, o.phone2, o.governorate, o.city, o.address,
         items.map(function (i) { return (i.categoryName ? i.categoryName + ' - ' : '') + i.name + ' x' + (i.qty || 1); }).join(' | '),
         items.reduce(function (s, i) { return s + num(i.qty, 1); }, 0),
-        typeof o.subtotal === 'number' ? o.subtotal : orderTotal(o) - num(o.shipping, 0), o.shipping || 0, orderTotal(o),
+        typeof o.subtotal === 'number' ? o.subtotal : orderTotal(o) - num(o.shipping, 0), o.shipping || 0, o.shippingZone || '', orderTotal(o),
         o.paymentMethod, o.status || 'جديد', o.notes, o.gps].map(cell).join(',');
     });
     var blob = new Blob(['\ufeff' + cols.map(cell).join(',') + '\n' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
@@ -696,6 +724,8 @@
     $('#cIcon').value = c ? c.icon : '🕌';
     $('#cTagline').value = c ? c.tagline : '';
     $('#cDesc').value = c ? c.description : '';
+    $('#cBestFor').value = c ? c.bestFor : '';
+    $('#cChooser').value = c ? c.chooser : '';
     $('#cPrice').value = c && c.price ? c.price : '';
     $('#cOldPrice').value = c && c.oldPrice ? c.oldPrice : '';
     $('#cBadge').value = c ? c.badge : '';
@@ -736,6 +766,7 @@
     var data = {
       name: name, shortName: $('#cShort').value.trim(), icon: $('#cIcon').value.trim() || '🕌',
       tagline: $('#cTagline').value.trim(), description: $('#cDesc').value.trim(),
+      bestFor: $('#cBestFor').value.trim(), chooser: $('#cChooser').value.trim(),
       price: Math.round(price), oldPrice: old ? Math.round(old) : null, badge: $('#cBadge').value.trim(),
       cardRatio: selectedRatio(), imageFit: $('#cFit').value === 'cover' ? 'cover' : 'contain',
       coverImg: CM.cover || '', specs: readSpecs(), visible: $('#cVisible').checked, updatedAt: serverTs()
@@ -1246,17 +1277,19 @@
   /* ================= SETTINGS ================= */
   var DEFAULT_THEME = { gold: '#C9A84C', bg: '#F5F0E8', header: '#0A0A0A' };
   function loadSettings() {
-    Promise.all([db.collection('settings').doc('store').get(), db.collection('settings').doc('theme').get()]).then(function (r) {
+    Promise.all([db.collection('settings').doc('store').get(), db.collection('settings').doc('theme').get(), db.collection('settings').doc('shipping').get()]).then(function (r) {
       S.store = r[0].exists ? (r[0].data() || {}) : {};
       S.theme = r[1].exists ? (r[1].data() || {}) : {};
+      S.shipping = D.normalizeShipping(r[2].exists ? r[2].data() : null);
       fillSettings();
-    }).catch(function (e) { toast('تعذر تحميل الإعدادات: ' + errMsg(e), 'error'); fillSettings(); });
+    }).catch(function (e) { toast('تعذر تحميل الإعدادات: ' + errMsg(e), 'error'); S.shipping = S.shipping || D.normalizeShipping(null); fillSettings(); });
   }
   function fillSettings() {
     var s = S.store, t = S.theme, d = D.CONFIG.defaults;
     $('#settingName').value = s.name || d.storeName;
     $('#settingWA').value = s.whatsapp || ('0' + d.whatsapp.replace(/^20/, ''));
-    $('#settingShipping').value = s.shipping != null ? s.shipping : d.shipping;
+    $('#settingTransfer').checked = s.allowTransfer === true;
+    if (S.shipping) renderShippingEditor();
     $('#settingShipCo').value = s.shippingCompany || '';
     setColor('Gold', t.gold || DEFAULT_THEME.gold);
     setColor('Bg', t.bg || DEFAULT_THEME.bg);
@@ -1264,13 +1297,82 @@
     $('#settingHeroText').value = t.heroText || '';
   }
   function setColor(key, v) { $('#color' + key).value = v; $('#color' + key + 'Text').value = v; }
+  /* ---------- shipping zones editor ---------- */
+  function shippingDraft() {
+    // read current editor state (zones + governorate assignment)
+    var zones = $$('#zonesEditor .zone-edit-row').map(function (row) {
+      return { id: row.getAttribute('data-zone'), name: row.querySelector('.zone-name').value.trim(), price: row.querySelector('.zone-price').value.trim() };
+    });
+    var govZones = {};
+    $$('#govGrid select').forEach(function (sel) { govZones[sel.getAttribute('data-gov')] = sel.value; });
+    return { zones: zones, govZones: govZones, deliveryText: $('#deliveryText').value };
+  }
+  function renderShippingEditor(draft) {
+    var sh = draft || S.shipping;
+    $('#zonesEditor').innerHTML = sh.zones.map(function (z) {
+      var count = D.GOVERNORATES.filter(function (g) { return sh.govZones[g] === z.id; }).length;
+      return '<div class="zone-edit-row" data-zone="' + esc(z.id) + '">' +
+        '<input type="text" class="setting-input zone-name" maxlength="60" value="' + esc(z.name) + '" aria-label="اسم المنطقة">' +
+        '<input type="number" class="setting-input zone-price" min="0" step="1" inputmode="numeric" value="' + esc(z.price) + '" aria-label="سعر الشحن">' +
+        '<span class="zone-count">' + count + ' محافظة</span>' +
+        '<button type="button" class="icon-action danger" data-del-zone="' + esc(z.id) + '" title="حذف المنطقة"' + (sh.zones.length < 2 ? ' disabled' : '') + '>🗑️</button></div>';
+    }).join('');
+    var options = function (sel) {
+      return sh.zones.map(function (z) { return '<option value="' + esc(z.id) + '"' + (z.id === sel ? ' selected' : '') + '>' + esc(z.name || 'بدون اسم') + ' — ' + esc(z.price) + ' ج</option>'; }).join('');
+    };
+    $('#govGrid').innerHTML = D.GOVERNORATES.map(function (g) {
+      var zid = sh.govZones[g];
+      return '<label class="gov-item' + (zid ? '' : ' changed') + '"><span>' + esc(g) + '</span><select data-gov="' + esc(g) + '">' +
+        (zid ? '' : '<option value="" selected>— اختار —</option>') + options(zid) + '</select></label>';
+    }).join('');
+    if (!draft) $('#deliveryText').value = sh.deliveryText || '';
+    setFormError('shippingFormError', '');
+  }
+  function refreshShippingLabels() {
+    // update option labels and counts in place (keeps focus while typing)
+    var d = shippingDraft();
+    d.zones.forEach(function (z) {
+      var count = D.GOVERNORATES.filter(function (g) { return d.govZones[g] === z.id; }).length;
+      var row = $('#zonesEditor .zone-edit-row[data-zone="' + z.id + '"] .zone-count'); if (row) row.textContent = count + ' محافظة';
+      $$('#govGrid option[value="' + z.id + '"]').forEach(function (o) { o.textContent = (z.name || 'بدون اسم') + ' — ' + (z.price === '' ? '?' : z.price) + ' ج'; });
+    });
+  }
+  function saveShipping(e) {
+    e.preventDefault();
+    var d = shippingDraft(), errs = [];
+    $$('#shippingForm .invalid').forEach(function (x) { x.classList.remove('invalid'); });
+    var names = {};
+    d.zones.forEach(function (z, i) {
+      var row = $$('#zonesEditor .zone-edit-row')[i];
+      if (!z.name) { errs.push('فيه منطقة من غير اسم'); row.querySelector('.zone-name').classList.add('invalid'); }
+      else if (names[z.name]) { errs.push('فيه منطقتين بنفس الاسم: ' + z.name); row.querySelector('.zone-name').classList.add('invalid'); }
+      names[z.name] = 1;
+      if (z.price === '' || !(num(z.price, -1) >= 0)) { errs.push('سعر ' + (z.name || 'منطقة') + ' مش صحيح'); row.querySelector('.zone-price').classList.add('invalid'); }
+    });
+    if (!d.zones.length) errs.push('لازم منطقة واحدة على الأقل');
+    var unassigned = D.GOVERNORATES.filter(function (g) { return !d.govZones[g]; });
+    if (unassigned.length) errs.push('حدد منطقة لـ: ' + unassigned.join('، '));
+    if (errs.length) return setFormError('shippingFormError', errs.filter(function (v, i, a) { return a.indexOf(v) === i; }).join(' — '));
+    var data = {
+      zones: d.zones.map(function (z) { return { id: z.id, name: z.name, price: Math.round(num(z.price, 0)) }; }),
+      govZones: d.govZones,
+      deliveryText: d.deliveryText.trim() || D.SEED_SHIPPING.deliveryText,
+      updatedAt: serverTs()
+    };
+    var btn = $('#saveShippingBtn'); btn.disabled = true; btn.textContent = '⏳ جاري الحفظ...';
+    db.collection('settings').doc('shipping').set(data).then(function () {
+      S.shipping = D.normalizeShipping(data); renderShippingEditor();
+      toast('✅ تم حفظ أسعار الشحن — هتتطبق على الأوردرات الجديدة');
+    }).catch(function (err) { setFormError('shippingFormError', 'تعذر الحفظ: ' + errMsg(err)); })
+      .then(function () { btn.disabled = false; btn.textContent = '💾 حفظ أسعار الشحن'; });
+  }
+
   function saveStore(e) {
     e.preventDefault();
-    var wa = D.normalizeWhatsapp($('#settingWA').value), ship = $('#settingShipping').value;
+    var wa = D.normalizeWhatsapp($('#settingWA').value);
     if (!/^20?1[0125]\d{8}$/.test(wa) && !/^\d{10,15}$/.test(wa)) { $('#settingWA').classList.add('invalid'); return toast('رقم الواتساب مش صحيح', 'error'); }
-    if (ship === '' || !(num(ship, -1) >= 0)) { $('#settingShipping').classList.add('invalid'); return toast('اكتب رسوم الشحن', 'error'); }
-    $('#settingWA').classList.remove('invalid'); $('#settingShipping').classList.remove('invalid');
-    var data = { name: $('#settingName').value.trim(), whatsapp: $('#settingWA').value.trim(), shipping: Math.round(num(ship, 0)), shippingCompany: $('#settingShipCo').value.trim(), updatedAt: serverTs() };
+    $('#settingWA').classList.remove('invalid');
+    var data = { name: $('#settingName').value.trim(), whatsapp: $('#settingWA').value.trim(), allowTransfer: $('#settingTransfer').checked, shippingCompany: $('#settingShipCo').value.trim(), updatedAt: serverTs() };
     db.collection('settings').doc('store').set(data, { merge: true }).then(function () { S.store = data; toast('✅ تم حفظ بيانات المتجر'); })
       .catch(function (err) { toast('تعذر الحفظ: ' + errMsg(err), 'error'); });
   }
@@ -1422,6 +1524,31 @@
     $$('input[name="catDelMode"]').forEach(function (r) { r.addEventListener('change', function () { $('#catDeleteMoveTo').disabled = $('input[name="catDelMode"]:checked').value !== 'move'; }); });
     // settings
     $('#storeSettingsForm').addEventListener('submit', saveStore);
+    $('#shippingForm').addEventListener('submit', saveShipping);
+    $('#addZoneBtn').addEventListener('click', function () {
+      if (!S.shipping) return;
+      var d = shippingDraft();
+      d.zones.push({ id: 'z' + D.randomId(6).toLowerCase(), name: '', price: '' });
+      renderShippingEditor(d);
+      var rows = $$('#zonesEditor .zone-name'); rows[rows.length - 1].focus();
+    });
+    $('#zonesEditor').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-del-zone]'); if (!b) return;
+      var id = b.getAttribute('data-del-zone'), d = shippingDraft();
+      if (d.zones.length < 2) return;
+      var moved = D.GOVERNORATES.filter(function (g) { return d.govZones[g] === id; });
+      d.zones = d.zones.filter(function (z) { return z.id !== id; });
+      moved.forEach(function (g) { d.govZones[g] = ''; });
+      renderShippingEditor(d);
+      if (moved.length) setFormError('shippingFormError', 'اختار منطقة جديدة للمحافظات المعلّمة باللون البرتقالي: ' + moved.join('، '));
+    });
+    $('#zonesEditor').addEventListener('input', refreshShippingLabels);
+    $('#govGrid').addEventListener('change', function (e) {
+      var sel = e.target.closest('select'); if (!sel) return;
+      var emptyOpt = sel.querySelector('option[value=""]'); if (sel.value && emptyOpt) emptyOpt.remove();
+      sel.parentElement.classList.toggle('changed', !sel.value);
+      refreshShippingLabels();
+    });
     $('#themeForm').addEventListener('submit', saveTheme);
     $('#resetThemeBtn').addEventListener('click', resetTheme);
     ['Gold', 'Bg', 'Header'].forEach(function (k) {

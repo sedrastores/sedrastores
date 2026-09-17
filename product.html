@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/sedra.css?v=3">
+<link rel="stylesheet" href="assets/sedra.css?v=4">
 <title>تفاصيل المنتج — سيدرا ستور</title>
 <meta name="description" content="تفاصيل تصميم المصلى من سيدرا ستور.">
 <style>
@@ -137,6 +137,7 @@
     <div class="footer-col">
       <h4>Sedra Store</h4>
       <p>مصليات فاخرة بتصاميم إسلامية: مبطنة إسفنج، بمسند للظهر، وميموري فوم لراحة الركبة.</p>
+      <a data-wa-link target="_blank" rel="noopener" href="https://wa.me/201033035681">واتساب: <span data-wa-display dir="ltr">01033035681</span></a>
     </div>
     <div class="footer-col">
       <h4>الأصناف</h4>
@@ -147,12 +148,10 @@
       </div>
     </div>
     <div class="footer-col">
-      <h4>الشحن والتواصل</h4>
-      <p>الشحن لكل المحافظات: <span data-shipping>75 ج</span></p>
-      <p>التوصيل: 2-5 أيام عمل</p>
-      <p>الدفع: عند الاستلام أو تحويل إلكتروني</p>
-      <a data-wa-link target="_blank" rel="noopener" href="https://wa.me/201033035681">واتساب: <span data-wa-display dir="ltr">01033035681</span></a>
-      <p>الإرجاع: في حالة العيب الصناعي فقط</p>
+      <h4>معلومات تهمك</h4>
+      <a href="shipping.html">الشحن والتوصيل (<span data-shipping>من 75 ج</span>)</a>
+      <a href="returns.html">الاستبدال والاسترجاع</a>
+      <p>معاينة قبل الاستلام، والدفع عند الاستلام</p>
     </div>
   </div>
   <div class="footer-bottom"><p>© <span id="yearNow">2026</span> سيدرا ستور — جميع الحقوق محفوظة</p></div>
@@ -161,8 +160,8 @@
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
 </a>
 
-<script src="assets/sedra-data.js?v=3"></script>
-<script src="assets/sedra-store.js?v=3"></script>
+<script src="assets/sedra-data.js?v=4"></script>
+<script src="assets/sedra-store.js?v=4"></script>
 <script>
 function renderFooterCats(cat) {
   var el = document.getElementById('footerCats'); if (!el) return;
@@ -288,7 +287,7 @@ function renderProduct(cat) {
       '<div class="viewers"><i></i><b id="viewerCount">14</b> بيتفرجوا على التصميم ده دلوقتي</div>' +
       '<div class="price-block"><span class="price-now">' + D.money(price) + '</span>' +
         (old ? '<span class="price-was">' + D.money(old) + '</span><span class="save">وفّر ' + D.money(old - price) + '</span>' : '') +
-        '<div class="price-ship"><strong>+ <span data-shipping>' + D.money(cat.settings.shipping) + '</span> شحن</strong>على الطلب كله</div></div>' +
+        '<div class="price-ship"><strong>+ الشحن <span data-shipping>من ' + D.money(D.minShipping(cat)) + '</span></strong>حسب المحافظة — <a href="shipping.html" style="color:var(--gold-dark);font-weight:800">التفاصيل</a></div></div>' +
       (specs.length ? '<div class="box"><h3>المواصفات</h3><div class="specs-grid">' + specs.map(function (sp) {
         return '<div><span class="spec-label">' + D.esc(sp.label) + '</span><span class="spec-val">' + D.esc(sp.value) + '</span></div>';
       }).join('') + '</div></div>' : '') +
@@ -301,7 +300,7 @@ function renderProduct(cat) {
         '<button class="add-more-btn" type="button" id="addOther" style="margin:0">+ أضف تصميم تاني أو صنف تاني لنفس الطلب</button>' +
         '<div class="in-cart-note" id="inCartNote"><span>✓ في طلبك: <b id="inCartQty">0</b> من التصميم ده</span><button type="button" data-checkout>إتمام الطلب</button></div>' +
       '</div>' +
-      '<div class="return-policy"><strong>سياسة الإرجاع</strong>الاسترجاع في حالة العيب الصناعي فقط. لا يُقبل الإرجاع بعد الاستخدام أو لعدم الرضا عن التصميم.</div>' +
+      '<div class="return-policy"><strong>👀 عاين قبل ما تستلم</strong>من حقك تفتح الشحنة وتعاين المصلية قدام المندوب قبل ما تدفع. لو مش عاجباك ترجّعها وتدفع مصاريف الشحن بس، ولو فيها عيب إحنا بنتحمل الشحن كله. <a href="returns.html" style="color:var(--gold-dark);font-weight:800">التفاصيل</a></div>' +
       '<a class="btn btn-wa btn-block" id="inquiryBtn" target="_blank" rel="noopener" href="#">' + Sedra.WA_SVG + ' استفسر عن التصميم ده</a>' +
     '</div>' +
   '</div>';

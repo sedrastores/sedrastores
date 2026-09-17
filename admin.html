@@ -1205,6 +1205,19 @@
   .design-rank-img { overflow: hidden; background: #fff; border: 1px solid var(--border); cursor: zoom-in; }
   .design-rank-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
   .detail-product-row img, .order-thumb img { max-width: 100%; }
+
+  .settings-card.wide { grid-column: 1 / -1; }
+  .zones-head, .zone-edit-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 90px 40px; gap: 8px; align-items: center; }
+  .zones-head { font-size: 11px; font-weight: 800; color: var(--text-light); margin-bottom: 6px; padding: 0 2px; }
+  .zone-edit-row { margin-bottom: 8px; }
+  .zone-edit-row input { width: 100%; }
+  .zone-edit-row .zone-count { font-size: 12px; color: var(--text-light); text-align: center; }
+  .sub-h { font-size: 14px; font-weight: 800; margin: 18px 0 10px; }
+  .gov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px; }
+  .gov-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #faf8f3; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 13px; font-weight: 700; }
+  .gov-item select { flex: 1; max-width: 72%; min-width: 0; padding: 5px 6px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 12px; background: #fff; }
+  .gov-item.changed { border-color: var(--orange); background: #fffbeb; }
+  @media (max-width: 560px) { .gov-grid { grid-template-columns: 1fr; } .zones-head, .zone-edit-row { grid-template-columns: minmax(0, 1fr) 80px 36px; } .zones-head span:nth-child(3), .zone-edit-row .zone-count { display: none; } }
 </style>
 </head>
 <body>
@@ -1371,9 +1384,22 @@
             <h3>🏪 بيانات المتجر</h3>
             <div class="setting-row"><label class="setting-label" for="settingName">اسم المتجر</label><input type="text" class="setting-input" id="settingName"></div>
             <div class="setting-row"><label class="setting-label" for="settingWA">رقم واتساب (اللي بيوصله استفسارات العملاء)</label><input type="tel" class="setting-input" id="settingWA" dir="ltr" placeholder="01033035681"></div>
-            <div class="setting-row"><label class="setting-label" for="settingShipping">رسوم الشحن على الأوردر (جنيه)</label><input type="number" min="0" step="1" class="setting-input" id="settingShipping"></div>
+            <label class="switch-row"><input type="checkbox" id="settingTransfer"> <span>إظهار "تحويل إلكتروني" كطريقة دفع (لو مقفول: الدفع عند الاستلام بس)</span></label>
             <div class="setting-row"><label class="setting-label" for="settingShipCo">شركة الشحن (اختياري)</label><input type="text" class="setting-input" id="settingShipCo"></div>
             <button class="save-settings-btn" type="submit">💾 حفظ بيانات المتجر</button>
+          </form>
+
+          <form class="settings-card wide" id="shippingForm" novalidate>
+            <h3>🚚 الشحن والتوصيل</h3>
+            <p class="hint" style="margin-bottom:12px">سعر الشحن بيتحسب على العميل تلقائي حسب المحافظة اللي بيختارها في الأوردر، وبيظهر في صفحة "الشحن والتوصيل".</p>
+            <div class="zones-head"><span>اسم المنطقة</span><span>السعر (ج)</span><span>المحافظات</span><span></span></div>
+            <div id="zonesEditor"></div>
+            <button type="button" class="btn-ghost" id="addZoneBtn">+ إضافة منطقة</button>
+            <h4 class="sub-h">كل محافظة تبع أنهي منطقة؟</h4>
+            <div class="gov-grid" id="govGrid"></div>
+            <div class="setting-row" style="margin-top:14px"><label class="setting-label" for="deliveryText">مدة التوصيل (كل سطر بيظهر كنقطة في صفحة الشحن)</label><textarea class="setting-input" id="deliveryText" rows="4"></textarea></div>
+            <div class="form-error" id="shippingFormError"></div>
+            <button class="save-settings-btn" type="submit" id="saveShippingBtn">💾 حفظ أسعار الشحن</button>
           </form>
 
           <form class="settings-card" id="themeForm">
@@ -1436,6 +1462,8 @@
       <div class="add-modal-field"><label for="cIcon">أيقونة</label><input type="text" id="cIcon" maxlength="8" placeholder="🕌" style="font-size:18px"></div>
       <div class="add-modal-field span2"><label for="cTagline">جملة بتميز الصنف (بتظهر تحت الاسم)</label><input type="text" id="cTagline" maxlength="90" placeholder="مثال: مسند يريح ظهرك في الجلوس والأذكار"></div>
       <div class="add-modal-field span2"><label for="cDesc">وصف الصنف</label><textarea id="cDesc" rows="3" maxlength="600"></textarea></div>
+      <div class="add-modal-field"><label for="cBestFor">مناسبة لمين؟ (بتظهر في المقارنة)</label><input type="text" id="cBestFor" maxlength="80" placeholder="مثال: اللي ظهره بيتعب في الجلوس الطويل"></div>
+      <div class="add-modal-field"><label for="cChooser">إحساس العميل (زرار في "مش متأكد أي نوع يناسبك؟")</label><input type="text" id="cChooser" maxlength="60" placeholder="مثال: ظهري بيتعب وأنا قاعد"></div>
       <div class="add-modal-field"><label for="cPrice">السعر (جنيه) *</label><input type="number" id="cPrice" min="1" step="1"></div>
       <div class="add-modal-field"><label for="cOldPrice">السعر قبل الخصم (اختياري)</label><input type="number" id="cOldPrice" min="0" step="1"></div>
       <div class="add-modal-field"><label for="cBadge">شارة على الكارت</label><input type="text" id="cBadge" maxlength="20" placeholder="مثال: ميموري فوم"></div>
@@ -1459,12 +1487,12 @@
     </fieldset>
 
     <fieldset class="fs">
-      <legend>صورة الصنف (بتظهر في كارت الصنف)</legend>
+      <legend>صورة الصنف — البانر (بتظهر في كارت الصنف وفوق صفحة الصنف، ويفضل تكون عريضة 3:2)</legend>
       <div class="single-img">
         <div class="single-img-thumb" id="cCoverThumb"></div>
         <div class="single-img-tools">
           <label class="btn-ghost file-btn">📤 رفع صورة<input type="file" accept="image/*" id="cCoverFile" hidden></label>
-          <div class="url-add"><input type="text" id="cCoverUrl" dir="ltr" placeholder="أو مسار/رابط: images/masnad/4/main.jpg"><button type="button" class="btn-ghost" id="cCoverUrlBtn">استخدام</button></div>
+          <div class="url-add"><input type="text" id="cCoverUrl" dir="ltr" placeholder="أو مسار/رابط: images/categories/masnad.jpg"><button type="button" class="btn-ghost" id="cCoverUrlBtn">استخدام</button></div>
           <button type="button" class="link-btn danger" id="cCoverClear">إزالة الصورة (هيستخدم صورة أول منتج)</button>
           <div class="upload-status" id="cCoverStatus"></div>
         </div>
@@ -1570,7 +1598,7 @@
 
 <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
 
-<script src="assets/sedra-data.js?v=3"></script>
-<script src="assets/admin.js?v=3"></script>
+<script src="assets/sedra-data.js?v=4"></script>
+<script src="assets/admin.js?v=4"></script>
 </body>
 </html>

@@ -28,59 +28,107 @@
       shipping: 75,
       shippingCompany: ''
     },
-    catalogVersion: 2
+    catalogVersion: 3,   // admin applies data updates up to this version
+    minLiveVersion: 2    // storefront trusts Firestore from this version
   };
 
   /* ---------------- Default catalog ---------------- */
-  var SPONGE_SPECS = [
-    { label: 'المقاس', value: '120 × 68 سم' },
-    { label: 'السماكة', value: '2 سم' },
-    { label: 'الخامة', value: 'إسفنج عالي الجودة' },
-    { label: 'التشطيب', value: 'شراشيب أنيقة' }
-  ];
-
   var SEED_CATEGORIES = [
     {
       id: 'sponge', order: 0, visible: true, icon: '🕌',
       name: 'مصليات مبطنة إسفنج',
       shortName: 'مبطنة إسفنج',
-      tagline: 'خفيفة وناعمة للاستخدام اليومي',
-      description: 'مصلى مبطن بطبقة إسفنج 2 سم تحت ركبتك وجبهتك، سهل تلفه وتشيله معاك، بتصاميم إسلامية وشراشيب.',
+      tagline: 'خفيفة وسهلة الحمل للاستخدام اليومي',
+      description: 'مصلية مبطنة بإسفنج عالي الكثافة سمكه 2 سم، خفيفة وسهلة الحمل ومناسبة للاستخدام اليومي، بتصاميم إسلامية فاخرة وتشطيب بالشراشيب.',
+      bestFor: 'الاستخدام اليومي',
+      chooser: 'عايز مصلية خفيفة للاستخدام اليومي',
       price: 450, oldPrice: 600, badge: 'إسفنج',
       cardRatio: '1/1', imageFit: 'cover',
-      coverImg: 'images/product1_thumb.jpg',
-      specs: SPONGE_SPECS
+      coverImg: 'images/categories/sponge.jpg',
+      specs: [
+        { label: 'المقاس', value: '120 × 68 سم' },
+        { label: 'السماكة', value: '2 سم' },
+        { label: 'الخامة', value: 'إسفنج عالي الكثافة' },
+        { label: 'التشطيب', value: 'شراشيب' }
+      ]
     },
     {
       id: 'masnad', order: 1, visible: true, icon: '🪑',
       name: 'مصليات بمسند للظهر',
       shortName: 'بمسند',
-      tagline: 'مسند يريح ظهرك في الجلوس والأذكار',
-      description: 'مصلى بمسند ظهر مدمج، تقعد عليه براحة في التشهد والأذكار وقراءة القرآن. كل تصميم متصور من كل الزوايا عشان تشوفه كويس قبل ما تطلب.',
+      tagline: 'مسند ظهر خشب يتحمل لحد 250 كيلو',
+      description: 'مصلية إسفنج بالكامل بسمك 3 سم مع ظهر خشب يتحمل لحد 250 كيلو، بتسند ظهرك وانت قاعد في التشهد والأذكار وقراءة القرآن، وقابلة للطي وسهلة الحمل.',
+      bestFor: 'اللي ظهره بيتعب في الجلوس الطويل',
+      chooser: 'ظهري بيتعب وأنا قاعد',
       price: 750, oldPrice: null, badge: 'بمسند',
       cardRatio: '4/3', imageFit: 'contain',
-      coverImg: 'images/masnad/4/main.jpg',
+      coverImg: 'images/categories/masnad.jpg',
       specs: [
-        { label: 'المسند', value: 'مسند ظهر مدمج' },
-        { label: 'الاستخدام', value: 'الصلاة والجلوس والأذكار' }
+        { label: 'المقاس', value: '150 × 70 سم' },
+        { label: 'السماكة', value: '3 سم (من غير الخشب)' },
+        { label: 'الخامة', value: 'إسفنج بالكامل' },
+        { label: 'الظهر', value: 'خشب يتحمل لحد 250 كيلو' },
+        { label: 'الطي', value: 'قابلة للطي وسهلة الحمل' },
+        { label: 'التشطيب', value: 'شراشيب' }
       ]
     },
     {
       id: 'memory', order: 2, visible: true, icon: '🦵',
       name: 'مصليات ميموري فوم للركبة',
       shortName: 'ميموري فوم',
-      tagline: 'ميموري فوم 5 سم في منطقة الركبة',
-      description: 'مصلى إسفنج مع طبقة ميموري فوم سمكها 5 سم في منطقة الركبة بالتحديد، بتخفف الضغط على الركبة في السجود والجلوس الطويل.',
+      tagline: 'ميموري فوم 5 سم يريّح ركبتك',
+      description: 'مصلية إسفنج فيها طبقة ميموري فوم سمكها 5 سم في منطقة الركبة بالتحديد، بتخفف الضغط على ركبتك في السجود والجلوس، وخفيفة وسهلة الحمل.',
+      bestFor: 'اللي عنده ألم في الركبة أو بيطوّل في السجود',
+      chooser: 'ركبتي بتوجعني في السجود',
       price: 950, oldPrice: null, badge: 'ميموري فوم',
       cardRatio: '2/3', imageFit: 'contain',
-      coverImg: 'images/memory/1.jpg',
+      coverImg: 'images/categories/memory.jpg',
       specs: [
-        { label: 'منطقة الركبة', value: 'ميموري فوم 5 سم' },
-        { label: 'باقي المصلى', value: 'إسفنج' },
-        { label: 'مناسبة لـ', value: 'آلام الركبة والجلوس الطويل' }
+        { label: 'المقاس', value: '120 × 70 سم' },
+        { label: 'السماكة', value: 'ميموري فوم 5 سم في منطقة الركبة' },
+        { label: 'الخامة', value: 'إسفنج + ميموري فوم في منطقة الركبة' },
+        { label: 'التشطيب', value: 'شراشيب' }
       ]
     }
   ];
+
+  /* ---------------- Shipping zones ---------------- */
+  var GOVERNORATES = ['القاهرة', 'الجيزة', 'الإسكندرية', 'القليوبية', 'الشرقية', 'الدقهلية', 'المنوفية', 'الغربية', 'كفر الشيخ', 'البحيرة',
+    'الإسماعيلية', 'السويس', 'بورسعيد', 'دمياط', 'بني سويف', 'الفيوم', 'المنيا', 'أسيوط', 'سوهاج', 'قنا', 'الأقصر', 'أسوان',
+    'البحر الأحمر', 'الوادي الجديد', 'مطروح', 'شمال سيناء', 'جنوب سيناء'];
+  var SEED_SHIPPING = {
+    zones: [
+      { id: 'cairo', name: 'القاهرة والجيزة', price: 75 },
+      { id: 'delta', name: 'الدلتا ومدن القناة', price: 95 },
+      { id: 'upper', name: 'الصعيد وشمال سيناء', price: 110 },
+      { id: 'redsea', name: 'البحر الأحمر ومطروح (الغردقة والساحل)', price: 125 },
+      { id: 'far', name: 'جنوب سيناء والوادي الجديد', price: 150 }
+    ],
+    govZones: {
+      'القاهرة': 'cairo', 'الجيزة': 'cairo',
+      'الإسكندرية': 'delta', 'القليوبية': 'delta', 'الشرقية': 'delta', 'الدقهلية': 'delta', 'المنوفية': 'delta', 'الغربية': 'delta',
+      'كفر الشيخ': 'delta', 'البحيرة': 'delta', 'دمياط': 'delta', 'الإسماعيلية': 'delta', 'السويس': 'delta', 'بورسعيد': 'delta',
+      'بني سويف': 'upper', 'الفيوم': 'upper', 'المنيا': 'upper', 'أسيوط': 'upper', 'سوهاج': 'upper', 'قنا': 'upper', 'الأقصر': 'upper',
+      'أسوان': 'upper', 'شمال سيناء': 'upper',
+      'البحر الأحمر': 'redsea', 'مطروح': 'redsea',
+      'جنوب سيناء': 'far', 'الوادي الجديد': 'far'
+    },
+    deliveryText: 'القاهرة والجيزة: من 1 إلى 3 أيام عمل\nباقي المحافظات: من 3 إلى 5 أيام عمل\nيوم الجمعة إجازة، وأوردرات المحافظات بتطلع يومي السبت والتلات.'
+  };
+  function normalizeShipping(d) {
+    d = d || {};
+    var zones = (Array.isArray(d.zones) ? d.zones : []).map(function (z, i) {
+      return { id: String((z && z.id) || ('z' + i)), name: String((z && z.name) || ''), price: Math.max(0, Math.round(num(z && z.price, 0))) };
+    }).filter(function (z) { return z.name; });
+    if (!zones.length) return JSON.parse(JSON.stringify(SEED_SHIPPING));
+    var ids = zones.map(function (z) { return z.id; });
+    var govZones = {};
+    GOVERNORATES.forEach(function (g) {
+      var zid = d.govZones && d.govZones[g];
+      govZones[g] = ids.indexOf(zid) > -1 ? zid : null;
+    });
+    return { zones: zones, govZones: govZones, deliveryText: (typeof d.deliveryText === 'string' && d.deliveryText.trim()) ? d.deliveryText : SEED_SHIPPING.deliveryText };
+  }
 
   var SPONGE_NAMES = [
     ['تصميم الزهور الكلاسيكي', 'أزرق ملكي'],
@@ -100,7 +148,7 @@
   ];
   var MEMORY = [
     ['ميموري فوم — أزرق ملكي', 'أزرق ملكي'],
-    ['ميموري فوم — أسود فحمي', 'أسود فحمي'],
+    ['ميموري فوم — رمادي', 'رمادي'],
     ['ميموري فوم — أبيض لؤلؤي', 'أبيض لؤلؤي'],
     ['ميموري فوم — أحمر عنابي', 'أحمر عنابي'],
     ['ميموري فوم — وردي', 'وردي'],
@@ -161,6 +209,8 @@
       icon: d.icon || '🕌',
       tagline: d.tagline || '',
       description: d.description || '',
+      bestFor: d.bestFor || '',
+      chooser: d.chooser || '',
       price: num(d.price, 0),
       oldPrice: num(d.oldPrice, 0) || null,
       badge: d.badge || '',
@@ -386,8 +436,10 @@
         storeName: s.name || CONFIG.defaults.storeName,
         whatsapp: normalizeWhatsapp(s.whatsapp) || CONFIG.defaults.whatsapp,
         shipping: num(s.shipping, CONFIG.defaults.shipping),
-        shippingCompany: s.shippingCompany || ''
+        shippingCompany: s.shippingCompany || '',
+        allowTransfer: s.allowTransfer === true
       },
+      shipping: normalizeShipping(s.__shipping),
       theme: (settings && settings.__theme) || {}
     };
   }
@@ -421,9 +473,11 @@
       var meta = res[0] || {};
       var settingsDocs = res[3] || [];
       var store = {}, theme = {};
-      settingsDocs.forEach(function (d) { if (d.id === 'store') store = d.data; if (d.id === 'theme') theme = d.data; });
+      var shippingDoc = null;
+      settingsDocs.forEach(function (d) { if (d.id === 'store') store = d.data; if (d.id === 'theme') theme = d.data; if (d.id === 'shipping') shippingDoc = d.data; });
       store.__theme = theme;
-      if (!(num(meta.version, 0) >= CONFIG.catalogVersion)) {
+      store.__shipping = shippingDoc;
+      if (!(num(meta.version, 0) >= CONFIG.minLiveVersion)) {
         // Admin hasn't published the new catalog yet: show default catalog, but live settings
         return buildCatalog(
           SEED_CATEGORIES.map(function (c) { return { id: c.id, data: c }; }),
@@ -486,6 +540,18 @@
     var old = (p && p.oldPrice) || (p && !p.price ? (categoryById(cat, p.categoryId) || {}).oldPrice : null);
     return old && old > price ? old : null;
   }
+  function shippingZoneFor(cat, gov) {
+    var sh = (cat && cat.shipping) || normalizeShipping(null);
+    var zid = sh.govZones[gov];
+    var z = sh.zones.filter(function (x) { return x.id === zid; })[0];
+    if (z) return z;
+    // unmapped governorate: charge the highest zone so we never under-charge
+    return sh.zones.slice().sort(function (a, b) { return b.price - a.price; })[0] || { id: '', name: '', price: CONFIG.defaults.shipping };
+  }
+  function minShipping(cat) {
+    var sh = (cat && cat.shipping) || normalizeShipping(null);
+    return sh.zones.reduce(function (m, z) { return Math.min(m, z.price); }, Infinity);
+  }
   function productImages(p) {
     var list = [];
     [p.mainImg].concat(p.gallery || []).forEach(function (src) { if (src && list.indexOf(src) === -1) list.push(src); });
@@ -496,6 +562,7 @@
     CONFIG: CONFIG,
     SEED_CATEGORIES: SEED_CATEGORIES,
     SEED_PRODUCTS: SEED_PRODUCTS,
+    GOVERNORATES: GOVERNORATES, SEED_SHIPPING: SEED_SHIPPING, normalizeShipping: normalizeShipping, shippingZoneFor: shippingZoneFor, minShipping: minShipping,
     esc: esc, num: num, money: money, toLatinDigits: toLatinDigits, randomId: randomId, validRatio: validRatio,
     normalizeCategory: normalizeCategory, normalizeProduct: normalizeProduct, normalizeWhatsapp: normalizeWhatsapp, byOrder: byOrder,
     fs: { list: fsList, get: fsGet, commit: fsCommit, writeCreate: writeCreate, writeIncrement: writeIncrement, writeMerge: writeMerge, encodeFields: encodeFields, decodeFields: decodeFields },
