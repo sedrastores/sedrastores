@@ -238,11 +238,8 @@
       var ops = [], cats = {};
       r[0].docs.forEach(function (d) { cats[d.id] = d.data() || {}; });
       D.SEED_CATEGORIES.forEach(function (sc) {
-        var cur = cats[sc.id];
-        if (!cur) return; // deleted on purpose: respect it
-        var data = { shortName: sc.shortName, tagline: sc.tagline, description: sc.description, bestFor: sc.bestFor, chooser: sc.chooser, badge: sc.badge, specs: sc.specs };
-        if (!cur.coverImg || /^images\/(product\d+_thumb|masnad\/\d+\/main|memory\/\d+)\.jpg$/.test(cur.coverImg)) data.coverImg = sc.coverImg;
-        ops.push({ type: 'set', col: 'categories', id: sc.id, merge: true, data: data });
+        if (!cats[sc.id]) return; // deleted on purpose: respect it
+        ops.push({ type: 'set', col: 'categories', id: sc.id, merge: true, data: D.seedCategoryPatch(sc.id, cats[sc.id]) });
       });
       var m2 = r[1].docs.filter(function (d) { return d.id === 'memory-2'; })[0];
       if (m2 && (m2.data() || {}).name === 'ميموري فوم — أسود فحمي') ops.push({ type: 'update', col: 'products', id: 'memory-2', data: { name: 'ميموري فوم — رمادي', color: 'رمادي' } });

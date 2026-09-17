@@ -115,6 +115,16 @@
     },
     deliveryText: 'القاهرة والجيزة: من 1 إلى 3 أيام عمل\nباقي المحافظات: من 3 إلى 5 أيام عمل\nيوم الجمعة إجازة، وأوردرات المحافظات بتطلع يومي السبت والتلات.'
   };
+  var DEFAULT_COVER_RE = /^images\/(product\d+_thumb|masnad\/\d+\/main|memory\/\d+)\.jpg$/;
+  // v3 details for the 3 main categories. Never touches name, price, order or visibility.
+  function seedCategoryPatch(id, cur) {
+    var sc = SEED_CATEGORIES.filter(function (c) { return c.id === id; })[0];
+    if (!sc) return null;
+    cur = cur || {};
+    var patch = { shortName: sc.shortName, tagline: sc.tagline, description: sc.description, bestFor: sc.bestFor, chooser: sc.chooser, badge: sc.badge, specs: sc.specs };
+    if (!cur.coverImg || DEFAULT_COVER_RE.test(cur.coverImg)) patch.coverImg = sc.coverImg;
+    return patch;
+  }
   function normalizeShipping(d) {
     d = d || {};
     var zones = (Array.isArray(d.zones) ? d.zones : []).map(function (z, i) {
@@ -484,7 +494,18 @@
           SEED_PRODUCTS.map(function (p) { return { id: p.id, data: p }; }),
           store, 'seed-live');
       }
-      return buildCatalog(res[1], res[2], store, 'live');
+      var cats = res[1], prods = res[2];
+      if (num(meta.version, 0) < CONFIG.catalogVersion) {
+        // admin hasn't applied v3 yet: show the new details right away (in memory only)
+        cats = cats.map(function (c) {
+          var patch = seedCategoryPatch(c.id, c.data);
+          return patch ? { id: c.id, data: Object.assign({}, c.data, patch) } : c;
+        });
+        prods = prods.map(function (p) {
+          return (p.id === 'memory-2' && p.data.name === 'ميموري فوم — أسود فحمي') ? { id: p.id, data: Object.assign({}, p.data, { name: 'ميموري فوم — رمادي', color: 'رمادي' }) } : p;
+        });
+      }
+      return buildCatalog(cats, prods, store, 'live');
     });
   }
 
@@ -562,6 +583,7 @@
     CONFIG: CONFIG,
     SEED_CATEGORIES: SEED_CATEGORIES,
     SEED_PRODUCTS: SEED_PRODUCTS,
+    seedCategoryPatch: seedCategoryPatch,
     GOVERNORATES: GOVERNORATES, SEED_SHIPPING: SEED_SHIPPING, normalizeShipping: normalizeShipping, shippingZoneFor: shippingZoneFor, minShipping: minShipping,
     esc: esc, num: num, money: money, toLatinDigits: toLatinDigits, randomId: randomId, validRatio: validRatio,
     normalizeCategory: normalizeCategory, normalizeProduct: normalizeProduct, normalizeWhatsapp: normalizeWhatsapp, byOrder: byOrder,
