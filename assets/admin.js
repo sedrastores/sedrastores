@@ -613,6 +613,37 @@
       'الإجمالي: ' + orderTotal(o) + ' ج', o.notes ? 'ملاحظات: ' + o.notes : ''].filter(Boolean).join('\n');
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { toast('✅ اتنسخ'); }).catch(function () { window.prompt('انسخ البيانات:', text); });
   }
+  function exportFeed() {
+    if (!S.catsLoaded || !S.prodsLoaded) return toast('استنى لحد ما المنتجات تحمّل', 'error');
+    var base = 'https://sedrastores.com/';
+    var abs = function (u) { return !u ? '' : (/^https?:\/\//i.test(u) ? u : (D.isMedia(u) ? '' : base + String(u).replace(/^\//, ''))); };
+    var head = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand', 'item_group_id', 'product_type', 'quantity_to_sell_on_facebook'];
+    var rows = [head], skipped = 0;
+    S.products.forEach(function (p) {
+      var c = catById(p.categoryId);
+      if (!c || !c.visible || !p.visible) return;
+      var img = abs(p.mainImg);
+      if (!img) { skipped++; return; }  // images kept inside the database have no public link
+      rows.push([
+        p.id,
+        p.name + (p.color ? ' — ' + p.color : ''),
+        (p.description || c.description || p.name).replace(/\s+/g, ' ').slice(0, 900),
+        'in stock', 'new',
+        ((D.num(p.price, 0) || c.price) || 0).toFixed(2) + ' EGP',
+        base + 'product.html?id=' + encodeURIComponent(p.id),
+        img, 'Sedra Store', c.id, c.name, 100
+      ]);
+    });
+    if (rows.length < 2) return toast('مفيش منتجات صالحة للتصدير', 'error');
+    var csv = '\ufeff' + rows.map(function (r) {
+      return r.map(function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }).join(',');
+    }).join('\n');
+    var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    var a = document.createElement('a');
+    a.href = url; a.download = 'sedra-facebook-catalog.csv'; a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    toast('✅ اتنزّل ' + (rows.length - 1) + ' منتج' + (skipped ? ' — ' + skipped + ' منتج اتساب لأن صورته محفوظة في قاعدة البيانات' : ''));
+  }
   function exportCsv() {
     var list = filteredOrders();
     if (!list.length) return toast('مفيش أوردرات للتصدير', 'warn');
@@ -1286,6 +1317,7 @@
     $('#settingName').value = s.name || d.storeName;
     $('#settingWA').value = s.whatsapp || ('0' + d.whatsapp.replace(/^20/, ''));
     $('#settingTransfer').checked = s.allowTransfer === true;
+    $('#settingPixel').value = s.pixelId === '' ? 'off' : (s.pixelId || '');
     if (S.shipping) renderShippingEditor();
     $('#settingShipCo').value = s.shippingCompany || '';
     setColor('Gold', t.gold || DEFAULT_THEME.gold);
@@ -1369,7 +1401,11 @@
     var wa = D.normalizeWhatsapp($('#settingWA').value);
     if (!/^20?1[0125]\d{8}$/.test(wa) && !/^\d{10,15}$/.test(wa)) { $('#settingWA').classList.add('invalid'); return toast('رقم الواتساب مش صحيح', 'error'); }
     $('#settingWA').classList.remove('invalid');
-    var data = { name: $('#settingName').value.trim(), whatsapp: $('#settingWA').value.trim(), allowTransfer: $('#settingTransfer').checked, shippingCompany: $('#settingShipCo').value.trim(), updatedAt: serverTs() };
+    var pixRaw = $('#settingPixel').value.trim();
+    var pixel = /^off$/i.test(pixRaw) ? '' : pixRaw.replace(/\D/g, '');
+    if (pixRaw && !/^off$/i.test(pixRaw) && !/^\d{10,20}$/.test(pixel)) { $('#settingPixel').classList.add('invalid'); return toast('رقم البيكسل لازم يكون أرقام بس، أو كلمة off', 'error'); }
+    $('#settingPixel').classList.remove('invalid');
+    var data = { name: $('#settingName').value.trim(), whatsapp: $('#settingWA').value.trim(), allowTransfer: $('#settingTransfer').checked, pixelId: pixRaw ? pixel : null, shippingCompany: $('#settingShipCo').value.trim(), updatedAt: serverTs() };
     db.collection('settings').doc('store').set(data, { merge: true }).then(function () { S.store = data; toast('✅ تم حفظ بيانات المتجر'); })
       .catch(function (err) { toast('تعذر الحفظ: ' + errMsg(err), 'error'); });
   }
@@ -1492,6 +1528,7 @@
     // orders
     ['orderSearch', 'statusFilter', 'orderCatFilter'].forEach(function (id) { $('#' + id).addEventListener(id === 'orderSearch' ? 'input' : 'change', renderOrders); });
     $('#exportCsvBtn').addEventListener('click', exportCsv);
+    $('#exportFeedBtn').addEventListener('click', exportFeed);
     // products
     $('#prodSearch').addEventListener('input', function () { S.prodFilter.q = this.value; renderProducts(); });
     $('#prodVisFilter').addEventListener('change', function () { S.prodFilter.vis = this.value; renderProducts(); });

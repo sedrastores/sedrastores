@@ -1384,6 +1384,7 @@
             <h3>🏪 بيانات المتجر</h3>
             <div class="setting-row"><label class="setting-label" for="settingName">اسم المتجر</label><input type="text" class="setting-input" id="settingName"></div>
             <div class="setting-row"><label class="setting-label" for="settingWA">رقم واتساب (اللي بيوصله استفسارات العملاء)</label><input type="tel" class="setting-input" id="settingWA" dir="ltr" placeholder="01033035681"></div>
+            <div class="setting-row"><label class="setting-label" for="settingPixel">رقم بيكسل فيسبوك (Meta Pixel ID)</label><input type="text" class="setting-input" id="settingPixel" dir="ltr" placeholder="1152563063529555"><small class="hint">سيبه فاضي عشان يستخدم الرقم الافتراضي، أو اكتب كلمة <b>off</b> عشان توقف التتبع تماماً. الأدمن نفسه مش بيتسجل في البيكسل أبداً.</small></div>
             <label class="switch-row"><input type="checkbox" id="settingTransfer"> <span>إظهار "تحويل إلكتروني" كطريقة دفع (لو مقفول: الدفع عند الاستلام بس)</span></label>
             <div class="setting-row"><label class="setting-label" for="settingShipCo">شركة الشحن (اختياري)</label><input type="text" class="setting-input" id="settingShipCo"></div>
             <button class="save-settings-btn" type="submit">💾 حفظ بيانات المتجر</button>
@@ -1432,6 +1433,10 @@
             <h3>🧰 أدوات الكتالوج</h3>
             <p class="hint" style="margin-bottom:12px">لو مسحت منتج أو صنف من الأصناف الأساسية بالغلط، الزرار ده بيرجّع الناقص بس من غير ما يغير أي حاجة عدلتها.</p>
             <button class="save-settings-btn" type="button" id="restoreDefaultsBtn">♻️ رجّع الأصناف والمنتجات الأساسية الناقصة</button>
+            <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+            <h3 style="margin-bottom:6px">📢 كتالوج فيسبوك</h3>
+            <p class="hint" style="margin-bottom:12px">نزّل ملف المنتجات وارفعه في Meta Commerce Manager عشان إعلانات المنتجات الديناميكية تشتغل. نزّله تاني بعد أي تعديل في الأسعار أو المنتجات.</p>
+            <button class="save-settings-btn" type="button" id="exportFeedBtn">⬇️ تنزيل فيد الكتالوج (CSV)</button>
           </div>
 
           <div class="settings-card danger-zone">

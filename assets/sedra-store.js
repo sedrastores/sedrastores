@@ -130,6 +130,7 @@
     if (existing) existing.qty = Math.min(99, existing.qty + qty);
     else cart.push(snapshotItem(p, qty));
     saveCart();
+    if (global.SedraPixel) SedraPixel.addToCart(D, cat, p, qty);
     var badge = $('#cartCount');
     if (badge) { badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
     if (!silent) toast('اتضاف "' + p.name + '" للطلب', { label: 'عرض الطلب', fn: openCart });
@@ -358,6 +359,7 @@
     openLayer('checkout');
     checkoutOpenedAt = Date.now();
     track({ modalOpens: 1 });
+    if (global.SedraPixel) SedraPixel.initiateCheckout(cart.map(function (i) { return { id: i.productId, quantity: i.qty, item_price: i.price }; }));
   }
   function closeCheckout() {
     var m = $('#checkoutModal'); if (!m || !m.classList.contains('open')) return;
@@ -544,6 +546,11 @@
         alertBox.innerHTML = 'مقدرناش نبعت الطلب بسبب مشكلة في الاتصال. جرّب تاني، أو <a href="' + esc(waLink(summary)) + '" target="_blank" rel="noopener" style="color:#128C7E;font-weight:800">ابعت الطلب على واتساب مباشرة</a>.';
         alertBox.classList.add('show');
         return;
+      }
+      if (global.SedraPixel) {
+        var nameParts = String(o.name).trim().split(/\s+/);
+        SedraPixel.identify({ phone: o.phone, firstName: nameParts[0], lastName: nameParts.slice(1).join(' '), city: o.city, state: o.governorate });
+        SedraPixel.purchase(o);
       }
       var openedAt = checkoutOpenedAt; checkoutOpenedAt = 0;
       track({ orders: 1, modalTime: openedAt ? Math.min(3600, Math.round((Date.now() - openedAt) / 1000)) : 0, modalTimeSamples: openedAt ? 1 : 0 });
@@ -749,6 +756,10 @@
       if ($('#checkoutModal').classList.contains('open')) return closeCheckout();
       setCart(false); setMenu(false);
     });
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[href*="wa.me"]');
+      if (a && global.SedraPixel) SedraPixel.contact('whatsapp');
+    }, true);
     window.addEventListener('storage', function (e) { if (e.key === CART_KEY) { loadCart(); renderCartUI(); refreshAddButtons(); } });
   }
   function refreshAddButtons() {

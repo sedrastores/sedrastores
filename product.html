@@ -92,6 +92,33 @@
     body.has-sticky .whatsapp-float { bottom: 84px; }
   }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+window.SEDRA_PIXEL_DEFAULT = '1152563063529555';
+(function () {
+  var id = window.SEDRA_PIXEL_DEFAULT;
+  try {
+    var c = JSON.parse(localStorage.getItem('sedra_catalog_v2') || 'null');
+    var p = c && c.data && c.data.settings && c.data.settings.pixelId;
+    if (p === '') id = ''; else if (p) id = String(p).trim();
+  } catch (e) {}
+  if (!id) return;
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', id);
+  fbq('track', 'PageView');
+})();
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1152563063529555&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 <a href="#main" class="skip-link">تخطي للمحتوى</a>
@@ -161,6 +188,7 @@
 </a>
 
 <script src="assets/sedra-data.js?v=5"></script>
+<script src="assets/sedra-pixel.js?v=5"></script>
 <script src="assets/sedra-store.js?v=5"></script>
 <script>
 function renderFooterCats(cat) {
@@ -344,6 +372,7 @@ function renderProduct(cat) {
   document.getElementById('inquiryBtn').href = Sedra.waLink('السلام عليكم، عندي استفسار عن: ' + c.name + ' — ' + p.name);
   document.getElementById('sbPrice').textContent = D.money(price);
   updateInCart();
+  if (window.SedraPixel && G.pixelFor !== p.id) { G.pixelFor = p.id; SedraPixel.viewContent(D, cat, p); }
 }
 
 // lightbox wiring (static)
