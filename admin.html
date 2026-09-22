@@ -1218,6 +1218,9 @@
   .gov-item select { flex: 1; max-width: 72%; min-width: 0; padding: 5px 6px; border-radius: 6px; border: 1px solid var(--border); font-family: inherit; font-size: 12px; background: #fff; }
   .gov-item.changed { border-color: var(--orange); background: #fffbeb; }
   @media (max-width: 560px) { .gov-grid { grid-template-columns: 1fr; } .zones-head, .zone-edit-row { grid-template-columns: minmax(0, 1fr) 80px 36px; } .zones-head span:nth-child(3), .zone-edit-row .zone-count { display: none; } }
+
+  .img-missing { position: relative; background: repeating-linear-gradient(45deg, #fdf0f0, #fdf0f0 10px, #f8e2e2 10px, #f8e2e2 20px) !important; }
+  .img-missing::after { content: '⚠️ الصورة مش ظاهرة'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #b42318; text-align: center; padding: 6px; }
 </style>
 </head>
 <body>
