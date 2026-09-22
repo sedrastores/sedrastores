@@ -1453,19 +1453,7 @@
   }
 
   /* ================= EVENTS ================= */
-  function bindBrokenImages() {
-    document.addEventListener('error', function (e) {
-      var img = e.target;
-      if (!img || img.tagName !== 'IMG' || img.dataset.broken) return;
-      if (img.src === D.BLANK) return;
-      img.dataset.broken = '1';
-      img.src = D.BLANK;
-      var box = img.closest('.pa-img, .img-thumb, .single-img-thumb, .design-rank-img, .order-thumb');
-      if (box) box.classList.add('img-missing');
-    }, true);
-  }
   function bind() {
-    bindBrokenImages();
     $('#loginForm').addEventListener('submit', doLogin);
     $('#logoutBtn').addEventListener('click', logout);
     $('#menuToggle').addEventListener('click', function () { setSidebar(!$('#sidebar').classList.contains('open')); });

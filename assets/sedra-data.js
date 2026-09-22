@@ -397,16 +397,6 @@
     return Promise.all(keys.map(function (k) { return mediaPending[k] || Promise.resolve(); }));
   }
 
-  // images whose stored data could not be found: flag the card so it never looks empty
-  var MISSING_BOXES = '.p-img, .cat-card-media, .line-img, .s-img, .g-main, .g-thumb, .cat-banner, .pa-img, .img-thumb, .single-img-thumb, .design-rank-img, .order-thumb';
-  function markUnresolved(imgs) {
-    imgs.forEach(function (img) {
-      if (!img.getAttribute('data-media')) return;
-      var box = (img.closest && img.closest(MISSING_BOXES)) || img.parentElement;
-      if (box) box.classList.add('img-missing');
-    });
-  }
-
   // Replace placeholder <img data-media> in a container. Thumbs fall back to full image.
   function hydrateMedia(root) {
     root = root || document;
@@ -423,13 +413,12 @@
         else if (v === 't') missing[mediaDocId(ref, 'f')] = 1;
       });
       var fullKeys = Object.keys(missing);
-      if (!fullKeys.length) return markUnresolved(imgs);
+      if (!fullKeys.length) return;
       return fetchMedia(fullKeys).then(function () {
         imgs.forEach(function (img) {
           var ref = img.getAttribute('data-media');
           if (ref && mediaCache[mediaDocId(ref, 'f')]) { img.src = mediaCache[mediaDocId(ref, 'f')]; img.removeAttribute('data-media'); }
         });
-        markUnresolved(imgs);
       });
     });
   }
