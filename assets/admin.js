@@ -698,6 +698,73 @@
     });
   }
 
+  /* ---------- one-click repair: attach the images hosted on the site ---------- */
+  var SITE_IMAGES = [
+    { match: ['الروضة الشريفة', 'الروضه الشريفه'], path: 'images/sponge/olive.jpg' },
+    { match: ['السلطانة', 'السلطانه'], path: 'images/sponge/beige.jpg' },
+    { match: ['المحراب الذهبي'], path: 'images/sponge/gold.jpg' },
+    { match: ['نجوم الأندلس', 'الأندلس', 'الاندلس'], path: 'images/sponge/white-gold.jpg' },
+    { match: ['برج الساعة', 'برج الساعه'], path: 'images/masnad/burj.jpg' },
+    { match: ['الحجر الأسود', 'الحجر الاسود'], path: 'images/masnad/hajar.jpg' }
+  ];
+  function normName(t) { return String(t || '').replace(/[ًٌٍَُِّْ]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/\s+/g, ' ').trim(); }
+  function siteImageFor(name) {
+    var n = normName(name);
+    var hit = SITE_IMAGES.filter(function (e) {
+      return e.match.some(function (m) { return n.indexOf(normName(m)) > -1; });
+    })[0];
+    return hit ? hit.path : null;
+  }
+  function repairImages() {
+    if (!S.prodsLoaded) return toast('استنى لحد ما المنتجات تحمّل', 'error');
+    openModal('scanModal');
+    $('#scanBody').innerHTML = '<div class="empty-state"><p>⏳ بيفحص الصور ويربط الناقص...</p></div>';
+    var jobs = S.products.map(function (p) {
+      var refs = [p.mainImg].concat(p.gallery || []);
+      return Promise.all(refs.map(checkRef)).then(function (states) { return { p: p, refs: refs, states: states }; });
+    });
+    Promise.all(jobs).then(function (rows) {
+      var ops = [], fixed = [], cleaned = [], stillBroken = [];
+      rows.forEach(function (r) {
+        var goodGallery = [], mainOk = r.states[0].state === 'ok';
+        for (var i = 1; i < r.refs.length; i++) if (r.states[i].state === 'ok') goodGallery.push(r.refs[i]);
+        var lostCount = r.states.filter(function (s) { return s.state !== 'ok'; }).length;
+        if (!lostCount) return;
+        var data = {};
+        if (!mainOk) {
+          var path = siteImageFor(r.p.name);
+          if (path) { data.mainImg = path; fixed.push(r.p.name); }
+          else if (goodGallery.length) { data.mainImg = goodGallery.shift(); cleaned.push(r.p.name); }
+          else { stillBroken.push(r.p.name); }
+        }
+        if (goodGallery.length !== (r.p.gallery || []).length) data.gallery = goodGallery;
+        if (Object.keys(data).length) {
+          data.updatedAt = serverTs();
+          ops.push({ type: 'set', col: 'products', id: r.p.id, merge: true, data: data });
+          if (!data.mainImg && cleaned.indexOf(r.p.name) === -1) cleaned.push(r.p.name);
+        }
+      });
+      if (!ops.length) {
+        $('#scanBody').innerHTML = '<div class="scan-sum"><span class="scan-pill ok">مفيش حاجة محتاجة ربط ✅</span></div>';
+        return;
+      }
+      return commitOps(ops).then(function () {
+        var html = '<div class="scan-sum">' +
+          (fixed.length ? '<span class="scan-pill ok">' + fixed.length + ' منتج اتربطت صورته</span>' : '') +
+          (cleaned.length ? '<span class="scan-pill warn">' + cleaned.length + ' منتج اتشالت منه صور ضايعة</span>' : '') +
+          (stillBroken.length ? '<span class="scan-pill bad">' + stillBroken.length + ' منتج لسه محتاج صورة</span>' : '') + '</div>';
+        if (fixed.length) html += '<div class="scan-row"><b>اتربطت صورهم:</b><div class="scan-img">' + fixed.map(esc).join(' — ') + '</div></div>';
+        if (cleaned.length) html += '<div class="scan-row"><b>اتنضفت صورهم الضايعة:</b><div class="scan-img">' + cleaned.map(esc).join(' — ') + '</div></div>';
+        if (stillBroken.length) html += '<div class="scan-row"><b>لسه محتاجين صورة:</b><div class="scan-img bad">' + stillBroken.map(esc).join(' — ') + '</div></div>' +
+          '<div class="scan-note">دول مفيش صورة ليهم على الموقع. ابعتهم لكلود وهو يحطهم بمسار ثابت، أو ارفعهم من زرار تعديل المنتج.</div>';
+        $('#scanBody').innerHTML = html;
+        toast('✅ تم ربط ' + fixed.length + ' صورة');
+      });
+    }).catch(function (e) {
+      $('#scanBody').innerHTML = '<div class="empty-state"><p>تعذر الإصلاح: ' + esc(errMsg(e)) + '</p></div>';
+    });
+  }
+
   function exportFeed() {
     if (!S.catsLoaded || !S.prodsLoaded) return toast('استنى لحد ما المنتجات تحمّل', 'error');
     var base = 'https://sedrastores.com/';
@@ -1627,6 +1694,7 @@
     $('#exportCsvBtn').addEventListener('click', exportCsv);
     $('#exportFeedBtn').addEventListener('click', exportFeed);
     $('#scanImagesBtn').addEventListener('click', scanImages);
+    $('#repairImagesBtn').addEventListener('click', repairImages);
     // products
     $('#prodSearch').addEventListener('input', function () { S.prodFilter.q = this.value; renderProducts(); });
     $('#prodVisFilter').addEventListener('change', function () { S.prodFilter.vis = this.value; renderProducts(); });
