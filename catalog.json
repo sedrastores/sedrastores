@@ -1,7 +1,7 @@
 {
  "version": 3,
  "note": "نسخة احتياطية من الكتالوج على الموقع نفسه. الموقع بيقراها فوراً من غير أي استهلاك لفايربيز.",
- "updatedAt": "2026-09-23T03:17:55.718Z",
+ "updatedAt": "2026-09-23T03:24:44.746Z",
  "categories": [
   {
    "id": "sponge",
@@ -420,6 +420,18 @@
    "price": null,
    "oldPrice": null,
    "order": 10,
+   "visible": true
+  },
+  {
+   "id": "sponge-andalus",
+   "categoryId": "sponge",
+   "name": "مصلية نجوم الأندلس",
+   "color": "أبيض وذهبي",
+   "mainImg": "images/sponge/white-gold.jpg",
+   "gallery": [],
+   "price": null,
+   "oldPrice": null,
+   "order": 11,
    "visible": true
   },
   {
