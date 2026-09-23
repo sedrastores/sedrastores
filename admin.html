@@ -1226,6 +1226,18 @@
   .health-bar.ok { background: #f2faf4; border-color: #bfe3c7; color: #166534; }
   .health-bar.warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
   .health-bar b { font-weight: 900; }
+
+  .scan-sum { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .scan-pill { border-radius: 20px; padding: 7px 14px; font-size: 13px; font-weight: 800; }
+  .scan-pill.ok { background: #e8f7ee; color: #166534; }
+  .scan-pill.bad { background: #fdecea; color: #b42318; }
+  .scan-pill.warn { background: #fffbeb; color: #92400e; }
+  .scan-row { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+  .scan-row b { font-size: 14px; }
+  .scan-img { font-size: 12px; color: var(--text-light); padding: 3px 0; display: flex; gap: 8px; align-items: center; }
+  .scan-img code { direction: ltr; background: #f6f2ea; padding: 1px 6px; border-radius: 5px; font-size: 11px; word-break: break-all; }
+  .scan-img.bad { color: #b42318; font-weight: 700; }
+  .scan-note { font-size: 13px; line-height: 1.8; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 12px; margin-top: 12px; }
 </style>
 </head>
 <body>
@@ -1354,6 +1366,7 @@
               <select class="filter-select" id="prodVisFilter">
                 <option value="all">الكل</option><option value="visible">الظاهر فقط</option><option value="hidden">المخفي فقط</option>
               </select>
+              <button class="btn-ghost" type="button" id="scanImagesBtn">🔍 فحص الصور</button>
               <button class="add-product-btn" type="button" data-act="new-prod">+ إضافة منتج</button>
             </div>
           </div>
@@ -1610,6 +1623,15 @@
   </div>
 </div>
 
+
+<!-- Image scan report -->
+<div class="add-modal-overlay" id="scanModal">
+  <div class="add-modal wide">
+    <div class="modal-top"><h2>🔍 فحص صور المنتجات</h2><button class="x-btn" type="button" data-close-modal aria-label="إغلاق">✕</button></div>
+    <div id="scanBody"><div class="empty-state"><p>⏳ جاري الفحص...</p></div></div>
+    <div class="add-modal-actions"><button class="btn-modal-cancel" type="button" data-close-modal>إغلاق</button></div>
+  </div>
+</div>
 <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
 
 <script src="assets/sedra-data.js?v=5"></script>

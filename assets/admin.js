@@ -633,6 +633,71 @@
       'الإجمالي: ' + orderTotal(o) + ' ج', o.notes ? 'ملاحظات: ' + o.notes : ''].filter(Boolean).join('\n');
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { toast('✅ اتنسخ'); }).catch(function () { window.prompt('انسخ البيانات:', text); });
   }
+  /* ---------- image scan: says exactly why an image is missing ---------- */
+  function checkRef(ref) {
+    // returns {state:'ok'|'gone'|'unreachable'|'empty', where:'db'|'file'}
+    if (!ref) return Promise.resolve({ state: 'empty', where: '-' });
+    if (D.isMedia(ref)) {
+      var id = ref.slice(6);
+      return db.collection('media').doc(id).get().then(function (d) {
+        if (!d.exists) return { state: 'gone', where: 'db' };
+        var data = d.data() || {};
+        return { state: data.data ? 'ok' : 'gone', where: 'db' };
+      }).catch(function () { return { state: 'unreachable', where: 'db' }; });
+    }
+    return new Promise(function (resolve) {
+      var img = new Image(), done = false;
+      var finish = function (st) { if (!done) { done = true; resolve({ state: st, where: 'file' }); } };
+      img.onload = function () { finish('ok'); };
+      img.onerror = function () { finish('gone'); };
+      setTimeout(function () { finish('unreachable'); }, 9000);
+      img.src = ref;
+    });
+  }
+  function scanImages() {
+    if (!S.prodsLoaded) return toast('استنى لحد ما المنتجات تحمّل', 'error');
+    openModal('scanModal');
+    $('#scanBody').innerHTML = '<div class="empty-state"><p>⏳ جاري فحص كل الصور...</p></div>';
+    var jobs = [];
+    S.products.forEach(function (p) {
+      var refs = [p.mainImg].concat(p.gallery || []);
+      jobs.push(Promise.all(refs.map(checkRef)).then(function (states) { return { p: p, refs: refs, states: states }; }));
+    });
+    Promise.all(jobs).then(function (rows) {
+      var bad = rows.filter(function (r) { return r.states.some(function (s) { return s.state !== 'ok'; }); });
+      var okCount = rows.length - bad.length;
+      var dbGone = 0, fileGone = 0;
+      bad.forEach(function (r) {
+        r.states.forEach(function (s) {
+          if (s.state === 'ok') return;
+          if (s.where === 'db') dbGone++; else fileGone++;
+        });
+      });
+      var label = { ok: '✅ سليمة', gone: '❌ مش موجودة', unreachable: '⚠️ تعذر الوصول', empty: '❌ فاضية' };
+      var html = '<div class="scan-sum">' +
+        '<span class="scan-pill ok">' + okCount + ' منتج صوره سليمة</span>' +
+        (bad.length ? '<span class="scan-pill bad">' + bad.length + ' منتج فيه مشكلة</span>' : '') +
+        (dbGone ? '<span class="scan-pill warn">' + dbGone + ' صورة مش متخزنة في قاعدة البيانات</span>' : '') +
+        (fileGone ? '<span class="scan-pill warn">' + fileGone + ' صورة مسارها غلط</span>' : '') + '</div>';
+      if (!bad.length) html += '<div class="empty-state"><p>كل الصور شغالة ✅</p></div>';
+      bad.forEach(function (r) {
+        var c = catById(r.p.categoryId);
+        html += '<div class="scan-row"><b>' + esc(r.p.name) + '</b> <span class="muted">— ' + esc(c ? c.name : 'بدون صنف') + '</span>';
+        r.refs.forEach(function (ref, i) {
+          var st = r.states[i];
+          html += '<div class="scan-img ' + (st.state === 'ok' ? '' : 'bad') + '">' +
+            (i === 0 ? 'الأساسية' : 'صورة ' + (i + 1)) + ': ' + label[st.state] +
+            ' <code>' + esc(ref ? (D.isMedia(ref) ? 'محفوظة في قاعدة البيانات' : ref) : 'فاضية') + '</code></div>';
+        });
+        html += '</div>';
+      });
+      if (dbGone) html += '<div class="scan-note"><b>الصور المحفوظة في قاعدة البيانات واللي مش موجودة</b> معناها إن رفعها ما اكتملش أو اتمسح. مفيش طريقة ترجعها — لازم ترفعها تاني، والأفضل تحطها بمسار ملف عشان تشتغل في إعلانات فيسبوك كمان.</div>';
+      $('#scanBody').innerHTML = html;
+    }).catch(function (e) {
+      $('#scanBody').innerHTML = '<div class="empty-state"><p>تعذر الفحص: ' + esc(errMsg(e)) + '</p></div>';
+    });
+  }
+
   function exportFeed() {
     if (!S.catsLoaded || !S.prodsLoaded) return toast('استنى لحد ما المنتجات تحمّل', 'error');
     var base = 'https://sedrastores.com/';
@@ -1561,6 +1626,7 @@
     ['orderSearch', 'statusFilter', 'orderCatFilter'].forEach(function (id) { $('#' + id).addEventListener(id === 'orderSearch' ? 'input' : 'change', renderOrders); });
     $('#exportCsvBtn').addEventListener('click', exportCsv);
     $('#exportFeedBtn').addEventListener('click', exportFeed);
+    $('#scanImagesBtn').addEventListener('click', scanImages);
     // products
     $('#prodSearch').addEventListener('input', function () { S.prodFilter.q = this.value; renderProducts(); });
     $('#prodVisFilter').addEventListener('change', function () { S.prodFilter.vis = this.value; renderProducts(); });
