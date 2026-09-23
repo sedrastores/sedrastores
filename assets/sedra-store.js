@@ -441,7 +441,8 @@
       '🎁 <b>المنتجات:</b>'
     ];
     order.items.forEach(function (i) {
-      lines.push('• [' + htmlEsc(i.categoryName) + '] ' + htmlEsc(i.name) + ' × ' + i.qty + ' = ' + (i.price * i.qty) + ' ج');
+      var noPhoto = !D.absoluteUrl(i.img) ? ' ⚠️ (من غير صورة)' : '';
+      lines.push('• [' + htmlEsc(i.categoryName) + '] ' + htmlEsc(i.name) + ' × ' + i.qty + ' = ' + (i.price * i.qty) + ' ج' + noPhoto);
     });
     lines.push('', '📦 عدد القطع: ' + order.itemsCount,
       '💰 المنتجات: ' + order.subtotal + ' ج',
@@ -466,21 +467,48 @@
       return { url: D.absoluteUrl(i.img), caption: i.name + ' × ' + i.qty };
     }).filter(function (x) { return x.url && !/^https?:\/\/(localhost|127\.)/.test(x.url); });
 
+    // One message: the full order details as the caption of the photo album.
+    // Telegram allows 1024 characters in a caption, which fits a normal order.
+    var plain = text.replace(/<[^>]+>/g, '');
+    var fits = plain.length <= 1000;
+
+    if (photos.length === 1 && fits) {
+      return post('sendPhoto', { chat_id: T.chatId, photo: photos[0].url, caption: text, parse_mode: 'HTML' })
+        .catch(function () { return post('sendPhoto', { chat_id: T.chatId, photo: photos[0].url, caption: plain }); });
+    }
+    if (photos.length > 1 && photos.length <= 10 && fits) {
+      return post('sendMediaGroup', {
+        chat_id: T.chatId,
+        media: photos.map(function (x, i) {
+          return i === 0
+            ? { type: 'photo', media: x.url, caption: text, parse_mode: 'HTML' }
+            : { type: 'photo', media: x.url };
+        })
+      }).catch(function () {
+        return post('sendMediaGroup', {
+          chat_id: T.chatId,
+          media: photos.map(function (x, i) { return i === 0 ? { type: 'photo', media: x.url, caption: plain } : { type: 'photo', media: x.url }; })
+        });
+      });
+    }
+
+    // too long, or more than 10 photos: album(s) first, then the details
     var photoStep = Promise.resolve();
-    if (photos.length === 1) {
-      photoStep = post('sendPhoto', { chat_id: T.chatId, photo: photos[0].url, caption: photos[0].caption }).catch(function () {});
-    } else if (photos.length > 1) {
+    if (photos.length) {
       var chunks = [];
       for (var i = 0; i < photos.length; i += 10) chunks.push(photos.slice(i, i + 10));
-      photoStep = chunks.reduce(function (p, ch) {
-        return p.then(function () {
-          return post('sendMediaGroup', { chat_id: T.chatId, media: ch.map(function (x) { return { type: 'photo', media: x.url, caption: x.caption }; }) }).catch(function () {});
+      photoStep = chunks.reduce(function (pr, ch) {
+        return pr.then(function () {
+          return (ch.length === 1
+            ? post('sendPhoto', { chat_id: T.chatId, photo: ch[0].url, caption: ch[0].caption })
+            : post('sendMediaGroup', { chat_id: T.chatId, media: ch.map(function (x) { return { type: 'photo', media: x.url, caption: x.caption }; }) })
+          ).catch(function () {});
         });
       }, Promise.resolve());
     }
     return photoStep.then(function () {
       return post('sendMessage', { chat_id: T.chatId, text: text, parse_mode: 'HTML', disable_web_page_preview: true })
-        .catch(function () { return post('sendMessage', { chat_id: T.chatId, text: text.replace(/<[^>]+>/g, '') }); });
+        .catch(function () { return post('sendMessage', { chat_id: T.chatId, text: plain }); });
     });
   }
 
