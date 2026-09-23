@@ -647,9 +647,15 @@
     }
     return new Promise(function (resolve) {
       var img = new Image(), done = false;
-      var finish = function (st) { if (!done) { done = true; resolve({ state: st, where: 'file' }); } };
+      var finish = function (st, extra) { if (!done) { done = true; resolve({ state: st, where: /^https?:/i.test(ref) ? 'url' : 'file', http: extra }); } };
       img.onload = function () { finish('ok'); };
-      img.onerror = function () { finish('gone'); };
+      img.onerror = function () {
+        // for remote URLs, report the server's answer (403 = blocked by rules, 404 = deleted)
+        if (!/^https?:/i.test(ref)) return finish('gone');
+        fetch(ref, { method: 'GET', mode: 'cors' })
+          .then(function (r) { finish('gone', r.status); })
+          .catch(function () { finish('gone', 'CORS/blocked'); });
+      };
       setTimeout(function () { finish('unreachable'); }, 9000);
       img.src = ref;
     });
@@ -685,9 +691,11 @@
         html += '<div class="scan-row"><b>' + esc(r.p.name) + '</b> <span class="muted">— ' + esc(c ? c.name : 'بدون صنف') + '</span>';
         r.refs.forEach(function (ref, i) {
           var st = r.states[i];
+          var kind = !ref ? 'فاضية' : D.isMedia(ref) ? 'قاعدة البيانات' : /^https?:/i.test(ref) ? 'Firebase Storage / رابط' : 'ملف في الموقع';
           html += '<div class="scan-img ' + (st.state === 'ok' ? '' : 'bad') + '">' +
             (i === 0 ? 'الأساسية' : 'صورة ' + (i + 1)) + ': ' + label[st.state] +
-            ' <code>' + esc(ref ? (D.isMedia(ref) ? 'محفوظة في قاعدة البيانات' : ref) : 'فاضية') + '</code></div>';
+            (st.http ? ' (رد الخادم: ' + esc(st.http) + ')' : '') +
+            ' — ' + kind + ' <code>' + esc(ref ? String(ref).slice(0, 90) : '—') + '</code></div>';
         });
         html += '</div>';
       });
