@@ -559,7 +559,10 @@
     return fetchSnapshot().then(function (fromSnap) {
       return fromSnap || fetchCollections();
     }, function (e) {
-      console.warn('Snapshot read failed:', e && e.message);
+      var msg = (e && e.message) || '';
+      console.warn('Snapshot read failed:', msg);
+      // quota exhausted (429): don't hammer Firestore with more requests
+      if (msg.indexOf('429') > -1) throw e;
       return fetchCollections();
     });
   }
