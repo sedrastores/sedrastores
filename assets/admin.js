@@ -389,7 +389,7 @@
     setInterval(renderOnline, 30000);
   }
   function renderOnline() {
-    var n = S.presence.filter(function (p) { return p.t > Date.now() - 3 * 60000; }).length;
+    var n = S.presence.filter(function (p) { return p.t > Date.now() - 15 * 60000; }).length;
     $('#onlineCount').textContent = n;
   }
   function updateNewBadge() {
@@ -398,7 +398,37 @@
     b.textContent = n; b.hidden = !n || S.tab === 'orders';
   }
 
+  /* ---------- storefront snapshot: one document the site reads (1 read/visitor) ---------- */
+  var snapTimer = null;
+  function scheduleSnapshot() {
+    if (!db || !S.catsLoaded || !S.prodsLoaded) return;
+    clearTimeout(snapTimer);
+    snapTimer = setTimeout(publishSnapshot, 1500);
+  }
+  function publishSnapshot(manual) {
+    if (!db || !S.catsLoaded || !S.prodsLoaded) return Promise.resolve();
+    var data = {
+      version: D.CONFIG.catalogVersion,
+      categories: S.categories.map(function (c) { return JSON.parse(JSON.stringify(c)); }),
+      products: S.products.map(function (p) { return JSON.parse(JSON.stringify(p)); }),
+      settings: {
+        name: S.store.name || '', whatsapp: S.store.whatsapp || '', shippingCompany: S.store.shippingCompany || '',
+        allowTransfer: S.store.allowTransfer === true, pixelId: S.store.pixelId === undefined ? null : S.store.pixelId
+      },
+      theme: S.theme || {},
+      shipping: S.shipping || null,
+      updatedAt: serverTs()
+    };
+    return db.collection('meta').doc('snapshot').set(data).then(function () {
+      if (manual) toast('✅ اتحدثت نسخة الموقع — العملاء هيشوفوا آخر تعديلاتك');
+    }).catch(function (e) {
+      console.warn('snapshot publish failed', e);
+      if (manual) toast('تعذر تحديث نسخة الموقع: ' + errMsg(e), 'error');
+    });
+  }
+
   function renderCatalogViews() {
+    scheduleSnapshot();
     if (!S.catsLoaded || !S.prodsLoaded) return;
     renderCategories(); renderProducts(); renderOverview(); fillOrderFilters();
     if (S.tab === 'analytics') renderAnalytics();
@@ -737,9 +767,16 @@
         var goodGallery = [], mainOk = r.states[0].state === 'ok';
         for (var i = 1; i < r.refs.length; i++) if (r.states[i].state === 'ok') goodGallery.push(r.refs[i]);
         var lostCount = r.states.filter(function (s) { return s.state !== 'ok'; }).length;
-        if (!lostCount) return;
+        var movable = D.isMedia(r.refs[0]) && !!siteImageFor(r.p.name);
+        if (!lostCount && !movable) return;
         var data = {};
-        if (!mainOk) {
+        // an image kept inside the database costs a Firestore read per view and breaks
+        // once the daily quota runs out: move it to the file hosted on the site
+        if (mainOk && D.isMedia(r.refs[0])) {
+          var sitePath = siteImageFor(r.p.name);
+          if (sitePath) { data.mainImg = sitePath; fixed.push(r.p.name); mainOk = false; }
+        }
+        if (!mainOk && !data.mainImg) {
           var path = siteImageFor(r.p.name);
           if (path) { data.mainImg = path; fixed.push(r.p.name); }
           else if (goodGallery.length) { data.mainImg = goodGallery.shift(); cleaned.push(r.p.name); }
@@ -1470,6 +1507,7 @@
       S.theme = r[1].exists ? (r[1].data() || {}) : {};
       S.shipping = D.normalizeShipping(r[2].exists ? r[2].data() : null);
       fillSettings();
+      scheduleSnapshot();
     }).catch(function (e) { toast('تعذر تحميل الإعدادات: ' + errMsg(e), 'error'); S.shipping = S.shipping || D.normalizeShipping(null); fillSettings(); });
   }
   function fillSettings() {
@@ -1551,6 +1589,7 @@
     var btn = $('#saveShippingBtn'); btn.disabled = true; btn.textContent = '⏳ جاري الحفظ...';
     db.collection('settings').doc('shipping').set(data).then(function () {
       S.shipping = D.normalizeShipping(data); renderShippingEditor();
+      publishSnapshot();
       toast('✅ تم حفظ أسعار الشحن — هتتطبق على الأوردرات الجديدة');
     }).catch(function (err) { setFormError('shippingFormError', 'تعذر الحفظ: ' + errMsg(err)); })
       .then(function () { btn.disabled = false; btn.textContent = '💾 حفظ أسعار الشحن'; });
@@ -1566,7 +1605,7 @@
     if (pixRaw && !/^off$/i.test(pixRaw) && !/^\d{10,20}$/.test(pixel)) { $('#settingPixel').classList.add('invalid'); return toast('رقم البيكسل لازم يكون أرقام بس، أو كلمة off', 'error'); }
     $('#settingPixel').classList.remove('invalid');
     var data = { name: $('#settingName').value.trim(), whatsapp: $('#settingWA').value.trim(), allowTransfer: $('#settingTransfer').checked, pixelId: pixRaw ? pixel : null, shippingCompany: $('#settingShipCo').value.trim(), updatedAt: serverTs() };
-    db.collection('settings').doc('store').set(data, { merge: true }).then(function () { S.store = data; toast('✅ تم حفظ بيانات المتجر'); })
+    db.collection('settings').doc('store').set(data, { merge: true }).then(function () { S.store = data; publishSnapshot(); toast('✅ تم حفظ بيانات المتجر'); })
       .catch(function (err) { toast('تعذر الحفظ: ' + errMsg(err), 'error'); });
   }
   function saveTheme(e) {
@@ -1575,13 +1614,13 @@
     var data = { gold: $('#colorGoldText').value.trim(), bg: $('#colorBgText').value.trim(), header: $('#colorHeaderText').value.trim(), heroText: $('#settingHeroText').value.trim() };
     if (!hex.test(data.gold) || !hex.test(data.bg) || !hex.test(data.header)) return toast('الألوان لازم تكون بالشكل #C9A84C', 'error');
     data.updatedAt = serverTs();
-    db.collection('settings').doc('theme').set(data).then(function () { S.theme = data; toast('✅ تم حفظ الألوان — هتظهر للعملاء خلال ثواني'); })
+    db.collection('settings').doc('theme').set(data).then(function () { S.theme = data; publishSnapshot(); toast('✅ تم حفظ الألوان — هتظهر للعملاء خلال ثواني'); })
       .catch(function (err) { toast('تعذر الحفظ: ' + errMsg(err), 'error'); });
   }
   function resetTheme() {
     askConfirm({ title: 'الألوان الافتراضية', text: 'ترجع الألوان وعنوان الصفحة الرئيسية للأصل؟', okText: 'رجّعها' }).then(function (ok) {
       if (!ok) return;
-      db.collection('settings').doc('theme').delete().then(function () { S.theme = {}; fillSettings(); toast('✅ رجعت الألوان الافتراضية'); })
+      db.collection('settings').doc('theme').delete().then(function () { S.theme = {}; fillSettings(); publishSnapshot(); toast('✅ رجعت الألوان الافتراضية'); })
         .catch(function (err) { toast(errMsg(err), 'error'); });
     });
   }
@@ -1703,6 +1742,7 @@
     $('#exportFeedBtn').addEventListener('click', exportFeed);
     $('#scanImagesBtn').addEventListener('click', scanImages);
     $('#repairImagesBtn').addEventListener('click', repairImages);
+    $('#publishSnapshotBtn').addEventListener('click', function () { publishSnapshot(true); });
     // products
     $('#prodSearch').addEventListener('input', function () { S.prodFilter.q = this.value; renderProducts(); });
     $('#prodVisFilter').addEventListener('change', function () { S.prodFilter.vis = this.value; renderProducts(); });

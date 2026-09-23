@@ -477,14 +477,30 @@
       SEED_PRODUCTS.map(function (p) { return { id: p.id, data: p }; }),
       null, source || 'seed');
   }
-  function readCache() {
-    try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); return c && c.data ? c.data : null; } catch (e) { return null; }
+  var CACHE_TTL = 10 * 60 * 1000; // one refresh per visitor per 10 minutes, at most
+  function readCacheEntry() {
+    try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); return (c && c.data) ? c : null; } catch (e) { return null; }
   }
+  function readCache() { var c = readCacheEntry(); return c ? c.data : null; }
   function writeCache(cat) {
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: cat })); } catch (e) {}
   }
 
-  function fetchLiveCatalog() {
+  // One document holding the whole catalog, published by the admin on every change.
+  // Costs a single Firestore read per visitor instead of one per product and image.
+  function fetchSnapshot() {
+    return fsGet('meta/snapshot', 6000).then(function (snap) {
+      if (!snap || !Array.isArray(snap.categories) || !Array.isArray(snap.products) || !snap.products.length) return null;
+      var store = snap.settings || {};
+      store.__theme = snap.theme || {};
+      store.__shipping = snap.shipping || null;
+      return buildCatalog(
+        snap.categories.map(function (c) { return { id: c.id, data: c }; }),
+        snap.products.map(function (p) { return { id: p.id, data: p }; }),
+        store, 'live');
+    });
+  }
+  function fetchCollections() {
     return Promise.all([
       fsGet('meta/catalog'),
       fsList('categories'),
@@ -539,6 +555,14 @@
       return buildCatalog(cats, prods, store, 'live');
     });
   }
+  function fetchLiveCatalog() {
+    return fetchSnapshot().then(function (fromSnap) {
+      return fromSnap || fetchCollections();
+    }, function (e) {
+      console.warn('Snapshot read failed:', e && e.message);
+      return fetchCollections();
+    });
+  }
 
   var catalogPromise = null;
   /**
@@ -548,6 +572,12 @@
    * Returns a promise resolving to the freshest catalog.
    */
   function loadCatalog(onUpdate) {
+    var entry = readCacheEntry();
+    if (entry && entry.ts && (Date.now() - entry.ts) < CACHE_TTL && entry.data && entry.data.source === 'live') {
+      // recent copy already on the device: serve it and make no network request at all
+      if (onUpdate) { try { onUpdate(entry.data, true); } catch (e) { console.error(e); } }
+      return Promise.resolve(entry.data);
+    }
     var cached = readCache();
     var cachedJson = cached ? JSON.stringify(cached) : '';
     if (cached && onUpdate) { try { onUpdate(cached, true); } catch (e) { console.error(e); } }

@@ -553,7 +553,7 @@
         SedraPixel.purchase(o);
       }
       var openedAt = checkoutOpenedAt; checkoutOpenedAt = 0;
-      track({ orders: 1, modalTime: openedAt ? Math.min(3600, Math.round((Date.now() - openedAt) / 1000)) : 0, modalTimeSamples: openedAt ? 1 : 0 });
+      track({ orders: 1, modalTime: openedAt ? Math.min(3600, Math.round((Date.now() - openedAt) / 1000)) : 0, modalTimeSamples: openedAt ? 1 : 0 }, true); // orders are written immediately
       cart = []; saveCart();
       $('#successTitle').textContent = 'تم استلام طلبك يا ' + o.name + '! 🎉';
       $('#orderCodeDisplay').textContent = o.orderCode;
@@ -573,9 +573,9 @@
   var trackQueue = {}, trackTimer = null;
   function track(incs, keepalive) {
     Object.keys(incs).forEach(function (k) { if (incs[k]) trackQueue[k] = (trackQueue[k] || 0) + incs[k]; });
+    // Counters are accumulated in memory and written once per page view (on leave),
+    // to keep Firestore usage inside the free quota.
     if (keepalive) return flushTrack(true);
-    clearTimeout(trackTimer);
-    trackTimer = setTimeout(flushTrack, 1200);
   }
   function flushTrack(keepalive) {
     var q = trackQueue; trackQueue = {};
@@ -587,6 +587,8 @@
       if (!sessionStorage.getItem('sedra_visit')) { sessionStorage.setItem('sedra_visit', '1'); track({ visitors: 1 }); }
     } catch (e) {}
     var viewKey = { home: 'homeViews', category: 'categoryViews', product: 'productViews' }[state.page];
+    var firstOfSession = false;
+    try { firstOfSession = !sessionStorage.getItem('sedra_presence'); if (firstOfSession) sessionStorage.setItem('sedra_presence', '1'); } catch (e) {}
     if (viewKey) track((function () { var o = {}; o[viewKey] = 1; return o; })());
     var start = Date.now(), sent = false;
     function leave() {
@@ -603,12 +605,10 @@
     var sid;
     try { sid = sessionStorage.getItem('sedra_sid') || D.randomId(16); sessionStorage.setItem('sedra_sid', sid); } catch (e) { sid = D.randomId(16); }
     function beat() {
-      if (document.visibilityState !== 'visible' || location.protocol === 'file:') return;
+      if (location.protocol === 'file:') return;
       D.fs.commit([D.fs.writeMerge('presence/' + sid, { page: state.page }, ['lastSeen'])]).catch(function () {});
     }
-    beat();
-    setInterval(beat, 60000);
-    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') beat(); });
+    if (firstOfSession) beat();   // one write per visitor session, not per minute
   }
 
   /* ================= THEME + SETTINGS DOM ================= */
