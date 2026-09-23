@@ -310,7 +310,7 @@
         return j.nextPageToken ? page(j.nextPageToken) : docs;
       });
     }
-    return withTimeout(page(null), timeoutMs || 8000);
+    return withTimeout(page(null), timeoutMs || 6000);
   }
   function fsGet(path, timeoutMs) {
     var url = FS_BASE + '/' + path + '?key=' + CONFIG.firebase.apiKey;
@@ -551,6 +551,15 @@
     var cached = readCache();
     var cachedJson = cached ? JSON.stringify(cached) : '';
     if (cached && onUpdate) { try { onUpdate(cached, true); } catch (e) { console.error(e); } }
+    // First-time visitor on a slow connection: never leave the page empty while waiting.
+    // Show the built-in catalog after a moment, then swap in the live data when it lands.
+    var settled = false, waitTimer = null;
+    if (!cached && onUpdate) {
+      waitTimer = setTimeout(function () {
+        if (settled) return;
+        try { onUpdate(seedCatalog('seed-wait'), true); } catch (e) { console.error(e); }
+      }, 1500);
+    }
     if (!catalogPromise) {
       catalogPromise = fetchLiveCatalog().then(function (live) {
         writeCache(live);
@@ -561,6 +570,8 @@
       });
     }
     return catalogPromise.then(function (cat) {
+      settled = true;
+      if (waitTimer) clearTimeout(waitTimer);
       if (onUpdate && JSON.stringify(cat) !== cachedJson) { try { onUpdate(cat, false); } catch (e) { console.error(e); } }
       return cat;
     });
