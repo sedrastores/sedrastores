@@ -726,7 +726,19 @@
   function emit(type) { state.listeners.forEach(function (l) { if (l.type === type) try { l.fn(state.catalog); } catch (e) { console.error(e); } }); }
   function onEvent(type, fn) { state.listeners.push({ type: type, fn: fn }); }
 
+  function bindBrokenImages() {
+    document.addEventListener('error', function (e) {
+      var img = e.target;
+      if (!img || img.tagName !== 'IMG' || img.dataset.broken) return;
+      if (img.src === D.BLANK) return;
+      img.dataset.broken = '1';
+      img.src = D.BLANK;
+      var box = img.closest('.p-img, .cat-card-media, .line-img, .s-img, .g-main, .g-thumb, .cat-banner');
+      if (box) box.classList.add('img-missing');
+    }, true);
+  }
   function bindGlobal() {
+    bindBrokenImages();
     on($('#hamburgerBtn'), 'click', function () { setMenu(!$('#siteMenu').classList.contains('open')); });
     on($('#cartBtn'), 'click', openCart);
     document.addEventListener('click', function (e) {

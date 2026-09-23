@@ -397,6 +397,16 @@
     return Promise.all(keys.map(function (k) { return mediaPending[k] || Promise.resolve(); }));
   }
 
+  // images whose stored data could not be found: flag the card so it never looks empty
+  var MISSING_BOXES = '.p-img, .cat-card-media, .line-img, .s-img, .g-main, .g-thumb, .cat-banner, .pa-img, .img-thumb, .single-img-thumb, .design-rank-img, .order-thumb';
+  function markUnresolved(imgs) {
+    imgs.forEach(function (img) {
+      if (!img.getAttribute('data-media')) return;
+      var box = (img.closest && img.closest(MISSING_BOXES)) || img.parentElement;
+      if (box) box.classList.add('img-missing');
+    });
+  }
+
   // Replace placeholder <img data-media> in a container. Thumbs fall back to full image.
   function hydrateMedia(root) {
     root = root || document;
@@ -413,12 +423,13 @@
         else if (v === 't') missing[mediaDocId(ref, 'f')] = 1;
       });
       var fullKeys = Object.keys(missing);
-      if (!fullKeys.length) return;
+      if (!fullKeys.length) return markUnresolved(imgs);
       return fetchMedia(fullKeys).then(function () {
         imgs.forEach(function (img) {
           var ref = img.getAttribute('data-media');
           if (ref && mediaCache[mediaDocId(ref, 'f')]) { img.src = mediaCache[mediaDocId(ref, 'f')]; img.removeAttribute('data-media'); }
         });
+        markUnresolved(imgs);
       });
     });
   }
@@ -487,12 +498,32 @@
       settingsDocs.forEach(function (d) { if (d.id === 'store') store = d.data; if (d.id === 'theme') theme = d.data; if (d.id === 'shipping') shippingDoc = d.data; });
       store.__theme = theme;
       store.__shipping = shippingDoc;
-      if (!(num(meta.version, 0) >= CONFIG.minLiveVersion)) {
-        // Admin hasn't published the new catalog yet: show default catalog, but live settings
+      // Always trust Firestore when it actually holds a catalog: anything the owner adds
+      // in the admin must reach customers, whatever version number is stored.
+      var hasLive = (res[1] || []).length > 0 && (res[2] || []).length > 0;
+      if (!hasLive) {
         return buildCatalog(
           SEED_CATEGORIES.map(function (c) { return { id: c.id, data: c }; }),
           SEED_PRODUCTS.map(function (p) { return { id: p.id, data: p }; }),
           store, 'seed-live');
+      }
+      // Very old database (before the 3-category rollout): show its data *plus* the
+      // defaults it is missing, so nothing ever disappears from the storefront.
+      if (num(meta.version, 0) < 2) {
+        var haveCat = {}, haveProd = {};
+        res[1].forEach(function (c) { haveCat[c.id] = 1; });
+        res[2].forEach(function (p) { haveProd[p.id] = 1; });
+        var sameKind = { sponge: /[اإ]سفنج/, masnad: /مسند/, memory: /ميموري/ };
+        SEED_CATEGORIES.forEach(function (c) {
+          if (haveCat[c.id]) return;
+          // the old database may hold the same kind under its own id: don't duplicate it
+          var exists = res[1].some(function (x) {
+            var n = (x.data && x.data.name) || '';
+            return sameKind[c.id] && sameKind[c.id].test(n) && !(c.id === 'sponge' && /مسند|ميموري/.test(n));
+          });
+          if (!exists) res[1].push({ id: c.id, data: c });
+        });
+        SEED_PRODUCTS.forEach(function (p) { if (!haveProd[p.id] && !haveCat[p.categoryId]) res[2].push({ id: p.id, data: p }); });
       }
       var cats = res[1], prods = res[2];
       if (num(meta.version, 0) < CONFIG.catalogVersion) {

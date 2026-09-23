@@ -407,7 +407,27 @@
 
   /* ================= OVERVIEW ================= */
   function statusCount(st) { return S.orders.filter(function (o) { return (o.status || 'جديد') === st; }).length; }
+  // Shows exactly what customers are served, so a mismatch can never go unnoticed
+  function renderHealth() {
+    var el = $('#healthBar');
+    if (!el || !S.catsLoaded || !S.prodsLoaded) return;
+    var visibleCats = S.categories.filter(function (c) { return c.visible; });
+    var visibleProds = S.products.filter(function (p) {
+      var c = catById(p.categoryId); return p.visible && c && c.visible;
+    });
+    var hidden = S.products.length - visibleProds.length;
+    var noImage = S.products.filter(function (p) { return !p.mainImg; }).length;
+    var problems = [];
+    if (hidden) problems.push(hidden + ' منتج مش ظاهر للعملاء (مخفي أو صنفه مخفي)');
+    if (noImage) problems.push(noImage + ' منتج من غير صورة');
+    el.hidden = false;
+    el.className = 'health-bar ' + (problems.length ? 'warn' : 'ok');
+    el.innerHTML = (problems.length ? '⚠️ ' : '✅ ') +
+      'العميل بيشوف دلوقتي <b>' + visibleProds.length + ' منتج</b> في <b>' + visibleCats.length + ' صنف</b>' +
+      (problems.length ? '<br>' + problems.map(esc).join(' — ') : '');
+  }
   function renderOverview() {
+    renderHealth();
     if (!S.ordersLoaded) return;
     var total = S.orders.length;
     var delivered = S.orders.filter(function (o) { return o.status === 'تم التسليم'; });
@@ -1453,7 +1473,19 @@
   }
 
   /* ================= EVENTS ================= */
+  function bindBrokenImages() {
+    document.addEventListener('error', function (e) {
+      var img = e.target;
+      if (!img || img.tagName !== 'IMG' || img.dataset.broken) return;
+      if (img.src === D.BLANK) return;
+      img.dataset.broken = '1';
+      img.src = D.BLANK;
+      var box = img.closest('.pa-img, .img-thumb, .single-img-thumb, .design-rank-img, .order-thumb');
+      if (box) box.classList.add('img-missing');
+    }, true);
+  }
   function bind() {
+    bindBrokenImages();
     $('#loginForm').addEventListener('submit', doLogin);
     $('#logoutBtn').addEventListener('click', logout);
     $('#menuToggle').addEventListener('click', function () { setSidebar(!$('#sidebar').classList.contains('open')); });
