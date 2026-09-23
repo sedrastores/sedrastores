@@ -486,6 +486,24 @@
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: cat })); } catch (e) {}
   }
 
+  // Catalog file hosted next to the site (GitHub). Costs nothing, never rate-limited,
+  // and keeps the shop working even when Firebase refuses requests.
+  function fetchStatic() {
+    return withTimeout(fetch('catalog.json', { cache: 'no-cache' }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function (j) {
+      if (!j || !Array.isArray(j.products) || !j.products.length) throw new Error('empty catalog file');
+      var store = j.settings || {};
+      store.__theme = j.theme || {};
+      store.__shipping = j.shipping || null;
+      return buildCatalog(
+        j.categories.map(function (c) { return { id: c.id, data: c }; }),
+        j.products.map(function (p) { return { id: p.id, data: p }; }),
+        store, 'static');
+    }), 6000);
+  }
+
   // One document holding the whole catalog, published by the admin on every change.
   // Costs a single Firestore read per visitor instead of one per product and image.
   function fetchSnapshot() {
@@ -583,28 +601,27 @@
     }
     var cached = readCache();
     var cachedJson = cached ? JSON.stringify(cached) : '';
+    var settled = false;
     if (cached && onUpdate) { try { onUpdate(cached, true); } catch (e) { console.error(e); } }
-    // First-time visitor on a slow connection: never leave the page empty while waiting.
-    // Show the built-in catalog after a moment, then swap in the live data when it lands.
-    var settled = false, waitTimer = null;
+    // No copy on the device yet: paint from the catalog file hosted with the site.
+    // It is instant, costs nothing, and works even when Firebase is refusing requests.
     if (!cached && onUpdate) {
-      waitTimer = setTimeout(function () {
-        if (settled) return;
-        try { onUpdate(seedCatalog('seed-wait'), true); } catch (e) { console.error(e); }
-      }, 1500);
+      fetchStatic().then(function (stat) {
+        if (settled) return;                     // live data already arrived: ignore
+        try { onUpdate(stat, true); } catch (e) { console.error(e); }
+      }).catch(function (e) { console.warn('catalog.json unavailable:', e && e.message); });
     }
     if (!catalogPromise) {
       catalogPromise = fetchLiveCatalog().then(function (live) {
         writeCache(live);
         return live;
       }).catch(function (err) {
-        console.warn('Catalog live fetch failed, using fallback:', err && err.message);
-        return cached || seedCatalog('seed-offline');
+        console.warn('Catalog live fetch failed, using site file:', err && err.message);
+        return fetchStatic().catch(function () { return cached || seedCatalog('seed-offline'); });
       });
     }
     return catalogPromise.then(function (cat) {
       settled = true;
-      if (waitTimer) clearTimeout(waitTimer);
       if (onUpdate && JSON.stringify(cat) !== cachedJson) { try { onUpdate(cat, false); } catch (e) { console.error(e); } }
       return cat;
     });

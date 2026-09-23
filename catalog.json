@@ -1,0 +1,516 @@
+{
+ "version": 3,
+ "note": "نسخة احتياطية من الكتالوج على الموقع نفسه. الموقع بيقراها فوراً من غير أي استهلاك لفايربيز.",
+ "updatedAt": "2026-09-23T03:17:55.718Z",
+ "categories": [
+  {
+   "id": "sponge",
+   "order": 0,
+   "visible": true,
+   "icon": "🕌",
+   "name": "مصليات مبطنة إسفنج",
+   "shortName": "مبطنة إسفنج",
+   "tagline": "خفيفة وسهلة الحمل للاستخدام اليومي",
+   "description": "مصلية مبطنة بإسفنج عالي الكثافة سمكه 2 سم، خفيفة وسهلة الحمل ومناسبة للاستخدام اليومي، بتصاميم إسلامية فاخرة وتشطيب بالشراشيب.",
+   "bestFor": "الاستخدام اليومي",
+   "chooser": "عايز مصلية خفيفة للاستخدام اليومي",
+   "price": 450,
+   "oldPrice": 600,
+   "badge": "إسفنج",
+   "cardRatio": "1/1",
+   "imageFit": "cover",
+   "coverImg": "images/categories/sponge.jpg",
+   "specs": [
+    {
+     "label": "المقاس",
+     "value": "120 × 68 سم"
+    },
+    {
+     "label": "السماكة",
+     "value": "2 سم"
+    },
+    {
+     "label": "الخامة",
+     "value": "إسفنج عالي الكثافة"
+    },
+    {
+     "label": "التشطيب",
+     "value": "شراشيب"
+    }
+   ]
+  },
+  {
+   "id": "masnad",
+   "order": 1,
+   "visible": true,
+   "icon": "🪑",
+   "name": "مصليات بمسند للظهر",
+   "shortName": "بمسند",
+   "tagline": "مسند ظهر خشب يتحمل لحد 250 كيلو",
+   "description": "مصلية إسفنج بالكامل بسمك 3 سم مع ظهر خشب يتحمل لحد 250 كيلو، بتسند ظهرك وانت قاعد في التشهد والأذكار وقراءة القرآن، وقابلة للطي وسهلة الحمل.",
+   "bestFor": "اللي ظهره بيتعب في الجلوس الطويل",
+   "chooser": "ظهري بيتعب وأنا قاعد",
+   "price": 750,
+   "oldPrice": null,
+   "badge": "بمسند",
+   "cardRatio": "4/3",
+   "imageFit": "contain",
+   "coverImg": "images/categories/masnad.jpg",
+   "specs": [
+    {
+     "label": "المقاس",
+     "value": "150 × 70 سم"
+    },
+    {
+     "label": "السماكة",
+     "value": "3 سم (من غير الخشب)"
+    },
+    {
+     "label": "الخامة",
+     "value": "إسفنج بالكامل"
+    },
+    {
+     "label": "الظهر",
+     "value": "خشب يتحمل لحد 250 كيلو"
+    },
+    {
+     "label": "الطي",
+     "value": "قابلة للطي وسهلة الحمل"
+    },
+    {
+     "label": "التشطيب",
+     "value": "شراشيب"
+    }
+   ]
+  },
+  {
+   "id": "memory",
+   "order": 2,
+   "visible": true,
+   "icon": "🦵",
+   "name": "مصليات ميموري فوم للركبة",
+   "shortName": "ميموري فوم",
+   "tagline": "ميموري فوم 5 سم يريّح ركبتك",
+   "description": "مصلية إسفنج فيها طبقة ميموري فوم سمكها 5 سم في منطقة الركبة بالتحديد، بتخفف الضغط على ركبتك في السجود والجلوس، وخفيفة وسهلة الحمل.",
+   "bestFor": "اللي عنده ألم في الركبة أو بيطوّل في السجود",
+   "chooser": "ركبتي بتوجعني في السجود",
+   "price": 950,
+   "oldPrice": null,
+   "badge": "ميموري فوم",
+   "cardRatio": "2/3",
+   "imageFit": "contain",
+   "coverImg": "images/categories/memory.jpg",
+   "specs": [
+    {
+     "label": "المقاس",
+     "value": "120 × 70 سم"
+    },
+    {
+     "label": "السماكة",
+     "value": "ميموري فوم 5 سم في منطقة الركبة"
+    },
+    {
+     "label": "الخامة",
+     "value": "إسفنج + ميموري فوم في منطقة الركبة"
+    },
+    {
+     "label": "التشطيب",
+     "value": "شراشيب"
+    }
+   ]
+  }
+ ],
+ "products": [
+  {
+   "id": "sponge-1",
+   "categoryId": "sponge",
+   "order": 0,
+   "visible": true,
+   "name": "تصميم الزهور الكلاسيكي",
+   "color": "أزرق ملكي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/product1_thumb.jpg",
+   "gallery": []
+  },
+  {
+   "id": "sponge-2",
+   "categoryId": "sponge",
+   "order": 1,
+   "visible": true,
+   "name": "تصميم البوستان الزاهر",
+   "color": "كريمي وأخضر",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/product2_thumb.jpg",
+   "gallery": []
+  },
+  {
+   "id": "sponge-3",
+   "categoryId": "sponge",
+   "order": 2,
+   "visible": true,
+   "name": "تصميم الأعمدة الإسلامية",
+   "color": "ذهبي وبيج",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/product3_thumb.jpg",
+   "gallery": []
+  },
+  {
+   "id": "sponge-4",
+   "categoryId": "sponge",
+   "order": 3,
+   "visible": true,
+   "name": "تصميم النقش المغربي",
+   "color": "بيج وذهبي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/product4_thumb.jpg",
+   "gallery": []
+  },
+  {
+   "id": "sponge-5",
+   "categoryId": "sponge",
+   "order": 4,
+   "visible": true,
+   "name": "تصميم زهور الربيع",
+   "color": "ألوان متعددة",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/product5_thumb.jpg",
+   "gallery": []
+  },
+  {
+   "id": "sponge-6",
+   "categoryId": "sponge",
+   "order": 5,
+   "visible": true,
+   "name": "تصميم المسجد الأزرق",
+   "color": "أزرق وذهبي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/product6_thumb.jpg",
+   "gallery": []
+  },
+  {
+   "id": "sponge-7",
+   "categoryId": "sponge",
+   "order": 6,
+   "visible": true,
+   "name": "تصميم قبة الأقصى",
+   "color": "نيلي وذهبي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/product7_thumb.jpg",
+   "gallery": []
+  },
+  {
+   "id": "sponge-8",
+   "categoryId": "sponge",
+   "order": 7,
+   "visible": true,
+   "name": "تصميم الخط العربي",
+   "color": "أسود وذهبي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/product8_thumb.jpg",
+   "gallery": []
+  },
+  {
+   "id": "masnad-1",
+   "categoryId": "masnad",
+   "order": 0,
+   "visible": true,
+   "name": "مسند الزخرفة الذهبية",
+   "color": "أسود بزخارف ذهبية",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/masnad/1/main.jpg",
+   "gallery": [
+    "images/masnad/1/angle-1.jpg",
+    "images/masnad/1/angle-2.jpg",
+    "images/masnad/1/angle-3.jpg",
+    "images/masnad/1/angle-4.jpg",
+    "images/masnad/1/angle-5.jpg"
+   ]
+  },
+  {
+   "id": "masnad-2",
+   "categoryId": "masnad",
+   "order": 1,
+   "visible": true,
+   "name": "مسند المسجد النبوي",
+   "color": "أسود وأبيض بقبة خضراء",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/masnad/2/main.jpg",
+   "gallery": [
+    "images/masnad/2/angle-1.jpg",
+    "images/masnad/2/angle-2.jpg",
+    "images/masnad/2/angle-3.jpg",
+    "images/masnad/2/angle-4.jpg"
+   ]
+  },
+  {
+   "id": "masnad-3",
+   "categoryId": "masnad",
+   "order": 2,
+   "visible": true,
+   "name": "مسند باب الكعبة",
+   "color": "أسود وذهبي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/masnad/3/main.jpg",
+   "gallery": [
+    "images/masnad/3/angle-1.jpg",
+    "images/masnad/3/angle-2.jpg",
+    "images/masnad/3/angle-3.jpg",
+    "images/masnad/3/angle-4.jpg",
+    "images/masnad/3/angle-5.jpg",
+    "images/masnad/3/angle-6.jpg"
+   ]
+  },
+  {
+   "id": "masnad-4",
+   "categoryId": "masnad",
+   "order": 3,
+   "visible": true,
+   "name": "مسند الكسوة",
+   "color": "أسود ونقوش ذهبية",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/masnad/4/main.jpg",
+   "gallery": [
+    "images/masnad/4/angle-1.jpg",
+    "images/masnad/4/angle-2.jpg",
+    "images/masnad/4/angle-3.jpg",
+    "images/masnad/4/angle-4.jpg",
+    "images/masnad/4/angle-5.jpg",
+    "images/masnad/4/angle-6.jpg"
+   ]
+  },
+  {
+   "id": "memory-1",
+   "categoryId": "memory",
+   "order": 0,
+   "visible": true,
+   "name": "ميموري فوم — أزرق ملكي",
+   "color": "أزرق ملكي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/memory/1.jpg",
+   "gallery": []
+  },
+  {
+   "id": "memory-2",
+   "categoryId": "memory",
+   "order": 1,
+   "visible": true,
+   "name": "ميموري فوم — رمادي",
+   "color": "رمادي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/memory/2.jpg",
+   "gallery": []
+  },
+  {
+   "id": "memory-3",
+   "categoryId": "memory",
+   "order": 2,
+   "visible": true,
+   "name": "ميموري فوم — أبيض لؤلؤي",
+   "color": "أبيض لؤلؤي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/memory/3.jpg",
+   "gallery": []
+  },
+  {
+   "id": "memory-4",
+   "categoryId": "memory",
+   "order": 3,
+   "visible": true,
+   "name": "ميموري فوم — أحمر عنابي",
+   "color": "أحمر عنابي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/memory/4.jpg",
+   "gallery": []
+  },
+  {
+   "id": "memory-5",
+   "categoryId": "memory",
+   "order": 4,
+   "visible": true,
+   "name": "ميموري فوم — وردي",
+   "color": "وردي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/memory/5.jpg",
+   "gallery": []
+  },
+  {
+   "id": "memory-6",
+   "categoryId": "memory",
+   "order": 5,
+   "visible": true,
+   "name": "ميموري فوم — كحلي",
+   "color": "كحلي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/memory/6.jpg",
+   "gallery": []
+  },
+  {
+   "id": "memory-7",
+   "categoryId": "memory",
+   "order": 6,
+   "visible": true,
+   "name": "ميموري فوم — بني جملي",
+   "color": "بني جملي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/memory/7.jpg",
+   "gallery": []
+  },
+  {
+   "id": "memory-8",
+   "categoryId": "memory",
+   "order": 7,
+   "visible": true,
+   "name": "ميموري فوم — أخضر زمردي",
+   "color": "أخضر زمردي",
+   "price": null,
+   "oldPrice": null,
+   "mainImg": "images/memory/8.jpg",
+   "gallery": []
+  },
+  {
+   "id": "sponge-rawda",
+   "categoryId": "sponge",
+   "name": "مصلية الروضة الشريفة",
+   "color": "أخضر زيتي × ذهبي",
+   "mainImg": "images/sponge/olive.jpg",
+   "gallery": [],
+   "price": null,
+   "oldPrice": null,
+   "order": 8,
+   "visible": true
+  },
+  {
+   "id": "sponge-sultana",
+   "categoryId": "sponge",
+   "name": "مصلية السلطانة",
+   "color": "بيج وسماوي",
+   "mainImg": "images/sponge/beige.jpg",
+   "gallery": [],
+   "price": null,
+   "oldPrice": null,
+   "order": 9,
+   "visible": true
+  },
+  {
+   "id": "sponge-mihrab",
+   "categoryId": "sponge",
+   "name": "مصلى المحراب الذهبي",
+   "color": "ذهبي",
+   "mainImg": "images/sponge/gold.jpg",
+   "gallery": [],
+   "price": null,
+   "oldPrice": null,
+   "order": 10,
+   "visible": true
+  },
+  {
+   "id": "masnad-burj",
+   "categoryId": "masnad",
+   "name": "مسند برج الساعه",
+   "color": "أسود وذهبي",
+   "mainImg": "images/masnad/burj.jpg",
+   "gallery": [],
+   "price": null,
+   "oldPrice": null,
+   "order": 4,
+   "visible": true
+  },
+  {
+   "id": "masnad-hajar",
+   "categoryId": "masnad",
+   "name": "مسند الحجر الأسود",
+   "color": "أسود ونقوش ذهبية",
+   "mainImg": "images/masnad/hajar.jpg",
+   "gallery": [],
+   "price": null,
+   "oldPrice": null,
+   "order": 5,
+   "visible": true
+  }
+ ],
+ "settings": {
+  "name": "سيدرا ستور",
+  "whatsapp": "201033035681",
+  "allowTransfer": false,
+  "pixelId": null
+ },
+ "theme": {},
+ "shipping": {
+  "zones": [
+   {
+    "id": "cairo",
+    "name": "القاهرة والجيزة",
+    "price": 75
+   },
+   {
+    "id": "delta",
+    "name": "الدلتا ومدن القناة",
+    "price": 95
+   },
+   {
+    "id": "upper",
+    "name": "الصعيد وشمال سيناء",
+    "price": 110
+   },
+   {
+    "id": "redsea",
+    "name": "البحر الأحمر ومطروح (الغردقة والساحل)",
+    "price": 125
+   },
+   {
+    "id": "far",
+    "name": "جنوب سيناء والوادي الجديد",
+    "price": 150
+   }
+  ],
+  "govZones": {
+   "القاهرة": "cairo",
+   "الجيزة": "cairo",
+   "الإسكندرية": "delta",
+   "القليوبية": "delta",
+   "الشرقية": "delta",
+   "الدقهلية": "delta",
+   "المنوفية": "delta",
+   "الغربية": "delta",
+   "كفر الشيخ": "delta",
+   "البحيرة": "delta",
+   "دمياط": "delta",
+   "الإسماعيلية": "delta",
+   "السويس": "delta",
+   "بورسعيد": "delta",
+   "بني سويف": "upper",
+   "الفيوم": "upper",
+   "المنيا": "upper",
+   "أسيوط": "upper",
+   "سوهاج": "upper",
+   "قنا": "upper",
+   "الأقصر": "upper",
+   "أسوان": "upper",
+   "شمال سيناء": "upper",
+   "البحر الأحمر": "redsea",
+   "مطروح": "redsea",
+   "جنوب سيناء": "far",
+   "الوادي الجديد": "far"
+  },
+  "deliveryText": "القاهرة والجيزة: من 1 إلى 3 أيام عمل\nباقي المحافظات: من 3 إلى 5 أيام عمل\nيوم الجمعة إجازة، وأوردرات المحافظات بتطلع يومي السبت والتلات."
+ }
+}
