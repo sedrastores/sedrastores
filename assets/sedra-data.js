@@ -26,6 +26,9 @@
       storeName: 'سيدرا ستور',
       whatsapp: '201033035681',
       shipping: 75,
+      instapayLink: 'https://ipn.eg/S/hasnaaa/instapay/1XavJ3',
+      instapayHandle: 'hasnaaa@instapay',
+      walletNumber: '01146164155',
       shippingCompany: ''
     },
     catalogVersion: 3,   // admin applies data updates up to this version
@@ -458,10 +461,12 @@
         whatsapp: normalizeWhatsapp(s.whatsapp) || CONFIG.defaults.whatsapp,
         shipping: num(s.shipping, CONFIG.defaults.shipping),
         shippingCompany: s.shippingCompany || '',
-        allowTransfer: s.allowTransfer === true,
-        instapayLink: s.instapayLink || '',
-        instapayHandle: s.instapayHandle || '',
-        walletNumber: s.walletNumber || ''
+        // Electronic payment is on unless the owner turns it off in the admin.
+        // (paymentV2 marks settings saved after this feature shipped.)
+        allowTransfer: s.paymentV2 === true ? s.allowTransfer === true : true,
+        instapayLink: s.instapayLink || CONFIG.defaults.instapayLink,
+        instapayHandle: s.instapayHandle || CONFIG.defaults.instapayHandle,
+        walletNumber: s.walletNumber || CONFIG.defaults.walletNumber
       },
       shipping: normalizeShipping(s.__shipping),
       theme: (settings && settings.__theme) || {}

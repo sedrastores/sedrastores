@@ -417,7 +417,7 @@
       products: S.products.map(function (p) { return JSON.parse(JSON.stringify(p)); }),
       settings: {
         name: S.store.name || '', whatsapp: S.store.whatsapp || '', shippingCompany: S.store.shippingCompany || '',
-        allowTransfer: S.store.allowTransfer === true, pixelId: S.store.pixelId === undefined ? null : S.store.pixelId,
+        allowTransfer: S.store.allowTransfer === true, paymentV2: S.store.paymentV2 === true, pixelId: S.store.pixelId === undefined ? null : S.store.pixelId,
         instapayLink: S.store.instapayLink || '', instapayHandle: S.store.instapayHandle || '', walletNumber: S.store.walletNumber || ''
       },
       theme: S.theme || {},
@@ -1531,11 +1531,11 @@
     var s = S.store, t = S.theme, d = D.CONFIG.defaults;
     $('#settingName').value = s.name || d.storeName;
     $('#settingWA').value = s.whatsapp || ('0' + d.whatsapp.replace(/^20/, ''));
-    $('#settingTransfer').checked = s.allowTransfer === true;
+    $('#settingTransfer').checked = s.paymentV2 === true ? s.allowTransfer === true : true;
     $('#settingPixel').value = s.pixelId === '' ? 'off' : (s.pixelId || '');
-    $('#settingInstapay').value = s.instapayLink || '';
-    $('#settingInstapayHandle').value = s.instapayHandle || '';
-    $('#settingWallet').value = s.walletNumber || '';
+    $('#settingInstapay').value = s.instapayLink || d.instapayLink || '';
+    $('#settingInstapayHandle').value = s.instapayHandle || d.instapayHandle || '';
+    $('#settingWallet').value = s.walletNumber || d.walletNumber || '';
     if (S.shipping) renderShippingEditor();
     $('#settingShipCo').value = s.shippingCompany || '';
     setColor('Gold', t.gold || DEFAULT_THEME.gold);
@@ -1624,7 +1624,7 @@
     var pixel = /^off$/i.test(pixRaw) ? '' : pixRaw.replace(/\D/g, '');
     if (pixRaw && !/^off$/i.test(pixRaw) && !/^\d{10,20}$/.test(pixel)) { $('#settingPixel').classList.add('invalid'); return toast('رقم البيكسل لازم يكون أرقام بس، أو كلمة off', 'error'); }
     $('#settingPixel').classList.remove('invalid');
-    var data = { name: $('#settingName').value.trim(), whatsapp: $('#settingWA').value.trim(), allowTransfer: $('#settingTransfer').checked, pixelId: pixRaw ? pixel : null,
+    var data = { name: $('#settingName').value.trim(), whatsapp: $('#settingWA').value.trim(), allowTransfer: $('#settingTransfer').checked, paymentV2: true, pixelId: pixRaw ? pixel : null,
       instapayLink: $('#settingInstapay').value.trim(), instapayHandle: $('#settingInstapayHandle').value.trim(), walletNumber: $('#settingWallet').value.trim(), shippingCompany: $('#settingShipCo').value.trim(), updatedAt: serverTs() };
     db.collection('settings').doc('store').set(data, { merge: true }).then(function () { S.store = data; publishSnapshot(); toast('✅ تم حفظ بيانات المتجر'); })
       .catch(function (err) { toast('تعذر الحفظ: ' + errMsg(err), 'error'); });
