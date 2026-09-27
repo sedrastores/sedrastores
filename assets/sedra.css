@@ -480,3 +480,26 @@ a.trust-item:hover { background: #faf6ec; }
   content: 'الصورة مش متاحة'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 800; color: #8a7f68; text-align: center; padding: 8px;
 }
+
+/* ================= ELECTRONIC PAYMENT ================= */
+.pay-panel { margin-top: 12px; background: #fbf7ee; border: 1.5px solid var(--gold); border-radius: 12px; padding: 14px; }
+.pay-amount { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+.pay-amount b { color: var(--gold-dark); font-size: 17px; font-weight: 900; }
+.pay-tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+.pay-tab { flex: 1; background: #fff; border: 1.5px solid rgba(0,0,0,0.12); border-radius: 8px; padding: 9px; font-size: 13px; font-weight: 800; cursor: pointer; color: var(--dark); }
+.pay-tab.active { background: var(--black); color: var(--gold-light); border-color: var(--black); }
+.pay-body { display: flex; flex-direction: column; gap: 8px; }
+.pay-body[hidden], .pay-panel[hidden] { display: none; }
+.pay-link { display: block; background: var(--black); color: var(--gold-light); text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 800; font-size: 14px; }
+.pay-link:hover { background: var(--gold); color: var(--black); }
+.pay-copy { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; font-weight: 700; }
+.pay-copy b { font-size: 15px; color: var(--dark); }
+.copy-btn { margin-right: auto; background: rgba(201,168,76,0.18); border: 1px solid var(--gold); color: var(--gold-dark); border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 800; cursor: pointer; }
+.copy-btn:hover { background: var(--gold); color: var(--black); }
+.pay-note { font-size: 12px; line-height: 1.7; color: var(--text-light); }
+.pay-note b { color: var(--gold-dark); }
+.receipt-box { display: block; margin-top: 10px; border: 1.5px dashed var(--gold); border-radius: 10px; background: #fff; padding: 14px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 800; color: var(--gold-dark); }
+.receipt-box:hover { background: rgba(201,168,76,0.08); }
+.receipt-box img { max-height: 190px; margin: 10px auto 0; border-radius: 8px; }
+.pay-wa { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; background: #fff; border: 1.5px solid var(--green); color: #128C7E; border-radius: 10px; padding: 10px; text-decoration: none; font-weight: 800; font-size: 13px; }
+.pay-wa:hover { background: var(--green); color: #fff; }

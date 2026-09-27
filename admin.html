@@ -1238,6 +1238,8 @@
   .scan-img code { direction: ltr; background: #f6f2ea; padding: 1px 6px; border-radius: 5px; font-size: 11px; word-break: break-all; }
   .scan-img.bad { color: #b42318; font-weight: 700; }
   .scan-note { font-size: 13px; line-height: 1.8; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 12px; margin-top: 12px; }
+
+  .paid-pill { background: #e8f7ee; color: #166534; font-weight: 800; font-size: 11px; padding: 3px 9px; border-radius: 12px; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -1409,6 +1411,9 @@
             <div class="setting-row"><label class="setting-label" for="settingWA">رقم واتساب (اللي بيوصله استفسارات العملاء)</label><input type="tel" class="setting-input" id="settingWA" dir="ltr" placeholder="01033035681"></div>
             <div class="setting-row"><label class="setting-label" for="settingPixel">رقم بيكسل فيسبوك (Meta Pixel ID)</label><input type="text" class="setting-input" id="settingPixel" dir="ltr" placeholder="1152563063529555"><small class="hint">سيبه فاضي عشان يستخدم الرقم الافتراضي، أو اكتب كلمة <b>off</b> عشان توقف التتبع تماماً. الأدمن نفسه مش بيتسجل في البيكسل أبداً.</small></div>
             <label class="switch-row"><input type="checkbox" id="settingTransfer"> <span>إظهار "تحويل إلكتروني" كطريقة دفع (لو مقفول: الدفع عند الاستلام بس)</span></label>
+            <div class="setting-row"><label class="setting-label" for="settingInstapay">لينك إنستاباي</label><input type="text" class="setting-input" id="settingInstapay" dir="ltr" placeholder="https://ipn.eg/S/..."></div>
+            <div class="setting-row"><label class="setting-label" for="settingInstapayHandle">حساب إنستاباي</label><input type="text" class="setting-input" id="settingInstapayHandle" dir="ltr" placeholder="hasnaaa@instapay"></div>
+            <div class="setting-row"><label class="setting-label" for="settingWallet">رقم فودافون كاش / المحفظة</label><input type="text" class="setting-input" id="settingWallet" dir="ltr" placeholder="01146164155"></div>
             <div class="setting-row"><label class="setting-label" for="settingShipCo">شركة الشحن (اختياري)</label><input type="text" class="setting-input" id="settingShipCo"></div>
             <button class="save-settings-btn" type="submit">💾 حفظ بيانات المتجر</button>
           </form>

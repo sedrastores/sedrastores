@@ -1,7 +1,7 @@
 {
  "version": 3,
  "note": "نسخة احتياطية من الكتالوج على الموقع نفسه. الموقع بيقراها فوراً من غير أي استهلاك لفايربيز.",
- "updatedAt": "2026-09-27T07:43:34.289Z",
+ "updatedAt": "2026-09-27T08:03:23.262Z",
  "categories": [
   {
    "id": "sponge",
@@ -462,8 +462,11 @@
  "settings": {
   "name": "سيدرا ستور",
   "whatsapp": "201033035681",
-  "allowTransfer": false,
-  "pixelId": null
+  "allowTransfer": true,
+  "pixelId": null,
+  "instapayLink": "https://ipn.eg/S/hasnaaa/instapay/1XavJ3",
+  "instapayHandle": "hasnaaa@instapay",
+  "walletNumber": "01146164155"
  },
  "theme": {},
  "shipping": {

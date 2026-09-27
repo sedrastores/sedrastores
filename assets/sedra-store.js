@@ -276,8 +276,31 @@
         '<div class="order-summary-box" id="checkoutSummary"></div>' +
         '<div class="payment-choice"><h4>💳 طريقة الدفع</h4><div class="payment-options">' +
           '<button type="button" class="payment-opt selected" data-pay="عند الاستلام"><div class="payment-opt-icon">💵</div><div class="payment-opt-label">الدفع عند الاستلام</div><div class="payment-opt-sub">كاش مع المندوب</div><div class="recommended-badge">عاين قبل ما تدفع</div></button>' +
-          '<button type="button" class="payment-opt" data-pay="تحويل إلكتروني" id="payTransfer" hidden><div class="payment-opt-icon">📱</div><div class="payment-opt-label">تحويل إلكتروني</div><div class="payment-opt-sub">فودافون كاش / إنستاباي</div></button>' +
-        '</div></div>' +
+          '<button type="button" class="payment-opt" data-pay="تحويل إلكتروني" id="payTransfer" hidden><div class="payment-opt-icon">📱</div><div class="payment-opt-label">تحويل إلكتروني</div><div class="payment-opt-sub">إنستاباي / فودافون كاش</div><div class="recommended-badge">شحن بدون تحصيل</div></button>' +
+        '</div>' +
+        '<div class="pay-panel" id="payPanel" hidden>' +
+          '<div class="pay-amount">المبلغ المطلوب تحويله: <b id="payAmount">—</b></div>' +
+          '<div class="pay-tabs">' +
+            '<button type="button" class="pay-tab active" data-pay-method="إنستاباي">إنستاباي</button>' +
+            '<button type="button" class="pay-tab" data-pay-method="فودافون كاش">فودافون كاش / محفظة</button>' +
+          '</div>' +
+          '<div class="pay-body" id="payInstapay">' +
+            '<a class="pay-link" id="instapayLink" href="#" target="_blank" rel="noopener">↗ افتح لينك إنستاباي وحوّل</a>' +
+            '<div class="pay-copy">الحساب: <b id="instapayHandle" dir="ltr">—</b><button type="button" class="copy-btn" data-copy="instapayHandle">نسخ</button></div>' +
+          '</div>' +
+          '<div class="pay-body" id="payWallet" hidden>' +
+            '<div class="pay-copy">حوّل على الرقم ده: <b id="walletNumber" dir="ltr">—</b><button type="button" class="copy-btn" data-copy="walletNumber">نسخ</button></div>' +
+            '<div class="pay-note">فودافون كاش أو أي محفظة إلكترونية.</div>' +
+          '</div>' +
+          '<label class="receipt-box" id="receiptBox">' +
+            '<input type="file" accept="image/*" id="fReceipt" hidden>' +
+            '<span id="receiptLabel">📷 ارفع صورة إيصال التحويل</span>' +
+            '<img id="receiptPreview" alt="" hidden>' +
+          '</label>' +
+          '<div class="pay-note">بعد ما تحوّل، ارفع صورة التحويل. هنراجعها ونتواصل معاك لتأكيد الطلب، وهيتشحن <b>بدون تحصيل</b>.</div>' +
+          '<a class="pay-wa" id="payWaBtn" target="_blank" rel="noopener" href="#">' + WA_SVG + ' قابلتك مشكلة في التحويل؟ كلمنا واتساب</a>' +
+        '</div>' +
+        '</div>' +
         '<div class="form-group" data-field="fName"><label class="form-label" for="fName">الاسم الكامل <span class="req">*</span></label><input type="text" class="form-input" id="fName" autocomplete="name" placeholder="اكتب اسمك بالكامل"><div class="field-error">اكتب اسمك</div></div>' +
         '<div class="form-group" data-field="fPhone"><label class="form-label" for="fPhone">رقم الموبايل <span class="req">*</span></label><input type="tel" class="form-input" id="fPhone" autocomplete="tel" inputmode="numeric" placeholder="01XXXXXXXXX" maxlength="14" dir="ltr" style="text-align:right"><div class="field-error">اكتب رقم موبايل مصري صحيح من 11 رقم يبدأ بـ 01</div></div>' +
         '<div class="form-group"><label class="form-label" for="fPhone2">رقم موبايل تاني <span class="opt">(اختياري)</span></label><input type="tel" class="form-input" id="fPhone2" inputmode="numeric" placeholder="01XXXXXXXXX" maxlength="14" dir="ltr" style="text-align:right"></div>' +
@@ -305,7 +328,7 @@
     document.body.appendChild(holder.firstChild);
     var gov = $('#fGov');
     Object.keys(EGYPT).forEach(function (g) { var o = document.createElement('option'); o.value = g; o.textContent = g; gov.appendChild(o); });
-    on(gov, 'change', function () { fillCities(gov.value); clearFieldError('fGov'); renderCheckoutSummary(); });
+    on(gov, 'change', function () { fillCities(gov.value); clearFieldError('fGov'); renderCheckoutSummary(); renderPayPanel(); });
     on($('#fCity'), 'change', function () { clearFieldError('fCity'); });
     ['fName', 'fPhone', 'fAddress'].forEach(function (id) { on($('#' + id), 'input', function () { clearFieldError(id); }); });
     on($('#gpsBtn'), 'click', getLocation);
@@ -315,10 +338,76 @@
       on(b, 'click', function () {
         selectedPayment = b.getAttribute('data-pay');
         Array.prototype.forEach.call(document.querySelectorAll('[data-pay]'), function (x) { x.classList.toggle('selected', x === b); });
+        renderPayPanel();
       });
     });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-pay-method]'), function (b) {
+      on(b, 'click', function () { transferMethod = b.getAttribute('data-pay-method'); renderPayPanel(); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'), function (b) {
+      on(b, 'click', function (e) {
+        e.preventDefault();
+        var val = ($('#' + b.getAttribute('data-copy')) || {}).textContent || '';
+        if (navigator.clipboard) navigator.clipboard.writeText(val.trim()).then(function () { toast('تم نسخ: ' + val.trim()); }, function () {});
+      });
+    });
+    on($('#fReceipt'), 'change', function (e) { setReceipt(e.target.files && e.target.files[0]); });
   }
   var selectedPayment = 'عند الاستلام';
+  var transferMethod = 'إنستاباي';
+  var receiptFile = null, receiptDataUrl = null;
+
+  function payInfo() {
+    var st = (state.catalog && state.catalog.settings) || {};
+    return {
+      instapayLink: st.instapayLink || '',
+      instapayHandle: st.instapayHandle || '',
+      wallet: st.walletNumber || ''
+    };
+  }
+  function renderPayPanel() {
+    var on = selectedPayment === 'تحويل إلكتروني';
+    var panel = $('#payPanel');
+    if (!panel) return;
+    panel.hidden = !on;
+    if (!on) return;
+    var info = payInfo(), gov = currentGov();
+    var total = cartSubtotal() + (gov ? zoneFor(gov).price : 0);
+    $('#payAmount').textContent = gov ? money(total) : money(cartSubtotal()) + ' + الشحن (اختار المحافظة)';
+    $('#instapayLink').href = info.instapayLink || '#';
+    $('#instapayLink').style.display = info.instapayLink ? '' : 'none';
+    $('#instapayHandle').textContent = info.instapayHandle || '—';
+    $('#walletNumber').textContent = info.wallet || '—';
+    $('#payWaBtn').href = waLink('السلام عليكم، عندي مشكلة في تحويل قيمة الطلب');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-pay-method]'), function (b) {
+      b.classList.toggle('active', b.getAttribute('data-pay-method') === transferMethod);
+    });
+    $('#payInstapay').hidden = transferMethod !== 'إنستاباي';
+    $('#payWallet').hidden = transferMethod === 'إنستاباي';
+  }
+  function setReceipt(file) {
+    receiptFile = null; receiptDataUrl = null;
+    var label = $('#receiptLabel'), prev = $('#receiptPreview');
+    if (!file) { if (label) label.textContent = '📷 ارفع صورة إيصال التحويل'; if (prev) { prev.hidden = true; prev.src = ''; } return; }
+    var img = new Image(), reader = new FileReader();
+    reader.onload = function (e) {
+      img.onload = function () {
+        // shrink the screenshot so it uploads fast and stays small
+        var max = 1000, sc = Math.min(1, max / Math.max(img.width, img.height));
+        var cv = document.createElement('canvas');
+        cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+        var ctx = cv.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+        ctx.drawImage(img, 0, 0, cv.width, cv.height);
+        receiptDataUrl = cv.toDataURL('image/jpeg', 0.75);
+        cv.toBlob(function (b) { receiptFile = b; }, 'image/jpeg', 0.75);
+        if (prev) { prev.src = receiptDataUrl; prev.hidden = false; }
+        if (label) label.textContent = '✅ تم اختيار صورة الإيصال — اضغط لتغييرها';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
   function fillCities(gov) {
     var city = $('#fCity');
     city.innerHTML = '<option value="">— اختر المدينة —</option>';
@@ -355,6 +444,7 @@
     $('#payTransfer').hidden = !allowT;
     if (!allowT && selectedPayment !== 'عند الاستلام') { selectedPayment = 'عند الاستلام'; Array.prototype.forEach.call(document.querySelectorAll('[data-pay]'), function (x) { x.classList.toggle('selected', x.getAttribute('data-pay') === selectedPayment); }); }
     renderCheckoutSummary();
+    renderPayPanel();
     $('#checkoutModal').classList.add('open');
     openLayer('checkout');
     checkoutOpenedAt = Date.now();
@@ -453,7 +543,10 @@
       '🏠 ' + htmlEsc(order.address),
       order.gps ? '🗺️ ' + htmlEsc(order.gps) : null,
       order.notes ? '📝 ملاحظات: ' + htmlEsc(order.notes) : null, '',
-      '💳 الدفع: ' + htmlEsc(order.paymentMethod),
+      order.paidOnline
+        ? '💳 الدفع: <b>تحويل إلكتروني (' + htmlEsc(order.transferMethod || '') + ')</b>' + (order.hasReceipt ? ' — مرفق صورة التحويل ✅' : ' — ⚠️ من غير صورة تحويل')
+        : '💳 الدفع: عند الاستلام',
+      order.paidOnline ? '📦 بوليصة <b>بدون تحصيل</b>' : null,
       '📱 الجهاز: ' + htmlEsc(order.deviceType),
       '📅 ' + htmlEsc(new Date().toLocaleString('ar-EG')));
     var text = lines.filter(function (l) { return l !== null; }).join('\n');
@@ -512,6 +605,18 @@
     });
   }
 
+  // the transfer screenshot is uploaded straight to Telegram (no public link needed)
+  function sendReceiptToTelegram(order) {
+    var T = D.CONFIG.telegram;
+    if (!receiptFile || !T.botToken) return Promise.resolve();
+    var fd = new FormData();
+    fd.append('chat_id', T.chatId);
+    fd.append('caption', '🧾 إيصال تحويل الطلب ' + order.orderCode + ' — ' + order.name + ' — ' + order.total + ' ج (' + (order.transferMethod || '') + ')');
+    fd.append('photo', receiptFile, 'receipt-' + order.orderCode + '.jpg');
+    return fetch('https://api.telegram.org/bot' + T.botToken + '/sendPhoto', { method: 'POST', body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (!j.ok) throw new Error(j.description || 'receipt failed'); });
+  }
   function saveOrderToFirestore(order) {
     var id = D.randomId(20);
     var data = JSON.parse(JSON.stringify(order));
@@ -555,6 +660,10 @@
         orderCode: code, name: name, phone: phone, phone2: /^01[0125]\d{8}$/.test(phone2) ? phone2 : null,
         address: address, governorate: gov, city: city, gps: val('fGPS') || null, notes: val('fNotes') || null,
         paymentMethod: selectedPayment, deviceType: detectDevice(), status: 'جديد',
+        transferMethod: selectedPayment === 'تحويل إلكتروني' ? transferMethod : null,
+        paidOnline: selectedPayment === 'تحويل إلكتروني',
+        hasReceipt: selectedPayment === 'تحويل إلكتروني' ? !!receiptDataUrl : null,
+        shippingCollect: selectedPayment !== 'تحويل إلكتروني',
         items: items, itemsCount: cartCount(), subtotal: subtotal, shipping: ship, shippingZone: zone.name || null, total: subtotal + ship,
         product: items.map(function (i) { return i.name; }).join('، '), productId: items[0].productId,
         categories: items.map(function (i) { return i.categoryName; }).filter(function (v, i, a) { return a.indexOf(v) === i; }),
@@ -563,7 +672,7 @@
       };
       return Promise.all([
         timeout(saveOrderToFirestore(order), 12000).then(function () { return true; }, function (e) { console.warn('Order save failed', e); return false; }),
-        timeout(sendTelegram(order), 15000).then(function () { return true; }, function (e) { console.warn('Telegram failed', e); return false; })
+        timeout(sendTelegram(order).then(function () { return sendReceiptToTelegram(order); }), 25000).then(function () { return true; }, function (e) { console.warn('Telegram failed', e); return false; })
       ]).then(function (res) { return { order: order, saved: res[0], notified: res[1] }; });
     }).then(function (r) {
       var o = r.order;
@@ -583,7 +692,17 @@
       var openedAt = checkoutOpenedAt; checkoutOpenedAt = 0;
       track({ orders: 1, modalTime: openedAt ? Math.min(3600, Math.round((Date.now() - openedAt) / 1000)) : 0, modalTimeSamples: openedAt ? 1 : 0 }, true); // orders are written immediately
       cart = []; saveCart();
+      setReceipt(null);
+      var rf = $('#fReceipt'); if (rf) rf.value = '';
       $('#successTitle').textContent = 'تم استلام طلبك يا ' + o.name + '! 🎉';
+      var sub = document.querySelector('#checkoutSuccess p');
+      if (sub) {
+        sub.innerHTML = o.paidOnline
+          ? (o.hasReceipt
+              ? 'استلمنا صورة التحويل، وهنراجعها ونتواصل معاك لتأكيد الطلب. الشحن هيبقى <b>بدون تحصيل</b>.'
+              : 'لسه محتاجين صورة التحويل. ابعتها لنا على واتساب من الزرار تحت عشان نأكد طلبك.')
+          : 'فريقنا هيتواصل معاك خلال 24 ساعة لتأكيد الطلب وميعاد التوصيل.';
+      }
       $('#orderCodeDisplay').textContent = o.orderCode;
       $('#successWaBtn').href = waLink(summary);
       $('#checkoutForm').style.display = 'none';

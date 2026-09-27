@@ -458,7 +458,10 @@
         whatsapp: normalizeWhatsapp(s.whatsapp) || CONFIG.defaults.whatsapp,
         shipping: num(s.shipping, CONFIG.defaults.shipping),
         shippingCompany: s.shippingCompany || '',
-        allowTransfer: s.allowTransfer === true
+        allowTransfer: s.allowTransfer === true,
+        instapayLink: s.instapayLink || '',
+        instapayHandle: s.instapayHandle || '',
+        walletNumber: s.walletNumber || ''
       },
       shipping: normalizeShipping(s.__shipping),
       theme: (settings && settings.__theme) || {}
@@ -536,10 +539,13 @@
       // in the admin must reach customers, whatever version number is stored.
       var hasLive = (res[1] || []).length > 0 && (res[2] || []).length > 0;
       if (!hasLive) {
-        return buildCatalog(
-          SEED_CATEGORIES.map(function (c) { return { id: c.id, data: c }; }),
-          SEED_PRODUCTS.map(function (p) { return { id: p.id, data: p }; }),
-          store, 'seed-live');
+        // nothing in Firestore: use the catalog file shipped with the site
+        return fetchStatic().catch(function () {
+          return buildCatalog(
+            SEED_CATEGORIES.map(function (c) { return { id: c.id, data: c }; }),
+            SEED_PRODUCTS.map(function (p) { return { id: p.id, data: p }; }),
+            store, 'seed-live');
+        });
       }
       // Very old database (before the 3-category rollout): show its data *plus* the
       // defaults it is missing, so nothing ever disappears from the storefront.
