@@ -60,7 +60,7 @@
       description: 'مصلية إسفنج بالكامل بسمك 3 سم مع ظهر خشب يتحمل لحد 250 كيلو، بتسند ظهرك وانت قاعد في التشهد والأذكار وقراءة القرآن، وقابلة للطي وسهلة الحمل.',
       bestFor: 'اللي ظهره بيتعب في الجلوس الطويل',
       chooser: 'ظهري بيتعب وأنا قاعد',
-      price: 750, oldPrice: null, badge: 'بمسند',
+      price: 875, oldPrice: null, badge: 'بمسند',
       cardRatio: '4/3', imageFit: 'contain',
       coverImg: 'images/categories/masnad.jpg',
       specs: [

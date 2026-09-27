@@ -10,6 +10,10 @@
   var ADMIN_PASSWORD = 'harby';
   var FIREBASE_ADMIN_EMAIL = 'admin@sedra.com';
   var STATUSES = ['جديد', 'قيد التجهيز', 'تم الشحن', 'تم التسليم', 'مرتجع', 'ملغي'];
+  // Display only — the value saved in the database stays the plain Arabic text,
+  // so nothing that is already stored changes.
+  var STATUS_EMOJI = { 'جديد': '🆕', 'قيد التجهيز': '⏳', 'تم الشحن': '🚚', 'تم التسليم': '✅', 'مرتجع': '❌', 'ملغي': '🚫' };
+  function statusLabel(st) { st = st || 'جديد'; return (STATUS_EMOJI[st] ? STATUS_EMOJI[st] + ' ' : '') + st; }
   var STATUS_CLASS = { 'جديد': 'status-new', 'قيد التجهيز': 'status-prep', 'تم الشحن': 'status-shipped', 'تم التسليم': 'status-delivered', 'مرتجع': 'status-returned', 'ملغي': 'status-cancelled' };
   var RATIOS = [
     { v: '1/1', label: 'مربع' }, { v: '4/3', label: 'عريض' }, { v: '3/2', label: 'عريض جداً' },
@@ -475,7 +479,7 @@
 
     $('#statusBars').innerHTML = STATUSES.map(function (st) {
       var n = statusCount(st), pct = total ? Math.round(n / total * 100) : 0;
-      return '<div class="status-bar-row"><span class="status-bar-label">' + esc(st) + '</span><div class="status-bar-track"><div class="status-bar-fill" style="width:' + pct + '%"></div></div><span class="status-bar-count">' + n + '</span></div>';
+      return '<div class="status-bar-row"><span class="status-bar-label">' + esc(statusLabel(st)) + '</span><div class="status-bar-track"><div class="status-bar-fill" style="width:' + pct + '%"></div></div><span class="status-bar-count">' + n + '</span></div>';
     }).join('');
 
     $('#catSales').innerHTML = categorySalesHTML();
@@ -505,7 +509,7 @@
         '<td><div class="o-name">' + esc(o.name) + '</div><span class="o-phone">' + esc(o.phone) + '</span></td>' +
         '<td>' + orderItemsHTML(o, true) + '</td><td>' + esc(o.governorate || '—') + '</td>' +
         '<td class="o-total">' + money(orderTotal(o)) + '</td>' +
-        '<td><span class="status-badge ' + (STATUS_CLASS[st] || '') + '">' + esc(st) + '</span></td><td class="o-date">' + fmtDate(o._ts, true) + '</td></tr>';
+        '<td><span class="status-badge ' + (STATUS_CLASS[st] || '') + '">' + esc(statusLabel(st)) + '</span></td><td class="o-date">' + fmtDate(o._ts, true) + '</td></tr>';
     }).join('') : '<tr><td colspan="7"><div class="empty-state"><p>لسه مفيش أوردرات</p></div></td></tr>';
     hydrate($('#recentOrdersBody'));
     hydrate($('#topDesignsOverview'));
@@ -571,7 +575,7 @@
   function fillOrderFilters() {
     var sf = $('#statusFilter'), cur = sf.value;
     if (sf.options.length <= 1) {
-      STATUSES.forEach(function (s) { var o = document.createElement('option'); o.value = s; o.textContent = s; sf.appendChild(o); });
+      STATUSES.forEach(function (s) { var o = document.createElement('option'); o.value = s; o.textContent = statusLabel(s); sf.appendChild(o); });
       sf.value = cur;
     }
     var cf = $('#orderCatFilter'), cc = cf.value;
@@ -606,7 +610,7 @@
         '<td style="min-width:150px;font-size:12px;line-height:1.6"><b>' + esc(o.governorate || '') + '</b>' + (o.city ? ' — ' + esc(o.city) : '') + '<br>' + esc(o.address || '') + '</td>' +
         '<td class="o-total">' + money(orderTotal(o)) + '</td>' +
         '<td style="font-size:12px">' + esc(o.paymentMethod || '—') + '</td>' +
-        '<td><select class="status-select" data-status="' + esc(o.id) + '">' + STATUSES.map(function (s) { return '<option' + (s === st ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select></td>' +
+        '<td><select class="status-select" data-status="' + esc(o.id) + '">' + STATUSES.map(function (s) { return '<option value="' + esc(s) + '"' + (s === st ? ' selected' : '') + '>' + esc(statusLabel(s)) + '</option>'; }).join('') + '</select></td>' +
         '<td class="o-date">' + fmtDate(o._ts, true) + '</td>' +
         '<td><div class="row-actions">' +
           '<button class="icon-action" type="button" data-act="order-detail" data-id="' + esc(o.id) + '">📋 تفاصيل</button>' +
@@ -618,7 +622,7 @@
   }
   function changeStatus(id, status) {
     db.collection('orders').doc(id).update({ status: status, statusUpdatedAt: serverTs() })
-      .then(function () { toast('✅ الحالة بقت: ' + status); })
+      .then(function () { toast('تم: ' + statusLabel(status)); })
       .catch(function (e) { toast('تعذر تغيير الحالة: ' + errMsg(e), 'error'); renderOrders(); });
   }
   function deleteOrder(id) {
@@ -638,7 +642,7 @@
       field('العميل', o.name) + field('الموبايل', o.phone, true) + field('موبايل تاني', o.phone2, true) +
       field('المحافظة', o.governorate) + field('المدينة', o.city) + field('العنوان', o.address) +
       field('ملاحظات', o.notes) + field('الدفع', o.paymentMethod) + field('منطقة الشحن', o.shippingZone) + field('الجهاز', o.deviceType) +
-      field('التاريخ', fmtDate(o._ts, true)) + field('الحالة', st) +
+      field('التاريخ', fmtDate(o._ts, true)) + field('الحالة', statusLabel(st)) +
       (o.gps ? '<div class="detail-item"><label>الموقع</label><span><a href="' + esc(/^https:\/\//.test(o.gps) ? o.gps : '#') + '" target="_blank" rel="noopener">📍 فتح الخريطة</a></span></div>' : '');
     $('#detailProductsList').innerHTML = orderItems(o).map(function (i) {
       return '<div class="detail-product-row"><div class="design-rank-img" data-zoom="' + esc(i.img || '') + '" style="width:56px;height:56px">' + img(i.img, { variant: 't' }) + '</div>' +
@@ -952,6 +956,15 @@
     $('#cBestFor').value = c ? c.bestFor : '';
     $('#cChooser').value = c ? c.chooser : '';
     $('#cPrice').value = c && c.price ? c.price : '';
+    var overrides = c ? S.products.filter(function (pr) { return pr.categoryId === c.id && pr.price; }) : [];
+    var warn = $('#cPriceWarn');
+    if (warn) {
+      warn.hidden = !overrides.length;
+      warn.innerHTML = overrides.length
+        ? '⚠️ ' + overrides.length + ' منتج في الصنف ده عندهم سعر خاص، فتغيير سعر الصنف مش هيأثر عليهم: ' +
+          overrides.map(function (pr) { return esc(pr.name) + ' (' + money(pr.price) + ')'; }).join(' — ')
+        : '';
+    }
     $('#cOldPrice').value = c && c.oldPrice ? c.oldPrice : '';
     $('#cBadge').value = c ? c.badge : '';
     $('#cFit').value = c ? c.imageFit : 'contain';
@@ -1494,7 +1507,7 @@
     var total = S.orders.length;
     $('#analyticsStatusTable').innerHTML = STATUSES.map(function (st) {
       var list = S.orders.filter(function (o) { return (o.status || 'جديد') === st; });
-      return '<tr><td><span class="status-badge ' + STATUS_CLASS[st] + '">' + esc(st) + '</span></td><td>' + list.length + '</td><td>' + (total ? Math.round(list.length / total * 100) : 0) + '%</td><td>' + money(list.reduce(function (s, o) { return s + orderTotal(o); }, 0)) + '</td></tr>';
+      return '<tr><td><span class="status-badge ' + STATUS_CLASS[st] + '">' + esc(statusLabel(st)) + '</span></td><td>' + list.length + '</td><td>' + (total ? Math.round(list.length / total * 100) : 0) + '%</td><td>' + money(list.reduce(function (s, o) { return s + orderTotal(o); }, 0)) + '</td></tr>';
     }).join('');
     hydrate($('#analyticsTopDesigns'));
   }
