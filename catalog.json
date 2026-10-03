@@ -1,7 +1,7 @@
 {
  "version": 3,
  "note": "نسخة احتياطية من الكتالوج على الموقع نفسه. الموقع بيقراها فوراً من غير أي استهلاك لفايربيز.",
- "updatedAt": "2026-10-03T11:48:09.205Z",
+ "updatedAt": "2026-10-03T22:32:30.043Z",
  "categories": [
   {
    "id": "sponge",
@@ -225,7 +225,7 @@
    "categoryId": "masnad",
    "order": 0,
    "visible": true,
-   "name": "مسند الزخرفة الذهبية",
+   "name": "مسند الكعبة الصغيرة",
    "color": "أسود بزخارف ذهبية",
    "price": null,
    "oldPrice": null,
@@ -279,7 +279,7 @@
    "categoryId": "masnad",
    "order": 3,
    "visible": true,
-   "name": "مسند الكسوة",
+   "name": "مسند كسوة الكعبة",
    "color": "أسود ونقوش ذهبية",
    "price": null,
    "oldPrice": null,

@@ -19,7 +19,7 @@
     { v: '1/1', label: 'مربع' }, { v: '4/3', label: 'عريض' }, { v: '3/2', label: 'عريض جداً' },
     { v: '3/4', label: 'طولي' }, { v: '2/3', label: 'طولي جداً' }
   ];
-  var TAB_TITLES = { overview: 'نظرة عامة', orders: 'الأوردرات', categories: 'الأصناف', products: 'المنتجات', analytics: 'الإحصائيات', settings: 'إعدادات الموقع' };
+  var TAB_TITLES = { overview: 'نظرة عامة', orders: 'الأوردرات', categories: 'الأصناف', products: 'المنتجات', analytics: 'الإحصائيات', settings: 'إعدادات الموقع', yousef: 'حساباتي' };
 
   /* ---------------- Firebase ---------------- */
   var db = null, auth = null, storage = null;
@@ -187,6 +187,7 @@
 
   /* ================= NAV ================= */
   function showTab(tab) {
+    if (tab === 'yousef') setTimeout(function () { ySetUnlocked(yIsUnlocked()); }, 0);
     if (!TAB_TITLES[tab]) tab = 'overview';
     S.tab = tab;
     $$('.tab-panel').forEach(function (p) { p.classList.toggle('active', p.id === 'tab-' + tab); });
@@ -443,6 +444,166 @@
   /* ================= OVERVIEW ================= */
   function statusCount(st) { return S.orders.filter(function (o) { return (o.status || 'جديد') === st; }).length; }
   // Shows exactly what customers are served, so a mismatch can never go unnoticed
+  /* ================= YOUSEF: private commission sheet =================
+     Lives in its own "commissions" collection. It never reads or writes anything
+     the rest of the site depends on — orders stay exactly as they are. */
+  var Y = { pass: '251581', unlocked: false, rates: null, settlements: [], loaded: false };
+
+  function yIsUnlocked() {
+    try { return sessionStorage.getItem('sedra_yousef') === '1'; } catch (e) { return Y.unlocked; }
+  }
+  function ySetUnlocked(v) {
+    Y.unlocked = v;
+    try { v ? sessionStorage.setItem('sedra_yousef', '1') : sessionStorage.removeItem('sedra_yousef'); } catch (e) {}
+    $('#yousefLock').hidden = v;
+    $('#yousefBody').hidden = !v;
+    if (v) yLoad();
+  }
+  function yDefaultRates() {
+    // per delivered piece
+    return { sponge: 50, masnad: 100, memory: 100 };
+  }
+  function yLoad() {
+    if (!db) return;
+    if (Y.loaded) { yRender(); return; }
+    Promise.all([db.collection('commissions').doc('config').get(), db.collection('commissions').get()])
+      .then(function (r) {
+        Y.rates = (r[0].exists && (r[0].data() || {}).rates) || yDefaultRates();
+        Y.settlements = r[1].docs.filter(function (d) { return d.id !== 'config'; })
+          .map(function (d) { var x = d.data() || {}; return { id: d.id, at: tsMillis(x.at), amount: num(x.amount, 0), orderIds: x.orderIds || [], pieces: x.pieces || {}, count: num(x.count, (x.orderIds || []).length) }; })
+          .sort(function (a, b) { return b.at - a.at; });
+        Y.loaded = true;
+        yRender();
+      }).catch(function (e) {
+        Y.rates = Y.rates || yDefaultRates();
+        toast('تعذر تحميل بيانات الحسابات: ' + errMsg(e), 'error');
+        yRender();
+      });
+  }
+  function yRateFor(categoryId, categoryName) {
+    var r = Y.rates || yDefaultRates();
+    if (r[categoryId] != null) return num(r[categoryId], 0);
+    // older orders may not carry the category id
+    var byName = { 'إسفنج': 'sponge', 'مسند': 'masnad', 'ميموري': 'memory' };
+    var hit = Object.keys(byName).filter(function (k) { return (categoryName || '').indexOf(k) > -1; })[0];
+    return hit ? num(r[byName[hit]], 0) : 0;
+  }
+  function yOrderBreakdown(o) {
+    var pieces = {}, amount = 0, unknown = 0;
+    (o.items || []).forEach(function (i) {
+      var qty = num(i.qty, 0);
+      var cid = i.categoryId || '';
+      var rate = yRateFor(cid, i.categoryName);
+      var key = cid || (i.categoryName || 'غير محدد');
+      pieces[key] = (pieces[key] || 0) + qty;
+      if (rate > 0) amount += rate * qty; else unknown += qty;
+    });
+    return { pieces: pieces, amount: amount, unknown: unknown };
+  }
+  function ySettledIds() {
+    var set = {};
+    Y.settlements.forEach(function (st) { (st.orderIds || []).forEach(function (id) { set[id] = 1; }); });
+    return set;
+  }
+  function yUnsettledOrders() {
+    var done = ySettledIds();
+    return S.orders.filter(function (o) {
+      return (o.status === 'تم التسليم') && !done[o.id];
+    }).sort(function (a, b) { return (a._ts || 0) - (b._ts || 0); });
+  }
+  function yCatName(key) {
+    var c = catById(key);
+    return c ? (c.shortName || c.name) : key;
+  }
+  function yRender() {
+    if (!yIsUnlocked() || !S.ordersLoaded) return;
+    var list = yUnsettledOrders();
+    var totalDue = 0, pieces = {}, unknownPieces = 0;
+    var rows = list.map(function (o) {
+      var br = yOrderBreakdown(o);
+      totalDue += br.amount; unknownPieces += br.unknown;
+      Object.keys(br.pieces).forEach(function (k) { pieces[k] = (pieces[k] || 0) + br.pieces[k]; });
+      return '<tr><td><b>' + esc(o.orderCode || '—') + '</b></td><td class="o-date">' + esc(fmtDate(o._ts)) + '</td>' +
+        '<td>' + esc(o.name || '') + '</td>' +
+        '<td><div class="pieces-chips">' + Object.keys(br.pieces).map(function (k) { return '<span class="piece-chip">' + esc(yCatName(k)) + ' ×' + br.pieces[k] + '</span>'; }).join('') + '</div></td>' +
+        '<td><b>' + money(br.amount) + '</b></td></tr>';
+    }).join('');
+    $('#yUnsettledBody').innerHTML = rows || '<tr><td colspan="5"><div class="empty-state"><p>مفيش أوردرات مسلّمة جديدة</p></div></td></tr>';
+    $('#yUnsettledCount').textContent = '(' + list.length + ' أوردر)';
+    var settledTotal = Y.settlements.reduce(function (s2, st) { return s2 + st.amount; }, 0);
+    $('#yDue').textContent = money(totalDue);
+    $('#yDueSub').textContent = list.length + ' أوردر مسلّم' + (unknownPieces ? ' — ' + unknownPieces + ' قطعة من غير نسبة' : '');
+    $('#ySettled').textContent = money(settledTotal);
+    $('#ySettledSub').textContent = Y.settlements.length + ' محاسبة';
+    $('#yPieces').textContent = Object.keys(pieces).reduce(function (n, k) { return n + pieces[k]; }, 0);
+    $('#yPiecesSub').innerHTML = Object.keys(pieces).map(function (k) { return esc(yCatName(k)) + ': ' + pieces[k]; }).join(' · ') || '—';
+    $('#yAll').textContent = money(totalDue + settledTotal);
+    $('#ySettleBtn').disabled = !list.length;
+
+    // rate inputs, one per category that exists
+    var rates = Y.rates || yDefaultRates();
+    var keys = S.categories.map(function (c) { return c.id; });
+    Object.keys(rates).forEach(function (k) { if (keys.indexOf(k) === -1) keys.push(k); });
+    $('#yRates').innerHTML = keys.map(function (k) {
+      return '<label class="rate-item"><span>' + esc(yCatName(k)) + '</span><input type="number" min="0" step="1" data-rate="' + esc(k) + '" value="' + esc(num(rates[k], 0)) + '"> <span>ج / قطعة</span></label>';
+    }).join('');
+
+    $('#ySettlementsBody').innerHTML = Y.settlements.length ? Y.settlements.map(function (st, idx) {
+      return '<tr><td class="o-date">' + esc(fmtDate(st.at, true)) + '</td><td>' + st.count + '</td>' +
+        '<td><div class="pieces-chips">' + Object.keys(st.pieces || {}).map(function (k) { return '<span class="piece-chip">' + esc(yCatName(k)) + ' ×' + st.pieces[k] + '</span>'; }).join('') + '</div></td>' +
+        '<td><b>' + money(st.amount) + '</b></td>' +
+        '<td>' + (idx === 0 ? '<button class="icon-action danger" type="button" data-undo-settle="' + esc(st.id) + '">↩️ تراجع</button>' : '') + '</td></tr>';
+    }).join('') : '<tr><td colspan="5"><div class="empty-state"><p>مفيش محاسبات متسجلة</p></div></td></tr>';
+  }
+  function ySaveRates() {
+    var rates = {};
+    $$('#yRates input[data-rate]').forEach(function (el) { rates[el.getAttribute('data-rate')] = Math.max(0, Math.round(num(el.value, 0))); });
+    db.collection('commissions').doc('config').set({ rates: rates, updatedAt: serverTs() }, { merge: true })
+      .then(function () { Y.rates = rates; yRender(); toast('✅ اتحفظت النسب'); })
+      .catch(function (e) { toast('تعذر الحفظ: ' + errMsg(e), 'error'); });
+  }
+  function ySettle() {
+    var list = yUnsettledOrders();
+    if (!list.length) return;
+    var total = 0, pieces = {};
+    list.forEach(function (o) {
+      var br = yOrderBreakdown(o);
+      total += br.amount;
+      Object.keys(br.pieces).forEach(function (k) { pieces[k] = (pieces[k] || 0) + br.pieces[k]; });
+    });
+    askConfirm({
+      title: 'تسجيل محاسبة',
+      text: 'هتسجل إنك استلمت ' + money(total) + ' عن ' + list.length + ' أوردر مسلّم.\nالأوردرات دي مش هتتحسب تاني في المستحق، والأوردرات الجديدة بعد كده هتبدأ من الصفر.',
+      okText: '✅ سجّل المحاسبة'
+    }).then(function (ok) {
+      if (!ok) return;
+      var ref = db.collection('commissions').doc();
+      var data = { at: serverTs(), amount: total, count: list.length, pieces: pieces,
+        orderIds: list.map(function (o) { return o.id; }),
+        rates: Y.rates || yDefaultRates() };
+      ref.set(data).then(function () {
+        Y.settlements.unshift({ id: ref.id, at: Date.now(), amount: total, orderIds: data.orderIds, pieces: pieces, count: list.length });
+        yRender();
+        toast('✅ اتسجلت محاسبة بـ ' + money(total));
+      }).catch(function (e) { toast('تعذر التسجيل: ' + errMsg(e), 'error'); });
+    });
+  }
+  function yUndoSettlement(id) {
+    askConfirm({ title: 'تراجع عن المحاسبة', text: 'الأوردرات بتاعتها هترجع تتحسب في المستحق تاني.', okText: '↩️ تراجع', danger: true })
+      .then(function (ok) {
+        if (!ok) return;
+        db.collection('commissions').doc(id).delete().then(function () {
+          Y.settlements = Y.settlements.filter(function (s2) { return s2.id !== id; });
+          yRender(); toast('اترجعت المحاسبة');
+        }).catch(function (e) { toast('تعذر التراجع: ' + errMsg(e), 'error'); });
+      });
+  }
+
+  function yTryUnlock() {
+    var v = ($('#yousefPass').value || '').trim();
+    if (v === Y.pass) { $('#yousefError').hidden = true; $('#yousefPass').value = ''; ySetUnlocked(true); }
+    else { $('#yousefError').hidden = false; }
+  }
   function renderHealth() {
     var el = $('#healthBar');
     if (!el || !S.catsLoaded || !S.prodsLoaded) return;
@@ -626,6 +787,7 @@
   }
   function renderOrders() {
     if (!S.ordersLoaded) return;
+    yRender();
     fillAreaFilters();
     var list = filteredOrders();
     renderRouteBar(list);
@@ -1807,6 +1969,16 @@
     $('#scanImagesBtn').addEventListener('click', scanImages);
     $('#repairImagesBtn').addEventListener('click', repairImages);
     $('#publishSnapshotBtn').addEventListener('click', function () { publishSnapshot(true); });
+    // Yousef tab
+    $('#yousefUnlock').addEventListener('click', yTryUnlock);
+    $('#yousefPass').addEventListener('keydown', function (e) { if (e.key === 'Enter') yTryUnlock(); });
+    $('#yousefLockBtn').addEventListener('click', function () { ySetUnlocked(false); $('#yousefPass').value = ''; });
+    $('#yRatesSave').addEventListener('click', ySaveRates);
+    $('#ySettleBtn').addEventListener('click', ySettle);
+    $('#ySettlementsBody').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-undo-settle]');
+      if (b) yUndoSettlement(b.getAttribute('data-undo-settle'));
+    });
     // products
     $('#prodSearch').addEventListener('input', function () { S.prodFilter.q = this.value; renderProducts(); });
     $('#prodVisFilter').addEventListener('change', function () { S.prodFilter.vis = this.value; renderProducts(); });

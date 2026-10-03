@@ -138,6 +138,22 @@
       return { id: c.id, data: merged };
     });
   }
+  // Names I generated earlier that the owner corrected. Applied only when the stored
+  // name is still exactly the old one, so renames made in the admin are never touched.
+  var PRODUCT_RENAMES = {
+    'masnad-1': { from: ['مسند الزخرفة الذهبية'], to: 'مسند الكعبة الصغيرة' },
+    'masnad-4': { from: ['مسند الكسوة'], to: 'مسند كسوة الكعبة' },
+    'memory-2': { from: ['ميموري فوم — أسود فحمي'], to: 'ميموري فوم — رمادي' }
+  };
+  function applyNameFixes(rawProds) {
+    return rawProds.map(function (p) {
+      var fix = PRODUCT_RENAMES[p.id];
+      if (!fix || !p.data || fix.from.indexOf(p.data.name) === -1) return p;
+      var d = {}; Object.keys(p.data).forEach(function (k) { d[k] = p.data[k]; });
+      d.name = fix.to;
+      return { id: p.id, data: d };
+    });
+  }
   function seedCategoryPatch(id, cur) {
     var sc = SEED_CATEGORIES.filter(function (c) { return c.id === id; })[0];
     if (!sc) return null;
@@ -172,10 +188,10 @@
     ['تصميم الخط العربي', 'أسود وذهبي']
   ];
   var MASNAD = [
-    ['مسند الزخرفة الذهبية', 'أسود بزخارف ذهبية', 5],
+    ['مسند الكعبة الصغيرة', 'أسود بزخارف ذهبية', 5],
     ['مسند المسجد النبوي', 'أسود وأبيض بقبة خضراء', 4],
     ['مسند باب الكعبة', 'أسود وذهبي', 6],
-    ['مسند الكسوة', 'أسود ونقوش ذهبية', 6]
+    ['مسند كسوة الكعبة', 'أسود ونقوش ذهبية', 6]
   ];
   var MEMORY = [
     ['ميموري فوم — أزرق ملكي', 'أزرق ملكي'],
@@ -508,7 +524,7 @@
       SEED_PRODUCTS.map(function (p) { return { id: p.id, data: p }; }),
       null, source || 'seed');
   }
-  var CACHE_TTL = 10 * 60 * 1000; // one refresh per visitor per 10 minutes, at most
+  var CACHE_TTL = 3 * 60 * 1000; // one refresh per visitor per 3 minutes, at most
   function readCacheEntry() {
     try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); return (c && c.data) ? c : null; } catch (e) { return null; }
   }
@@ -545,7 +561,7 @@
       store.__shipping = snap.shipping || null;
       return buildCatalog(
         applyOfferDefaults(snap.categories.map(function (c) { return { id: c.id, data: c }; })),
-        snap.products.map(function (p) { return { id: p.id, data: p }; }),
+        applyNameFixes(snap.products.map(function (p) { return { id: p.id, data: p }; })),
         store, 'live');
     });
   }
@@ -604,7 +620,7 @@
           return (p.id === 'memory-2' && p.data.name === 'ميموري فوم — أسود فحمي') ? { id: p.id, data: Object.assign({}, p.data, { name: 'ميموري فوم — رمادي', color: 'رمادي' }) } : p;
         });
       }
-      return buildCatalog(applyOfferDefaults(cats), prods, store, 'live');
+      return buildCatalog(applyOfferDefaults(cats), applyNameFixes(prods), store, 'live');
     });
   }
   function fetchLiveCatalog() {
@@ -626,6 +642,12 @@
    * - Calls onUpdate again when live data arrives and differs
    * Returns a promise resolving to the freshest catalog.
    */
+  // Reload straight from Firestore, ignoring any cached copy. Used before placing an
+  // order so a hidden or deleted product can never be ordered from a stale page.
+  function refreshCatalog() {
+    catalogPromise = fetchLiveCatalog().then(function (live) { writeCache(live); return live; });
+    return catalogPromise;
+  }
   function loadCatalog(onUpdate) {
     var entry = readCacheEntry();
     if (entry && entry.ts && (Date.now() - entry.ts) < CACHE_TTL && entry.data && entry.data.source === 'live') {
@@ -730,14 +752,14 @@
     CONFIG: CONFIG,
     SEED_CATEGORIES: SEED_CATEGORIES,
     SEED_PRODUCTS: SEED_PRODUCTS,
-    seedCategoryPatch: seedCategoryPatch,
+    seedCategoryPatch: seedCategoryPatch, PRODUCT_RENAMES: PRODUCT_RENAMES,
     GOVERNORATES: GOVERNORATES, SEED_SHIPPING: SEED_SHIPPING, normalizeShipping: normalizeShipping, shippingZoneFor: shippingZoneFor, minShipping: minShipping,
     esc: esc, num: num, money: money, toLatinDigits: toLatinDigits, randomId: randomId, validRatio: validRatio,
     normalizeCategory: normalizeCategory, normalizeProduct: normalizeProduct, normalizeWhatsapp: normalizeWhatsapp, byOrder: byOrder,
     fs: { list: fsList, get: fsGet, commit: fsCommit, writeCreate: writeCreate, writeIncrement: writeIncrement, writeMerge: writeMerge, encodeFields: encodeFields, decodeFields: decodeFields },
     isMedia: isMedia, imgTag: imgTag, hydrateMedia: hydrateMedia,
     primeMedia: function (key, dataUrl) { mediaCache[key] = dataUrl; }, mediaDocId: mediaDocId, absoluteUrl: absoluteUrl, BLANK: BLANK,
-    loadCatalog: loadCatalog, seedCatalog: seedCatalog,
+    loadCatalog: loadCatalog, refreshCatalog: refreshCatalog, seedCatalog: seedCatalog,
     visibleCategories: visibleCategories, categoryById: categoryById, productById: productById, productsOf: productsOf,
     isProductAvailable: isProductAvailable, effectivePrice: effectivePrice, effectiveOldPrice: effectiveOldPrice, productImages: productImages,
     bundleFor: bundleFor, priceForQty: priceForQty, bundleSaving: bundleSaving

@@ -1245,6 +1245,20 @@
   .bundle-row input { width: 92px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; }
   .route-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #f3f9f4; border: 1px solid #bfe3c7; color: #166534; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; font-weight: 800; }
   .route-bar b { font-size: 15px; }
+
+  .lock-screen { display: flex; align-items: center; justify-content: center; padding: 60px 20px; }
+  .lock-screen[hidden], #yousefBody[hidden] { display: none; }
+  .lock-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 30px; max-width: 360px; width: 100%; text-align: center; box-shadow: var(--shadow); }
+  .lock-icon { font-size: 40px; margin-bottom: 8px; }
+  .lock-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+  .lock-card p { font-size: 13px; color: var(--text-light); margin-bottom: 16px; }
+  .lock-card .setting-input { text-align: center; letter-spacing: 4px; font-size: 18px; margin-bottom: 12px; }
+  .lock-error { color: #b42318 !important; font-weight: 700; margin-top: 10px !important; }
+  .rates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; padding: 0 18px 10px; }
+  .rate-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #faf8f3; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 700; }
+  .rate-item input { width: 90px; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; text-align: center; }
+  .pieces-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .piece-chip { background: #f3f9f4; color: #166534; border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 800; }
 </style>
 </head>
 <body>
@@ -1282,6 +1296,7 @@
       <div class="nav-item" data-tab="analytics"><span class="nav-item-icon">📈</span> الإحصائيات</div>
       <div class="nav-section-label">الإعدادات</div>
       <div class="nav-item" data-tab="settings"><span class="nav-item-icon">⚙️</span> إعدادات الموقع</div>
+      <div class="nav-item" data-tab="yousef"><span class="nav-item-icon">🔒</span> Yousef</div>
       <a class="nav-item" href="index.html" target="_blank" rel="noopener"><span class="nav-item-icon">🔗</span> فتح المتجر</a>
     </nav>
     <div class="sidebar-footer"><button class="logout-btn" type="button" id="logoutBtn"><span>🚪</span> تسجيل الخروج</button></div>
@@ -1407,6 +1422,59 @@
             <thead><tr><th>الحالة</th><th>عدد الأوردرات</th><th>النسبة</th><th>قيمة الأوردرات</th></tr></thead>
             <tbody id="analyticsStatusTable"></tbody>
           </table></div>
+        </div>
+      </section>
+
+      <!-- ============ YOUSEF (private) ============ -->
+      <section class="tab-panel" id="tab-yousef">
+        <div class="lock-screen" id="yousefLock">
+          <div class="lock-card">
+            <div class="lock-icon">🔒</div>
+            <h3>الخانة دي محمية</h3>
+            <p>اكتب كلمة السر عشان تفتحها</p>
+            <input type="password" class="setting-input" id="yousefPass" placeholder="كلمة السر" autocomplete="off" inputmode="numeric">
+            <button class="save-settings-btn" type="button" id="yousefUnlock">فتح</button>
+            <p class="lock-error" id="yousefError" hidden>كلمة السر غلط</p>
+          </div>
+        </div>
+
+        <div id="yousefBody" hidden>
+          <div class="topbar-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <span>💰 حساباتي</span>
+            <button class="btn-ghost" type="button" id="yousefLockBtn">🔒 قفل الخانة</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card gold"><div class="stat-icon">💵</div><div class="stat-label">مستحق ليا دلوقتي</div><div class="stat-value" id="yDue">0 ج</div><div class="stat-sub" id="yDueSub">من غير محاسبة</div></div>
+            <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-label">اتحاسبت عليه قبل كده</div><div class="stat-value" id="ySettled">0 ج</div><div class="stat-sub" id="ySettledSub">0 محاسبة</div></div>
+            <div class="stat-card blue"><div class="stat-icon">📦</div><div class="stat-label">قطع مسلّمة لسه ما اتحاسبتش</div><div class="stat-value" id="yPieces">0</div><div class="stat-sub" id="yPiecesSub">—</div></div>
+            <div class="stat-card purple"><div class="stat-icon">📊</div><div class="stat-label">إجمالي من بداية البراند</div><div class="stat-value" id="yAll">0 ج</div><div class="stat-sub">المستحق + المحاسب</div></div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-header"><div class="table-title">نسبتي لكل قطعة مسلّمة</div><button class="btn-ghost" type="button" id="yRatesSave">💾 حفظ النسب</button></div>
+            <div id="yRates" class="rates-grid"></div>
+            <p class="hint" style="padding:0 18px 16px">بتتحسب على <b>القطع المسلّمة فقط</b> (حالة الأوردر: تم التسليم)، وبالقطعة مش بالأوردر.</p>
+          </div>
+
+          <div class="table-card">
+            <div class="table-header wrap">
+              <div class="table-title">أوردرات مسلّمة لسه ما اتحاسبتش <span class="muted" id="yUnsettledCount"></span></div>
+              <button class="add-product-btn" type="button" id="ySettleBtn">✅ تسجيل محاسبة بالمبلغ ده</button>
+            </div>
+            <div class="table-scroll"><table>
+              <thead><tr><th>الكود</th><th>التاريخ</th><th>العميل</th><th>القطع</th><th>نسبتي</th></tr></thead>
+              <tbody id="yUnsettledBody"></tbody>
+            </table></div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-header"><div class="table-title">سجل المحاسبات</div></div>
+            <div class="table-scroll"><table>
+              <thead><tr><th>التاريخ</th><th>عدد الأوردرات</th><th>القطع</th><th>المبلغ</th><th></th></tr></thead>
+              <tbody id="ySettlementsBody"></tbody>
+            </table></div>
+          </div>
         </div>
       </section>
 

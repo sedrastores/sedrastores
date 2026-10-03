@@ -686,6 +686,45 @@
     var btn = $('#submitOrderBtn');
     btn.disabled = true; btn.textContent = '⏳ جاري إرسال الطلب...';
 
+    // Re-check the catalog right now: the page may have been open for a while and a
+    // product could have been hidden or deleted in the meantime.
+    timeout(D.refreshCatalog(), 8000).then(function (fresh) {
+      state.catalog = fresh;
+      var gone = cart.filter(function (i) {
+        var p = D.productById(fresh, i.productId);
+        return !D.isProductAvailable(fresh, p);
+      });
+      if (gone.length) {
+        gone.forEach(function (g) { cart = cart.filter(function (i) { return i.productId !== g.productId; }); });
+        saveCart(); renderCheckoutSummary(); refreshAddButtons();
+        throw new Error('UNAVAILABLE:' + gone.map(function (g) { return g.name; }).join('، '));
+      }
+      reconcileCart();
+      renderCheckoutSummary();
+    }, function () { /* offline: continue with what we have */ }).then(function () {
+      return doSubmit();
+    }).catch(function (e) {
+      submitting = false; btn.disabled = false; btn.textContent = '✅ تأكيد الطلب';
+      var msg = String(e && e.message || '');
+      if (msg.indexOf('UNAVAILABLE:') === 0) {
+        alertBox.textContent = 'للأسف خلص من المخزن: ' + msg.slice(12) + '. شلناه من طلبك، راجع الطلب وأكد تاني.';
+        alertBox.classList.add('show');
+        if (!cart.length) closeCheckout();
+      } else {
+        alertBox.textContent = 'حصلت مشكلة غير متوقعة. جرّب تاني.';
+        alertBox.classList.add('show');
+      }
+    });
+    return;
+  }
+
+  function doSubmit() {
+    var val = function (id) { var el = $('#' + id); return el ? el.value.trim() : ''; };
+    var name = val('fName'), address = val('fAddress'), gov = val('fGov'), city = val('fCity');
+    var phone = D.toLatinDigits(val('fPhone')).replace(/[\s-]/g, '').replace(/^\+?20(?=1)/, '0');
+    var phone2 = D.toLatinDigits(val('fPhone2')).replace(/[\s-]/g, '').replace(/^\+?20(?=1)/, '0');
+    var alertBox = $('#checkoutAlert'), btn = $('#submitOrderBtn');
+
     var items = cart.map(function (i) {
       return { productId: i.productId, categoryId: i.categoryId, categoryName: i.categoryName, name: i.name, color: i.color || '',
         img: D.isMedia(i.img) ? i.img : (D.absoluteUrl(i.img) || i.img), qty: i.qty, price: i.price,
