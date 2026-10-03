@@ -115,17 +115,35 @@
     emit('cart');
   }
   function cartCount() { return cart.reduce(function (s, i) { return s + i.qty; }, 0); }
-  function lineTotal(i) {
-    var p = state.catalog && D.productById(state.catalog, i.productId);
-    if (!p) return i.price * i.qty;                 // catalog not loaded: fall back to the stored price
-    return D.priceForQty(state.catalog, p, i.qty);
+  function lineTotal(i) { return i.price * i.qty; }
+  // The offer counts every piece of the category together, even different designs:
+  // e.g. 3 different back-support mats = 2 for 1799 + one extra at 900.
+  function cartPricing() {
+    var cat = state.catalog;
+    var groups = {}, gross = 0;
+    cart.forEach(function (i) {
+      gross += i.price * i.qty;
+      if (!cat) return;
+      var p = D.productById(cat, i.productId);
+      if (!p || p.price) return;                 // a product with its own price stays outside the offer
+      var c = D.categoryById(cat, p.categoryId);
+      var b = c && c.bundle;
+      if (!b) return;
+      var g = groups[p.categoryId] = groups[p.categoryId] || { qty: 0, unit: c.price, bundle: b, name: c.shortName || c.name };
+      g.qty += i.qty;
+    });
+    var discount = 0, offers = [];
+    Object.keys(groups).forEach(function (k) {
+      var g = groups[k];
+      var plain = g.unit * g.qty;
+      var withOffer = g.qty >= g.bundle.minQty
+        ? g.bundle.total + (g.qty - g.bundle.minQty) * (g.bundle.extraUnit > 0 ? g.bundle.extraUnit : g.unit)
+        : plain;
+      if (withOffer < plain) { discount += plain - withOffer; offers.push({ name: g.name, qty: g.qty, saved: plain - withOffer }); }
+    });
+    return { gross: gross, discount: discount, net: gross - discount, offers: offers };
   }
-  function lineSaving(i) {
-    var p = state.catalog && D.productById(state.catalog, i.productId);
-    if (!p) return 0;
-    return Math.max(0, i.price * i.qty - lineTotal(i));
-  }
-  function cartSubtotal() { return cart.reduce(function (s, i) { return s + lineTotal(i); }, 0); }
+  function cartSubtotal() { return cartPricing().net; }
   function snapshotItem(p, qty) {
     var cat = state.catalog, c = D.categoryById(cat, p.categoryId) || {};
     return { productId: p.id, categoryId: p.categoryId, categoryName: c.name || '', name: p.name, color: p.color || '',
@@ -172,7 +190,7 @@
     return '<div class="line-item">' +
       '<div class="line-img">' + D.imgTag(i.img, { alt: i.name, variant: 't' }) + '</div>' +
       '<div><div class="line-cat">' + esc(i.categoryName) + '</div><div class="line-name">' + esc(i.name) + '</div>' +
-      '<div class="line-price">' + money(i.price) + ' للقطعة' + (lineSaving(i) ? ' · <b style="color:#166534">وفّرت ' + money(lineSaving(i)) + '</b>' : '') + '</div>' +
+      '<div class="line-price">' + money(i.price) + ' للقطعة</div>' +
       '<button class="line-remove" type="button" data-remove="' + esc(i.productId) + '">إزالة</button></div>' +
       '<div class="line-side"><div class="qty" role="group" aria-label="الكمية">' +
         '<button type="button" data-qty="' + esc(i.productId) + '" data-delta="1" aria-label="زيادة">+</button>' +
@@ -196,9 +214,11 @@
     }
     body.innerHTML = cart.map(lineItemHTML).join('') +
       '<button class="add-more-btn" type="button" data-open-picker>+ أضف تصميم تاني من أي صنف</button>';
-    var sub = cartSubtotal();
+    var pr = cartPricing();
+    var sub = pr.net;
     foot.innerHTML =
-      '<div class="totals-row"><span>المنتجات (' + n + ' قطعة)</span><span>' + money(sub) + '</span></div>' +
+      '<div class="totals-row"><span>المنتجات (' + n + ' قطعة)</span><span>' + money(pr.gross) + '</span></div>' +
+      (pr.discount ? '<div class="totals-row offer-row"><span>🎁 خصم العرض (' + pr.offers.map(function (o) { return esc(o.name) + ' ×' + o.qty; }).join('، ') + ')</span><span>− ' + money(pr.discount) + '</span></div>' : '') +
       '<div class="totals-row"><span>الشحن</span><span>حسب المحافظة (من ' + money(minShip()) + ')</span></div>' +
       '<div class="totals-row grand"><span>الإجمالي</span><span>' + money(sub) + ' + الشحن</span></div>' +
       '<div class="drawer-actions"><button class="btn btn-gold btn-block" type="button" data-checkout>✅ إتمام الطلب</button>' +
@@ -429,14 +449,15 @@
 
   var checkoutOpenedAt = 0;
   function renderCheckoutSummary() {
-    var sub = cartSubtotal(), n = cartCount();
+    var pr = cartPricing(), sub = pr.net, n = cartCount();
     $('#checkoutSummary').innerHTML = cart.map(function (i) {
       return '<div class="summary-item"><div class="s-img">' + D.imgTag(i.img, { alt: i.name, variant: 't' }) + '</div>' +
         '<span class="summary-item-name"><small>' + esc(i.categoryName) + '</small>' + esc(i.name) + '</span>' +
         '<span class="summary-item-qty">×' + i.qty + '</span><span class="summary-item-price">' + money(lineTotal(i)) + '</span></div>';
     }).join('') +
     '<button class="summary-edit" type="button" data-edit-cart>تعديل الطلب أو إضافة تصميم</button>' +
-    '<div class="totals-row"><span>المنتجات (' + n + ' قطعة)</span><span>' + money(sub) + '</span></div>' +
+    '<div class="totals-row"><span>المنتجات (' + n + ' قطعة)</span><span>' + money(pr.gross) + '</span></div>' +
+    (pr.discount ? '<div class="totals-row offer-row"><span>🎁 خصم العرض</span><span>− ' + money(pr.discount) + '</span></div>' : '') +
     (currentGov()
       ? '<div class="totals-row"><span>الشحن (' + esc(currentGov()) + ')</span><span>' + money(zoneFor(currentGov()).price) + '</span></div>' +
         '<div class="totals-row grand"><span>الإجمالي</span><span>' + money(sub + zoneFor(currentGov()).price) + '</span></div>'
@@ -459,9 +480,12 @@
     openLayer('checkout');
     checkoutOpenedAt = Date.now();
     track({ modalOpens: 1 });
-    if (global.SedraPixel) SedraPixel.initiateCheckout(cart.map(function (i) {
-      return { id: i.productId, quantity: i.qty, item_price: Math.round((lineTotal(i) / Math.max(1, i.qty)) * 100) / 100 };
-    }));
+    if (global.SedraPixel) {
+      var prc = cartPricing(), ratio = prc.gross > 0 ? prc.net / prc.gross : 1;
+      SedraPixel.initiateCheckout(cart.map(function (i) {
+        return { id: i.productId, quantity: i.qty, item_price: Math.round(i.price * ratio * 100) / 100 };
+      }));
+    }
   }
   function closeCheckout() {
     var m = $('#checkoutModal'); if (!m || !m.classList.contains('open')) return;
@@ -542,16 +566,13 @@
       order.phone2 ? '📱 موبايل تاني: <code>' + htmlEsc(order.phone2) + '</code>' : null, '',
       '🎁 <b>المنتجات:</b>'
     ];
-    var totalSaving = 0;
     order.items.forEach(function (i) {
       var noPhoto = !D.absoluteUrl(i.img) ? ' ⚠️ (من غير صورة)' : '';
-      var tot = i.lineTotal != null ? i.lineTotal : i.price * i.qty;
-      totalSaving += i.saving || 0;
-      lines.push('• [' + htmlEsc(i.categoryName) + '] ' + htmlEsc(i.name) + ' × ' + i.qty + ' = ' + tot + ' ج' +
-        ((i.saving || 0) > 0 ? ' (عرض — وفّر ' + i.saving + ' ج)' : '') + noPhoto);
+      lines.push('• [' + htmlEsc(i.categoryName) + '] ' + htmlEsc(i.name) + ' × ' + i.qty + ' = ' + (i.price * i.qty) + ' ج' + noPhoto);
     });
+    if (order.offerDiscount > 0) lines.push('🎁 خصم العرض: −' + order.offerDiscount + ' ج' + (order.offerNote ? ' (' + htmlEsc(order.offerNote) + ')' : ''));
     lines.push('', '📦 عدد القطع: ' + order.itemsCount,
-      '💰 المنتجات: ' + order.subtotal + ' ج' + (totalSaving > 0 ? ' (بعد خصم ' + totalSaving + ' ج)' : ''),
+      '💰 المنتجات: ' + order.subtotal + ' ج',
       '🚚 الشحن: ' + order.shipping + ' ج' + (order.shippingZone ? ' (' + htmlEsc(order.shippingZone) + ')' : ''),
       '💵 <b>الإجمالي: ' + order.total + ' ج</b>', '',
       '📍 <b>العنوان</b>',
@@ -668,9 +689,10 @@
     var items = cart.map(function (i) {
       return { productId: i.productId, categoryId: i.categoryId, categoryName: i.categoryName, name: i.name, color: i.color || '',
         img: D.isMedia(i.img) ? i.img : (D.absoluteUrl(i.img) || i.img), qty: i.qty, price: i.price,
-        lineTotal: lineTotal(i), saving: lineSaving(i) };
+        lineTotal: i.price * i.qty };
     });
-    var subtotal = cartSubtotal(), zone = zoneFor(gov), ship = zone.price;
+    var pricing = cartPricing();
+    var subtotal = pricing.net, zone = zoneFor(gov), ship = zone.price;
 
     nextOrderCode().then(function (code) {
       var order = {
@@ -681,7 +703,9 @@
         paidOnline: selectedPayment === 'تحويل إلكتروني',
         hasReceipt: selectedPayment === 'تحويل إلكتروني' ? !!receiptDataUrl : null,
         shippingCollect: selectedPayment !== 'تحويل إلكتروني',
-        items: items, itemsCount: cartCount(), subtotal: subtotal, shipping: ship, shippingZone: zone.name || null, total: subtotal + ship,
+        items: items, itemsCount: cartCount(), subtotal: subtotal, productsBeforeOffer: pricing.gross, offerDiscount: pricing.discount,
+        offerNote: pricing.offers.map(function (o) { return o.name + ' ×' + o.qty + ' — وفّر ' + o.saved + ' ج'; }).join('، ') || null,
+        shipping: ship, shippingZone: zone.name || null, total: subtotal + ship,
         product: items.map(function (i) { return i.name; }).join('، '), productId: items[0].productId,
         categories: items.map(function (i) { return i.categoryName; }).filter(function (v, i, a) { return a.indexOf(v) === i; }),
         orderDuration: checkoutOpenedAt ? Math.round((Date.now() - checkoutOpenedAt) / 1000) : null,

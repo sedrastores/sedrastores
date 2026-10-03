@@ -316,7 +316,7 @@ function renderProduct(cat) {
       '<div class="price-block"><span class="price-now">' + D.money(price) + '</span>' +
         (old ? '<span class="price-was">' + D.money(old) + '</span><span class="save">وفّر ' + D.money(old - price) + '</span>' : '') +
         '<div class="price-ship"><strong>+ الشحن <span data-shipping>من ' + D.money(D.minShipping(cat)) + '</span></strong>حسب المحافظة — <a href="shipping.html" style="color:var(--gold-dark);font-weight:800">التفاصيل</a></div></div>' +
-      (D.bundleFor(cat, p) ? '<div class="offer-box">🎁 <b>عرض:</b> ' + D.bundleFor(cat, p).minQty + ' قطع بـ <b>' + D.money(D.bundleFor(cat, p).total) + '</b> بدل ' + D.money(price * D.bundleFor(cat, p).minQty) + ' — وفّر ' + D.money(D.bundleSaving(cat, p)) + (D.bundleFor(cat, p).extraUnit ? '<br>وكل قطعة زيادة بـ <b>' + D.money(D.bundleFor(cat, p).extraUnit) + '</b> بس' : '') + '<div class="offer-live" id="offerLive"></div></div>' : '') +
+      (D.bundleFor(cat, p) ? '<div class="offer-box">🎁 <b>عرض:</b> أي ' + D.bundleFor(cat, p).minQty + ' قطع من ' + D.esc(c.name) + ' بـ <b>' + D.money(D.bundleFor(cat, p).total) + '</b> بدل ' + D.money(c.price * D.bundleFor(cat, p).minQty) + (D.bundleFor(cat, p).extraUnit ? '<br>وكل قطعة زيادة بـ <b>' + D.money(D.bundleFor(cat, p).extraUnit) + '</b> بس' : '') + '<br><small>العرض بيتحسب على كل قطع الصنف مع بعض، حتى لو تصاميم مختلفة.</small><div class="offer-live" id="offerLive"></div></div>' : '') +
       (specs.length ? '<div class="box"><h3>المواصفات</h3><div class="specs-grid">' + specs.map(function (sp) {
         return '<div><span class="spec-label">' + D.esc(sp.label) + '</span><span class="spec-val">' + D.esc(sp.value) + '</span></div>';
       }).join('') + '</div></div>' : '') +
@@ -366,10 +366,18 @@ function renderProduct(cat) {
   function showQtyPrice() {
     var box = document.getElementById('offerLive');
     if (!box) return;
-    var tot = D.priceForQty(cat, p, G.qty);
+    var inCartSameCat = 0;
+    try {
+      inCartSameCat = (JSON.parse(localStorage.getItem('sedra_cart_v2') || '[]') || []).reduce(function (n, it) {
+        var op = D.productById(cat, it.productId);
+        return n + ((op && op.categoryId === p.categoryId && !op.price) ? it.qty : 0);
+      }, 0);
+    } catch (e) {}
+    var totalQty = G.qty + inCartSameCat;
+    var tot = D.priceForQty(cat, p, totalQty) - D.priceForQty(cat, p, inCartSameCat);
     var saved = Math.max(0, price * G.qty - tot);
-    box.innerHTML = G.qty > 1
-      ? 'إجمالي ' + G.qty + ' قطع: <b>' + D.money(tot) + '</b>' + (saved ? ' — وفّرت ' + D.money(saved) : '')
+    box.innerHTML = (G.qty > 1 || (inCartSameCat && saved))
+      ? 'إجمالي ' + G.qty + ' قطع' + (inCartSameCat ? ' (مع ' + inCartSameCat + ' في سلتك)' : '') + ': <b>' + D.money(tot) + '</b>' + (saved ? ' — وفّرت ' + D.money(saved) : '')
       : '';
   }
   document.getElementById('qtyPlus').addEventListener('click', function () { G.qty = Math.min(99, G.qty + 1); qv.textContent = G.qty; showQtyPrice(); });

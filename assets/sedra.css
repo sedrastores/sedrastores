@@ -510,3 +510,4 @@ a.trust-item:hover { background: #faf6ec; }
 .offer-live { font-size: 13px; color: #166534; font-weight: 800; margin-top: 6px; }
 .p-offer { background: #fff7e3; border: 1px solid var(--border); color: var(--gold-dark); font-size: 11px; font-weight: 800; border-radius: 8px; padding: 4px 8px; margin-bottom: 8px; text-align: center; }
 .cat-card-offer { background: #fff7e3; border: 1px solid var(--gold); color: var(--gold-dark); font-size: 12px; font-weight: 800; border-radius: 8px; padding: 6px 10px; }
+.totals-row.offer-row { color: #166534; font-weight: 800; }
