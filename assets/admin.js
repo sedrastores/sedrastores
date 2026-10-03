@@ -1043,6 +1043,7 @@
       tagline: $('#cTagline').value.trim(), description: $('#cDesc').value.trim(),
       bestFor: $('#cBestFor').value.trim(), chooser: $('#cChooser').value.trim(),
       price: Math.round(price), oldPrice: old ? Math.round(old) : null, badge: $('#cBadge').value.trim(),
+      offerV1: true,
       bundleQty: num($('#cBundleQty').value, 0) >= 2 ? Math.round(num($('#cBundleQty').value, 0)) : null,
       bundleTotal: num($('#cBundleTotal').value, 0) > 0 ? Math.round(num($('#cBundleTotal').value, 0)) : null,
       bundleExtra: num($('#cBundleExtra').value, 0) > 0 ? Math.round(num($('#cBundleExtra').value, 0)) : null,

@@ -121,6 +121,23 @@
   };
   var DEFAULT_COVER_RE = /^images\/(product\d+_thumb|masnad\/\d+\/main|memory\/\d+)\.jpg$/;
   // v3 details for the 3 main categories. Never touches name, price, order or visibility.
+  // The launch offer (price + bundle) for the built-in categories.
+  // Applied until the owner saves that category in the admin (which stamps offerV1).
+  function applyOfferDefaults(rawCats) {
+    return rawCats.map(function (c) {
+      var sc = SEED_CATEGORIES.filter(function (x) { return x.id === c.id; })[0];
+      if (!sc || !sc.bundleQty) return c;
+      var d = c.data || {};
+      if (d.offerV1 === true) return c;                 // the owner set it themselves
+      var merged = {};
+      Object.keys(d).forEach(function (k) { merged[k] = d[k]; });
+      merged.price = sc.price;
+      merged.bundleQty = sc.bundleQty;
+      merged.bundleTotal = sc.bundleTotal;
+      merged.bundleExtra = sc.bundleExtra;
+      return { id: c.id, data: merged };
+    });
+  }
   function seedCategoryPatch(id, cur) {
     var sc = SEED_CATEGORIES.filter(function (c) { return c.id === id; })[0];
     if (!sc) return null;
@@ -527,7 +544,7 @@
       store.__theme = snap.theme || {};
       store.__shipping = snap.shipping || null;
       return buildCatalog(
-        snap.categories.map(function (c) { return { id: c.id, data: c }; }),
+        applyOfferDefaults(snap.categories.map(function (c) { return { id: c.id, data: c }; })),
         snap.products.map(function (p) { return { id: p.id, data: p }; }),
         store, 'live');
     });
@@ -587,7 +604,7 @@
           return (p.id === 'memory-2' && p.data.name === 'ميموري فوم — أسود فحمي') ? { id: p.id, data: Object.assign({}, p.data, { name: 'ميموري فوم — رمادي', color: 'رمادي' }) } : p;
         });
       }
-      return buildCatalog(cats, prods, store, 'live');
+      return buildCatalog(applyOfferDefaults(cats), prods, store, 'live');
     });
   }
   function fetchLiveCatalog() {
