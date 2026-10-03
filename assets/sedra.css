@@ -503,3 +503,10 @@ a.trust-item:hover { background: #faf6ec; }
 .receipt-box img { max-height: 190px; margin: 10px auto 0; border-radius: 8px; }
 .pay-wa { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; background: #fff; border: 1.5px solid var(--green); color: #128C7E; border-radius: 10px; padding: 10px; text-decoration: none; font-weight: 800; font-size: 13px; }
 .pay-wa:hover { background: var(--green); color: #fff; }
+
+/* ================= BUNDLE OFFER ================= */
+.offer-box { background: #fff7e3; border: 1.5px solid var(--gold); border-radius: 12px; padding: 12px 14px; margin: 12px 0; font-size: 14px; line-height: 1.8; color: var(--text); }
+.offer-box b { color: var(--gold-dark); font-weight: 900; }
+.offer-live { font-size: 13px; color: #166534; font-weight: 800; margin-top: 6px; }
+.p-offer { background: #fff7e3; border: 1px solid var(--border); color: var(--gold-dark); font-size: 11px; font-weight: 800; border-radius: 8px; padding: 4px 8px; margin-bottom: 8px; text-align: center; }
+.cat-card-offer { background: #fff7e3; border: 1px solid var(--gold); color: var(--gold-dark); font-size: 12px; font-weight: 800; border-radius: 8px; padding: 6px 10px; }

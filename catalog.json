@@ -1,7 +1,7 @@
 {
  "version": 3,
  "note": "نسخة احتياطية من الكتالوج على الموقع نفسه. الموقع بيقراها فوراً من غير أي استهلاك لفايربيز.",
- "updatedAt": "2026-09-27T08:03:23.262Z",
+ "updatedAt": "2026-10-03T11:48:09.205Z",
  "categories": [
   {
    "id": "sponge",
@@ -50,9 +50,12 @@
    "description": "مصلية إسفنج بالكامل بسمك 3 سم مع ظهر خشب يتحمل لحد 250 كيلو، بتسند ظهرك وانت قاعد في التشهد والأذكار وقراءة القرآن، وقابلة للطي وسهلة الحمل.",
    "bestFor": "اللي ظهره بيتعب في الجلوس الطويل",
    "chooser": "ظهري بيتعب وأنا قاعد",
-   "price": 875,
+   "price": 999,
    "oldPrice": null,
    "badge": "بمسند",
+   "bundleQty": 2,
+   "bundleTotal": 1799,
+   "bundleExtra": 900,
    "cardRatio": "4/3",
    "imageFit": "contain",
    "coverImg": "images/categories/masnad.jpg",
@@ -306,7 +309,7 @@
    "id": "memory-2",
    "categoryId": "memory",
    "order": 1,
-   "visible": true,
+   "visible": false,
    "name": "ميموري فوم — رمادي",
    "color": "رمادي",
    "price": null,

@@ -1240,6 +1240,11 @@
   .scan-note { font-size: 13px; line-height: 1.8; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 12px; margin-top: 12px; }
 
   .paid-pill { background: #e8f7ee; color: #166534; font-weight: 800; font-size: 11px; padding: 3px 9px; border-radius: 12px; white-space: nowrap; }
+
+  .bundle-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; font-weight: 700; }
+  .bundle-row input { width: 92px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; }
+  .route-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #f3f9f4; border: 1px solid #bfe3c7; color: #166534; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; font-weight: 800; }
+  .route-bar b { font-size: 15px; }
 </style>
 </head>
 <body>
@@ -1336,9 +1341,12 @@
               <input type="search" class="search-input" id="orderSearch" placeholder="بحث بالاسم أو الموبايل أو الكود">
               <select class="filter-select" id="statusFilter"><option value="">كل الحالات</option></select>
               <select class="filter-select" id="orderCatFilter"><option value="">كل الأصناف</option></select>
+              <select class="filter-select" id="orderGovFilter"><option value="">كل المحافظات</option></select>
+              <select class="filter-select" id="orderCityFilter"><option value="">كل المناطق</option></select>
               <button class="btn-ghost" type="button" id="exportCsvBtn">⬇️ تصدير Excel</button>
             </div>
           </div>
+          <div class="route-bar" id="routeBar" hidden></div>
           <div class="table-scroll"><table class="orders-table">
             <thead><tr><th>الكود</th><th>العميل</th><th>المنتجات</th><th>العنوان</th><th>الإجمالي</th><th>الدفع</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr></thead>
             <tbody id="ordersTableBody"><tr><td colspan="9"><div class="empty-state"><p>⏳ جاري تحميل الأوردرات...</p></div></td></tr></tbody>
@@ -1504,6 +1512,15 @@
       <div class="add-modal-field"><label for="cPrice">السعر (جنيه) *</label><input type="number" id="cPrice" min="1" step="1"><small class="hint" id="cPriceWarn" hidden></small></div>
       <div class="add-modal-field"><label for="cOldPrice">السعر قبل الخصم (اختياري)</label><input type="number" id="cOldPrice" min="0" step="1"></div>
       <div class="add-modal-field"><label for="cBadge">شارة على الكارت</label><input type="text" id="cBadge" maxlength="20" placeholder="مثال: ميموري فوم"></div>
+      <div class="add-modal-field span2">
+        <label>🎁 عرض الكمية (اختياري)</label>
+        <div class="bundle-row">
+          <span>اشترِ</span><input type="number" id="cBundleQty" min="2" step="1" placeholder="2"><span>قطعة بـ</span>
+          <input type="number" id="cBundleTotal" min="1" step="1" placeholder="1799"><span>ج، والقطعة الزيادة بـ</span>
+          <input type="number" id="cBundleExtra" min="0" step="1" placeholder="900"><span>ج</span>
+        </div>
+        <small class="hint" id="cBundleHint">سيبهم فاضيين لو مفيش عرض. مثال: 2 قطعة بـ 1799، والزيادة بـ 900 للقطعة.</small>
+      </div>
       <div class="add-modal-field" id="cIdField"><label for="cId">رابط الصنف (إنجليزي، اختياري)</label><input type="text" id="cId" dir="ltr" maxlength="40" placeholder="kids"><small class="hint" id="cIdHint"></small></div>
     </div>
 

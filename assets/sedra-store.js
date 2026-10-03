@@ -115,7 +115,17 @@
     emit('cart');
   }
   function cartCount() { return cart.reduce(function (s, i) { return s + i.qty; }, 0); }
-  function cartSubtotal() { return cart.reduce(function (s, i) { return s + i.price * i.qty; }, 0); }
+  function lineTotal(i) {
+    var p = state.catalog && D.productById(state.catalog, i.productId);
+    if (!p) return i.price * i.qty;                 // catalog not loaded: fall back to the stored price
+    return D.priceForQty(state.catalog, p, i.qty);
+  }
+  function lineSaving(i) {
+    var p = state.catalog && D.productById(state.catalog, i.productId);
+    if (!p) return 0;
+    return Math.max(0, i.price * i.qty - lineTotal(i));
+  }
+  function cartSubtotal() { return cart.reduce(function (s, i) { return s + lineTotal(i); }, 0); }
   function snapshotItem(p, qty) {
     var cat = state.catalog, c = D.categoryById(cat, p.categoryId) || {};
     return { productId: p.id, categoryId: p.categoryId, categoryName: c.name || '', name: p.name, color: p.color || '',
@@ -162,13 +172,13 @@
     return '<div class="line-item">' +
       '<div class="line-img">' + D.imgTag(i.img, { alt: i.name, variant: 't' }) + '</div>' +
       '<div><div class="line-cat">' + esc(i.categoryName) + '</div><div class="line-name">' + esc(i.name) + '</div>' +
-      '<div class="line-price">' + money(i.price) + ' للقطعة</div>' +
+      '<div class="line-price">' + money(i.price) + ' للقطعة' + (lineSaving(i) ? ' · <b style="color:#166534">وفّرت ' + money(lineSaving(i)) + '</b>' : '') + '</div>' +
       '<button class="line-remove" type="button" data-remove="' + esc(i.productId) + '">إزالة</button></div>' +
       '<div class="line-side"><div class="qty" role="group" aria-label="الكمية">' +
         '<button type="button" data-qty="' + esc(i.productId) + '" data-delta="1" aria-label="زيادة">+</button>' +
         '<span>' + i.qty + '</span>' +
         '<button type="button" data-qty="' + esc(i.productId) + '" data-delta="-1" aria-label="تقليل">−</button></div>' +
-      '<div class="line-total">' + money(i.price * i.qty) + '</div></div>' +
+      '<div class="line-total">' + money(lineTotal(i)) + '</div></div>' +
     '</div>';
   }
 
@@ -423,7 +433,7 @@
     $('#checkoutSummary').innerHTML = cart.map(function (i) {
       return '<div class="summary-item"><div class="s-img">' + D.imgTag(i.img, { alt: i.name, variant: 't' }) + '</div>' +
         '<span class="summary-item-name"><small>' + esc(i.categoryName) + '</small>' + esc(i.name) + '</span>' +
-        '<span class="summary-item-qty">×' + i.qty + '</span><span class="summary-item-price">' + money(i.price * i.qty) + '</span></div>';
+        '<span class="summary-item-qty">×' + i.qty + '</span><span class="summary-item-price">' + money(lineTotal(i)) + '</span></div>';
     }).join('') +
     '<button class="summary-edit" type="button" data-edit-cart>تعديل الطلب أو إضافة تصميم</button>' +
     '<div class="totals-row"><span>المنتجات (' + n + ' قطعة)</span><span>' + money(sub) + '</span></div>' +
@@ -449,7 +459,9 @@
     openLayer('checkout');
     checkoutOpenedAt = Date.now();
     track({ modalOpens: 1 });
-    if (global.SedraPixel) SedraPixel.initiateCheckout(cart.map(function (i) { return { id: i.productId, quantity: i.qty, item_price: i.price }; }));
+    if (global.SedraPixel) SedraPixel.initiateCheckout(cart.map(function (i) {
+      return { id: i.productId, quantity: i.qty, item_price: Math.round((lineTotal(i) / Math.max(1, i.qty)) * 100) / 100 };
+    }));
   }
   function closeCheckout() {
     var m = $('#checkoutModal'); if (!m || !m.classList.contains('open')) return;
@@ -530,12 +542,16 @@
       order.phone2 ? '📱 موبايل تاني: <code>' + htmlEsc(order.phone2) + '</code>' : null, '',
       '🎁 <b>المنتجات:</b>'
     ];
+    var totalSaving = 0;
     order.items.forEach(function (i) {
       var noPhoto = !D.absoluteUrl(i.img) ? ' ⚠️ (من غير صورة)' : '';
-      lines.push('• [' + htmlEsc(i.categoryName) + '] ' + htmlEsc(i.name) + ' × ' + i.qty + ' = ' + (i.price * i.qty) + ' ج' + noPhoto);
+      var tot = i.lineTotal != null ? i.lineTotal : i.price * i.qty;
+      totalSaving += i.saving || 0;
+      lines.push('• [' + htmlEsc(i.categoryName) + '] ' + htmlEsc(i.name) + ' × ' + i.qty + ' = ' + tot + ' ج' +
+        ((i.saving || 0) > 0 ? ' (عرض — وفّر ' + i.saving + ' ج)' : '') + noPhoto);
     });
     lines.push('', '📦 عدد القطع: ' + order.itemsCount,
-      '💰 المنتجات: ' + order.subtotal + ' ج',
+      '💰 المنتجات: ' + order.subtotal + ' ج' + (totalSaving > 0 ? ' (بعد خصم ' + totalSaving + ' ج)' : ''),
       '🚚 الشحن: ' + order.shipping + ' ج' + (order.shippingZone ? ' (' + htmlEsc(order.shippingZone) + ')' : ''),
       '💵 <b>الإجمالي: ' + order.total + ' ج</b>', '',
       '📍 <b>العنوان</b>',
@@ -651,7 +667,8 @@
 
     var items = cart.map(function (i) {
       return { productId: i.productId, categoryId: i.categoryId, categoryName: i.categoryName, name: i.name, color: i.color || '',
-        img: D.isMedia(i.img) ? i.img : (D.absoluteUrl(i.img) || i.img), qty: i.qty, price: i.price };
+        img: D.isMedia(i.img) ? i.img : (D.absoluteUrl(i.img) || i.img), qty: i.qty, price: i.price,
+        lineTotal: lineTotal(i), saving: lineSaving(i) };
     });
     var subtotal = cartSubtotal(), zone = zoneFor(gov), ship = zone.price;
 
@@ -799,6 +816,7 @@
       '<div class="p-info">' +
         '<a href="' + href + '" style="text-decoration:none;color:inherit"><h3 class="p-name">' + esc(p.name) + '</h3></a>' +
         '<div class="p-meta">' + esc(p.color || c.tagline || '') + '</div>' +
+        (D.bundleFor(cat, p) ? '<div class="p-offer">🎁 ' + D.bundleFor(cat, p).minQty + ' بـ ' + money(D.bundleFor(cat, p).total) + '</div>' : '') +
         '<div class="p-foot"><div class="price-line"><span class="price-now">' + money(price) + '</span>' + (old ? '<span class="price-was">' + money(old) + '</span>' : '') + '</div>' +
         '<button type="button" class="p-add' + (q ? ' added' : '') + '" data-add="' + esc(p.id) + '">' + (q ? '✓ في الطلب' : '+ أضف للطلب') + '</button></div>' +
       '</div></article>';
@@ -814,6 +832,7 @@
       '<div class="cat-card-body"><div class="cat-card-name">' + esc(c.icon) + ' ' + esc(c.name) + '</div>' +
         '<div class="cat-card-tag">' + esc(c.tagline || c.description) + '</div>' +
         (c.bestFor ? '<div class="cat-card-for"><b>مناسبة لـ</b> ' + esc(c.bestFor) + '</div>' : '') +
+        (c.bundle ? '<div class="cat-card-offer">🎁 ' + c.bundle.minQty + ' قطع بـ ' + money(c.bundle.total) + (c.bundle.extraUnit ? ' · الزيادة بـ ' + money(c.bundle.extraUnit) : '') + '</div>' : '') +
         '<div class="cat-card-foot"><div class="price-line"><span class="price-now">' + money(c.price) + '</span>' +
           (c.oldPrice && c.oldPrice > c.price ? '<span class="price-was">' + money(c.oldPrice) + '</span>' : '') + '</div>' +
           '<span class="btn btn-dark">شوف التصاميم</span></div>' +

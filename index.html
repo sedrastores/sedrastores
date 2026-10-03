@@ -1954,10 +1954,20 @@ function renderHome(cat) {
   if (!cw.dataset.bound) { Sedra.bindCompare(cw); cw.dataset.bound = '1'; }
   renderDesigns(cat);
 
+  var bundleCat = cats.filter(function (c) { return c.bundle; })[0];
   var promo = cats.filter(function (c) { return c.oldPrice && c.oldPrice > c.price; }).sort(function (a, b) { return a.price - b.price; })[0];
   var cheapest = cats.slice().sort(function (a, b) { return a.price - b.price; })[0];
   var oldEl = document.getElementById('bannerOld'), newEl = document.getElementById('bannerNew');
-  if (promo) { oldEl.hidden = false; oldEl.textContent = D.money(promo.oldPrice); newEl.textContent = D.money(promo.price) + ' فقط'; }
+  var label = document.querySelector('.countdown-label');
+  var hurry = document.querySelector('.btn-hurry');
+  if (bundleCat) {
+    // the bundle offer is the headline deal
+    oldEl.hidden = false;
+    oldEl.textContent = D.money(bundleCat.price * bundleCat.bundle.minQty);
+    newEl.textContent = bundleCat.bundle.minQty + ' قطع بـ ' + D.money(bundleCat.bundle.total);
+    if (label) label.textContent = '🎁 عرض ' + (bundleCat.shortName || bundleCat.name) + ' — ينتهي خلال';
+    if (hurry) hurry.href = 'category.html?c=' + encodeURIComponent(bundleCat.id);
+  } else if (promo) { oldEl.hidden = false; oldEl.textContent = D.money(promo.oldPrice); newEl.textContent = D.money(promo.price) + ' فقط'; }
   else if (cheapest) { oldEl.hidden = true; newEl.textContent = 'تبدأ من ' + D.money(cheapest.price); }
 
   var ht = cat.theme && cat.theme.heroText;

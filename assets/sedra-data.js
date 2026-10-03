@@ -63,7 +63,8 @@
       description: 'مصلية إسفنج بالكامل بسمك 3 سم مع ظهر خشب يتحمل لحد 250 كيلو، بتسند ظهرك وانت قاعد في التشهد والأذكار وقراءة القرآن، وقابلة للطي وسهلة الحمل.',
       bestFor: 'اللي ظهره بيتعب في الجلوس الطويل',
       chooser: 'ظهري بيتعب وأنا قاعد',
-      price: 875, oldPrice: null, badge: 'بمسند',
+      price: 999, oldPrice: null, badge: 'بمسند',
+      bundleQty: 2, bundleTotal: 1799, bundleExtra: 900,
       cardRatio: '4/3', imageFit: 'contain',
       coverImg: 'images/categories/masnad.jpg',
       specs: [
@@ -227,6 +228,11 @@
       price: num(d.price, 0),
       oldPrice: num(d.oldPrice, 0) || null,
       badge: d.badge || '',
+      bundle: (function () {
+        var bq = num(d.bundleQty, 0), bt = num(d.bundleTotal, 0), be = num(d.bundleExtra, 0);
+        if (bq >= 2 && bt > 0) return { minQty: Math.round(bq), total: bt, extraUnit: be > 0 ? be : 0 };
+        return null;
+      })(),
       cardRatio: validRatio(d.cardRatio),
       imageFit: d.imageFit === 'cover' ? 'cover' : 'contain',
       coverImg: d.coverImg || '',
@@ -627,8 +633,11 @@
         writeCache(live);
         return live;
       }).catch(function (err) {
-        console.warn('Catalog live fetch failed, using site file:', err && err.message);
-        return fetchStatic().catch(function () { return cached || seedCatalog('seed-offline'); });
+        console.warn('Catalog live fetch failed:', err && err.message);
+        // prefer the copy this visitor already received (it reflects hidden products and
+        // admin edits), and only then the file shipped with the site
+        if (cached) return cached;
+        return fetchStatic().catch(function () { return seedCatalog('seed-offline'); });
       });
     }
     return catalogPromise.then(function (cat) {
@@ -676,6 +685,24 @@
     var sh = (cat && cat.shipping) || normalizeShipping(null);
     return sh.zones.reduce(function (m, z) { return Math.min(m, z.price); }, Infinity);
   }
+  function bundleFor(cat, product) {
+    var c = product ? categoryById(cat, product.categoryId) : null;
+    return (c && c.bundle) ? c.bundle : null;
+  }
+  // Total for a quantity, applying the category offer (e.g. 2 for 1799, each extra at 900)
+  function priceForQty(cat, product, qty) {
+    qty = Math.max(0, Math.round(num(qty, 0)));
+    var unit = effectivePrice(cat, product);
+    var b = bundleFor(cat, product);
+    if (!b || qty < b.minQty) return unit * qty;
+    var extra = b.extraUnit > 0 ? b.extraUnit : unit;
+    return b.total + (qty - b.minQty) * extra;
+  }
+  function bundleSaving(cat, product) {
+    var b = bundleFor(cat, product);
+    if (!b) return 0;
+    return Math.max(0, effectivePrice(cat, product) * b.minQty - b.total);
+  }
   function productImages(p) {
     var list = [];
     [p.mainImg].concat(p.gallery || []).forEach(function (src) { if (src && list.indexOf(src) === -1) list.push(src); });
@@ -695,6 +722,7 @@
     primeMedia: function (key, dataUrl) { mediaCache[key] = dataUrl; }, mediaDocId: mediaDocId, absoluteUrl: absoluteUrl, BLANK: BLANK,
     loadCatalog: loadCatalog, seedCatalog: seedCatalog,
     visibleCategories: visibleCategories, categoryById: categoryById, productById: productById, productsOf: productsOf,
-    isProductAvailable: isProductAvailable, effectivePrice: effectivePrice, effectiveOldPrice: effectiveOldPrice, productImages: productImages
+    isProductAvailable: isProductAvailable, effectivePrice: effectivePrice, effectiveOldPrice: effectiveOldPrice, productImages: productImages,
+    bundleFor: bundleFor, priceForQty: priceForQty, bundleSaving: bundleSaving
   };
 })(window);

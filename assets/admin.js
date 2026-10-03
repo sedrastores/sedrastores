@@ -586,16 +586,49 @@
   function filteredOrders() {
     var q = D.toLatinDigits($('#orderSearch').value.trim().toLowerCase());
     var st = $('#statusFilter').value, cf = $('#orderCatFilter').value;
+    var gf = ($('#orderGovFilter') || {}).value || '', cityf = ($('#orderCityFilter') || {}).value || '';
     return S.orders.filter(function (o) {
       if (st && (o.status || 'جديد') !== st) return false;
+      if (gf && (o.governorate || '') !== gf) return false;
+      if (cityf && (o.city || '') !== cityf) return false;
       if (cf && !orderItems(o).some(function (i) { var p = i.productId ? prodById(i.productId) : null; return (i.categoryId || (p && p.categoryId)) === cf; })) return false;
       if (!q) return true;
       return [o.name, o.phone, o.phone2, o.orderCode, o.governorate, o.city].some(function (v) { return String(v || '').toLowerCase().indexOf(q) > -1; });
     });
   }
+  function fillAreaFilters() {
+    var gfSel = $('#orderGovFilter'), cSel = $('#orderCityFilter');
+    if (!gfSel || !cSel) return;
+    var gov = gfSel.value, city = cSel.value;
+    var govs = {}, cities = {};
+    S.orders.forEach(function (o) {
+      if (o.governorate) govs[o.governorate] = (govs[o.governorate] || 0) + 1;
+      if (o.city && (!gov || o.governorate === gov)) cities[o.city] = (cities[o.city] || 0) + 1;
+    });
+    var opts = function (obj, sel, allLabel) {
+      return '<option value="">' + allLabel + '</option>' + Object.keys(obj).sort(function (a, b) { return obj[b] - obj[a]; })
+        .map(function (k) { return '<option value="' + esc(k) + '"' + (k === sel ? ' selected' : '') + '>' + esc(k) + ' (' + obj[k] + ')</option>'; }).join('');
+    };
+    gfSel.innerHTML = opts(govs, gov, 'كل المحافظات');
+    cSel.innerHTML = opts(cities, cities[city] ? city : '', 'كل المناطق');
+  }
+  function renderRouteBar(list) {
+    var bar = $('#routeBar'); if (!bar) return;
+    var gf = ($('#orderGovFilter') || {}).value || '', cityf = ($('#orderCityFilter') || {}).value || '';
+    if (!gf && !cityf) { bar.hidden = true; return; }
+    var toDeliver = list.filter(function (o) { return ['جديد', 'قيد التجهيز', 'تم الشحن'].indexOf(o.status || 'جديد') > -1; });
+    var cash = toDeliver.filter(function (o) { return !o.paidOnline; }).reduce(function (sum, o) { return sum + orderTotal(o); }, 0);
+    bar.hidden = false;
+    bar.innerHTML = '🚚 خط التوصيل: <b>' + esc([gf, cityf].filter(Boolean).join(' — ')) + '</b>' +
+      ' · أوردرات للتسليم: <b>' + toDeliver.length + '</b>' +
+      ' · المطلوب تحصيله: <b>' + money(cash) + '</b>' +
+      ' <button class="btn-ghost" type="button" id="routeCsvBtn" style="padding:5px 12px">⬇️ تصدير القائمة</button>';
+  }
   function renderOrders() {
     if (!S.ordersLoaded) return;
+    fillAreaFilters();
     var list = filteredOrders();
+    renderRouteBar(list);
     $('#ordersCount').textContent = '(' + list.length + (list.length !== S.orders.length ? ' من ' + S.orders.length : '') + ')';
     var body = $('#ordersTableBody');
     if (!list.length) {
@@ -1010,6 +1043,9 @@
       tagline: $('#cTagline').value.trim(), description: $('#cDesc').value.trim(),
       bestFor: $('#cBestFor').value.trim(), chooser: $('#cChooser').value.trim(),
       price: Math.round(price), oldPrice: old ? Math.round(old) : null, badge: $('#cBadge').value.trim(),
+      bundleQty: num($('#cBundleQty').value, 0) >= 2 ? Math.round(num($('#cBundleQty').value, 0)) : null,
+      bundleTotal: num($('#cBundleTotal').value, 0) > 0 ? Math.round(num($('#cBundleTotal').value, 0)) : null,
+      bundleExtra: num($('#cBundleExtra').value, 0) > 0 ? Math.round(num($('#cBundleExtra').value, 0)) : null,
       cardRatio: selectedRatio(), imageFit: $('#cFit').value === 'cover' ? 'cover' : 'contain',
       coverImg: CM.cover || '', specs: readSpecs(), visible: $('#cVisible').checked, updatedAt: serverTs()
     };
@@ -1758,7 +1794,13 @@
     $('#confirmTypeInput').addEventListener('keydown', function (e) { if (e.key === 'Enter' && confirmResolver) confirmResolver(true); });
 
     // orders
-    ['orderSearch', 'statusFilter', 'orderCatFilter'].forEach(function (id) { $('#' + id).addEventListener(id === 'orderSearch' ? 'input' : 'change', renderOrders); });
+    ['orderSearch', 'statusFilter', 'orderCatFilter', 'orderGovFilter', 'orderCityFilter'].forEach(function (id) {
+      var el = $('#' + id); if (el) el.addEventListener(id === 'orderSearch' ? 'input' : 'change', renderOrders);
+    });
+    // export just the filtered delivery run
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'routeCsvBtn') exportCsv();
+    });
     $('#exportCsvBtn').addEventListener('click', exportCsv);
     $('#exportFeedBtn').addEventListener('click', exportFeed);
     $('#scanImagesBtn').addEventListener('click', scanImages);

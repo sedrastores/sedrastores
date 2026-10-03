@@ -225,6 +225,7 @@ function renderCategory(cat) {
       '<div class="price-line"><span class="price-now">' + D.money(c.price) + '</span>' +
         (c.oldPrice && c.oldPrice > c.price ? '<span class="price-was">' + D.money(c.oldPrice) + '</span>' : '') + '</div>' +
       (c.bestFor ? '<div class="for"><b>مناسبة لـ:</b> ' + D.esc(c.bestFor) + '</div>' : '') +
+      (c.bundle ? '<div class="offer-box">🎁 <b>عرض:</b> ' + c.bundle.minQty + ' قطع بـ <b>' + D.money(c.bundle.total) + '</b> بدل ' + D.money(c.price * c.bundle.minQty) + (c.bundle.extraUnit ? '<br>وكل قطعة زيادة بـ <b>' + D.money(c.bundle.extraUnit) + '</b>' : '') + '</div>' : '') +
       '<div class="ship">🚚 الشحن حسب المحافظة (<span data-shipping>من ' + D.money(D.minShipping(cat)) + '</span>) — <a href="shipping.html">التفاصيل</a><br>👀 عاين قبل ما تستلم والدفع عند الاستلام — <a href="returns.html">الاسترجاع</a></div>' +
       '<a class="btn btn-gold btn-block" href="#catProducts" style="margin-top:12px">شوف الـ ' + list.length + ' تصاميم</a>' +
     '</aside></section>' +
