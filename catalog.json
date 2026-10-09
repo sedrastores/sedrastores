@@ -1,7 +1,7 @@
 {
  "version": 3,
  "note": "نسخة احتياطية من الكتالوج على الموقع نفسه. الموقع بيقراها فوراً من غير أي استهلاك لفايربيز.",
- "updatedAt": "2026-10-03T22:32:30.043Z",
+ "updatedAt": "2026-10-09T00:00:00.000Z",
  "categories": [
   {
    "id": "sponge",
@@ -50,12 +50,9 @@
    "description": "مصلية إسفنج بالكامل بسمك 3 سم مع ظهر خشب يتحمل لحد 250 كيلو، بتسند ظهرك وانت قاعد في التشهد والأذكار وقراءة القرآن، وقابلة للطي وسهلة الحمل.",
    "bestFor": "اللي ظهره بيتعب في الجلوس الطويل",
    "chooser": "ظهري بيتعب وأنا قاعد",
-   "price": 999,
+   "price": 850,
    "oldPrice": null,
    "badge": "بمسند",
-   "bundleQty": 2,
-   "bundleTotal": 1799,
-   "bundleExtra": 900,
    "cardRatio": "4/3",
    "imageFit": "contain",
    "coverImg": "images/categories/masnad.jpg",

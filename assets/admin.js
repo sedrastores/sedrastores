@@ -358,7 +358,10 @@
   /* ================= LISTENERS ================= */
   function listenCatalog() {
     db.collection('categories').onSnapshot(function (snap) {
-      S.categories = snap.docs.map(function (d) { return D.normalizeCategory(d.id, d.data()); }).sort(D.byOrder);
+      // same price corrections the storefront applies, so the admin always shows
+      // exactly what the customer is being charged — never two different prices
+      S.categories = D.applyPriceDefaults(snap.docs.map(function (d) { return { id: d.id, data: d.data() }; }))
+        .map(function (c) { return D.normalizeCategory(c.id, c.data); }).sort(D.byOrder);
       S.catsLoaded = true; banner('');
       renderCatalogViews();
     }, function (e) { banner('تعذر تحميل الأصناف: ' + errMsg(e)); });
@@ -1166,6 +1169,10 @@
     }
     $('#cOldPrice').value = c && c.oldPrice ? c.oldPrice : '';
     $('#cBadge').value = c ? c.badge : '';
+    // fill the offer fields from the saved offer, so editing a category never wipes it by accident
+    $('#cBundleQty').value = c && c.bundle ? c.bundle.minQty : '';
+    $('#cBundleTotal').value = c && c.bundle ? c.bundle.total : '';
+    $('#cBundleExtra').value = c && c.bundle && c.bundle.extraUnit ? c.bundle.extraUnit : '';
     $('#cFit').value = c ? c.imageFit : 'contain';
     $('#cVisible').checked = c ? c.visible : true;
     $('#cId').value = c ? c.id : '';
@@ -1205,7 +1212,7 @@
       tagline: $('#cTagline').value.trim(), description: $('#cDesc').value.trim(),
       bestFor: $('#cBestFor').value.trim(), chooser: $('#cChooser').value.trim(),
       price: Math.round(price), oldPrice: old ? Math.round(old) : null, badge: $('#cBadge').value.trim(),
-      offerV1: true,
+      priceV2: true,
       bundleQty: num($('#cBundleQty').value, 0) >= 2 ? Math.round(num($('#cBundleQty').value, 0)) : null,
       bundleTotal: num($('#cBundleTotal').value, 0) > 0 ? Math.round(num($('#cBundleTotal').value, 0)) : null,
       bundleExtra: num($('#cBundleExtra').value, 0) > 0 ? Math.round(num($('#cBundleExtra').value, 0)) : null,

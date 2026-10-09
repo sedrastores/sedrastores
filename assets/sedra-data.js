@@ -63,8 +63,7 @@
       description: 'مصلية إسفنج بالكامل بسمك 3 سم مع ظهر خشب يتحمل لحد 250 كيلو، بتسند ظهرك وانت قاعد في التشهد والأذكار وقراءة القرآن، وقابلة للطي وسهلة الحمل.',
       bestFor: 'اللي ظهره بيتعب في الجلوس الطويل',
       chooser: 'ظهري بيتعب وأنا قاعد',
-      price: 999, oldPrice: null, badge: 'بمسند',
-      bundleQty: 2, bundleTotal: 1799, bundleExtra: 900,
+      price: 850, oldPrice: null, badge: 'بمسند',
       cardRatio: '4/3', imageFit: 'contain',
       coverImg: 'images/categories/masnad.jpg',
       specs: [
@@ -121,20 +120,23 @@
   };
   var DEFAULT_COVER_RE = /^images\/(product\d+_thumb|masnad\/\d+\/main|memory\/\d+)\.jpg$/;
   // v3 details for the 3 main categories. Never touches name, price, order or visibility.
-  // The launch offer (price + bundle) for the built-in categories.
-  // Applied until the owner saves that category in the admin (which stamps offerV1).
-  function applyOfferDefaults(rawCats) {
+  // Price corrections for the built-in categories + cancellation of the launch bundle
+  // offer. Applied until the owner saves that category in the admin, which stamps
+  // priceV2. The older offerV1 stamp is deliberately ignored: the bundle offer is
+  // cancelled everywhere, whatever is still stored in the database.
+  var PRICE_FIX = { masnad: { price: 850, oldPrice: null } };
+  function applyPriceDefaults(rawCats) {
     return rawCats.map(function (c) {
-      var sc = SEED_CATEGORIES.filter(function (x) { return x.id === c.id; })[0];
-      if (!sc || !sc.bundleQty) return c;
       var d = c.data || {};
-      if (d.offerV1 === true) return c;                 // the owner set it themselves
+      if (d.priceV2 === true) return c;                 // the owner set it themselves
+      var fix = PRICE_FIX[c.id];
+      var hasBundle = num(d.bundleQty, 0) > 0 || num(d.bundleTotal, 0) > 0 || num(d.bundleExtra, 0) > 0
+        || !!(d.bundle && d.bundle.minQty);
+      if (!fix && !hasBundle) return c;                 // nothing to correct
       var merged = {};
       Object.keys(d).forEach(function (k) { merged[k] = d[k]; });
-      merged.price = sc.price;
-      merged.bundleQty = sc.bundleQty;
-      merged.bundleTotal = sc.bundleTotal;
-      merged.bundleExtra = sc.bundleExtra;
+      if (fix) { merged.price = fix.price; merged.oldPrice = fix.oldPrice; }
+      merged.bundleQty = null; merged.bundleTotal = null; merged.bundleExtra = null; merged.bundle = null;
       return { id: c.id, data: merged };
     });
   }
@@ -266,6 +268,12 @@
         if (bq >= 2 && bt > 0) return { minQty: Math.round(bq), total: bt, extraUnit: be > 0 ? be : 0 };
         return null;
       })(),
+      // the raw offer fields are kept so a normalized category survives a round-trip
+      // through meta/snapshot (which stores the normalized shape) without losing the offer
+      bundleQty: num(d.bundleQty, 0) || null,
+      bundleTotal: num(d.bundleTotal, 0) || null,
+      bundleExtra: num(d.bundleExtra, 0) || null,
+      priceV2: d.priceV2 === true,
       cardRatio: validRatio(d.cardRatio),
       imageFit: d.imageFit === 'cover' ? 'cover' : 'contain',
       coverImg: d.coverImg || '',
@@ -485,7 +493,7 @@
   }
 
   /* ---------------- Catalog ---------------- */
-  var CACHE_KEY = 'sedra_catalog_v2';
+  var CACHE_KEY = 'sedra_catalog_v3';   // bumped with the price change so no visitor keeps an old cached price
 
   function buildCatalog(rawCats, rawProds, settings, source) {
     var categories = rawCats.map(function (c) { return normalizeCategory(c.id, c.data); }).sort(byOrder);
@@ -560,7 +568,7 @@
       store.__theme = snap.theme || {};
       store.__shipping = snap.shipping || null;
       return buildCatalog(
-        applyOfferDefaults(snap.categories.map(function (c) { return { id: c.id, data: c }; })),
+        applyPriceDefaults(snap.categories.map(function (c) { return { id: c.id, data: c }; })),
         applyNameFixes(snap.products.map(function (p) { return { id: p.id, data: p }; })),
         store, 'live');
     });
@@ -620,7 +628,7 @@
           return (p.id === 'memory-2' && p.data.name === 'ميموري فوم — أسود فحمي') ? { id: p.id, data: Object.assign({}, p.data, { name: 'ميموري فوم — رمادي', color: 'رمادي' }) } : p;
         });
       }
-      return buildCatalog(applyOfferDefaults(cats), applyNameFixes(prods), store, 'live');
+      return buildCatalog(applyPriceDefaults(cats), applyNameFixes(prods), store, 'live');
     });
   }
   function fetchLiveCatalog() {
@@ -728,7 +736,7 @@
     var c = product ? categoryById(cat, product.categoryId) : null;
     return (c && c.bundle) ? c.bundle : null;
   }
-  // Total for a quantity, applying the category offer (e.g. 2 for 1799, each extra at 900)
+  // Total for a quantity, applying the category offer when the owner sets one (none right now)
   function priceForQty(cat, product, qty) {
     qty = Math.max(0, Math.round(num(qty, 0)));
     var unit = effectivePrice(cat, product);
@@ -756,6 +764,7 @@
     GOVERNORATES: GOVERNORATES, SEED_SHIPPING: SEED_SHIPPING, normalizeShipping: normalizeShipping, shippingZoneFor: shippingZoneFor, minShipping: minShipping,
     esc: esc, num: num, money: money, toLatinDigits: toLatinDigits, randomId: randomId, validRatio: validRatio,
     normalizeCategory: normalizeCategory, normalizeProduct: normalizeProduct, normalizeWhatsapp: normalizeWhatsapp, byOrder: byOrder,
+    applyPriceDefaults: applyPriceDefaults,
     fs: { list: fsList, get: fsGet, commit: fsCommit, writeCreate: writeCreate, writeIncrement: writeIncrement, writeMerge: writeMerge, encodeFields: encodeFields, decodeFields: decodeFields },
     isMedia: isMedia, imgTag: imgTag, hydrateMedia: hydrateMedia,
     primeMedia: function (key, dataUrl) { mediaCache[key] = dataUrl; }, mediaDocId: mediaDocId, absoluteUrl: absoluteUrl, BLANK: BLANK,
