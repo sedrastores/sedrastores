@@ -9,6 +9,9 @@
   var ADMIN_USERNAME = 'admin';
   var ADMIN_PASSWORD = 'harby';
   var FIREBASE_ADMIN_EMAIL = 'admin@sedra.com';
+  // The Firebase account's own password. Firebase requires at least 6 characters,
+  // so it is deliberately not the same string as the panel's own password above.
+  var FIREBASE_ADMIN_PASSWORD = 'harbyy';
   var STATUSES = ['جديد', 'قيد التجهيز', 'تم الشحن', 'تم التسليم', 'مرتجع', 'ملغي'];
   // Display only — the value saved in the database stays the plain Arabic text,
   // so nothing that is already stored changes.
@@ -30,6 +33,23 @@
     try { storage = firebase.storage ? firebase.storage() : null; if (storage && storage.setMaxUploadRetryTime) storage.setMaxUploadRetryTime(20000); } catch (e) { storage = null; }
   } catch (e) { console.error('Firebase init error', e); }
   function serverTs() { return firebase.firestore.FieldValue.serverTimestamp(); }
+
+  // The security rules only let a signed-in user read orders or change the catalog,
+  // so the panel must win this sign-in before it reads or writes anything. A failure
+  // here used to be swallowed, which left the panel looking fine while every request
+  // was being refused — now it resolves false and the caller says so out loud.
+  var authReady = null;
+  function ensureAuth() {
+    if (authReady) return authReady;
+    if (!auth) { authReady = Promise.resolve(false); return authReady; }
+    authReady = new Promise(function (resolve) {
+      if (auth.currentUser) return resolve(true);
+      auth.signInWithEmailAndPassword(FIREBASE_ADMIN_EMAIL, FIREBASE_ADMIN_PASSWORD)
+        .then(function () { resolve(true); })
+        .catch(function (e) { console.error('Firebase sign-in failed:', e && e.code, e && e.message); resolve(false); });
+    });
+    return authReady;
+  }
 
   /* ---------------- State ---------------- */
   var S = {
@@ -157,7 +177,12 @@
     $('#loginPage').style.display = 'none';
     $('#dashboard').classList.add('visible');
     $('#adminEmail').textContent = label || 'أدمن';
-    startApp();
+    banner('⏳ جاري الاتصال بقاعدة البيانات...');
+    ensureAuth().then(function (ok) {
+      authBanner = ok ? '' : '⚠️ تعذر تسجيل الدخول الآمن لقاعدة البيانات — الأوردرات والتعديلات مش هتشتغل. افتح Firebase ← Authentication واتأكد إن حساب ' + FIREBASE_ADMIN_EMAIL + ' موجود وإن الباسورد مطابق.';
+      banner('');
+      startApp();
+    });
   }
   function doLogin(e) {
     if (e) e.preventDefault();
@@ -166,7 +191,6 @@
     errEl.classList.remove('show');
     if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
       try { sessionStorage.setItem('sedra_admin_logged', '1'); } catch (x) {}
-      if (auth) auth.signInWithEmailAndPassword(FIREBASE_ADMIN_EMAIL, ADMIN_PASSWORD).catch(function () {});
       return showDashboard('أدمن');
     }
     if (auth && u.indexOf('@') > -1) {
@@ -226,7 +250,13 @@
     loadAnalytics();
     renderImgModeStatus();
   }
-  function banner(text) { var b = $('#connBanner'); b.textContent = text || ''; b.hidden = !text; }
+  // A failed sign-in is the root cause of every permission error that follows it,
+  // so its message outranks them and is never overwritten by a symptom.
+  var authBanner = '';
+  function banner(text) {
+    var b = $('#connBanner'), msg = authBanner || text || '';
+    b.textContent = msg; b.hidden = !msg;
+  }
 
   /* ================= CATALOG MIGRATION ================= */
   function ensureCatalog() {
