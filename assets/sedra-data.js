@@ -18,9 +18,12 @@
       messagingSenderId: "582683278164",
       appId: "1:582683278164:web:e630144e0a0f9b8c0866c1"
     },
+    // The bot token is NOT here and must never come back. A static site hands
+    // every byte it loads to the public, so a token in this file is a token
+    // anyone can take — which is exactly what happened. The relay below holds
+    // it instead; see relay/worker.js.
     telegram: {
-      botToken: "8607316328:AAGK9h27liYMqwFzj5oiWgrYNPT4ktxT4_8",
-      chatId: "8288843086"
+      relay: 'https://sedra-orders.REPLACE-ME.workers.dev'
     },
     defaults: {
       storeName: 'سيدرا ستور',

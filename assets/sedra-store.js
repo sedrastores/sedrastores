@@ -556,8 +556,7 @@
 
   function sendTelegram(order) {
     var T = D.CONFIG.telegram;
-    if (!T.botToken || !T.chatId) return Promise.reject(new Error('no telegram'));
-    var api = 'https://api.telegram.org/bot' + T.botToken + '/';
+    if (!T.relay) return Promise.reject(new Error('no telegram'));
     var lines = [
       '🛍️ <b>طلب جديد — سيدرا ستور</b>', '',
       '🆔 رقم الطلب: <b>' + htmlEsc(order.orderCode) + '</b>', '',
@@ -588,8 +587,15 @@
       '📅 ' + htmlEsc(new Date().toLocaleString('ar-EG')));
     var text = lines.filter(function (l) { return l !== null; }).join('\n');
 
+    // The relay holds the token and forces its own chat_id, so nothing secret
+    // and no destination travels with this request.
     function post(method, body) {
-      return fetch(api + method, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      var payload = {};
+      Object.keys(body).forEach(function (k) { if (k !== 'chat_id') payload[k] = body[k]; });
+      return fetch(T.relay, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: method, payload: payload })
+      })
         .then(function (r) { return r.json(); })
         .then(function (j) { if (!j.ok) throw new Error(j.description || 'telegram error'); return j; });
     }
@@ -603,12 +609,11 @@
     var fits = plain.length <= 1000;
 
     if (photos.length === 1 && fits) {
-      return post('sendPhoto', { chat_id: T.chatId, photo: photos[0].url, caption: text, parse_mode: 'HTML' })
-        .catch(function () { return post('sendPhoto', { chat_id: T.chatId, photo: photos[0].url, caption: plain }); });
+      return post('sendPhoto', { photo: photos[0].url, caption: text, parse_mode: 'HTML' })
+        .catch(function () { return post('sendPhoto', { photo: photos[0].url, caption: plain }); });
     }
     if (photos.length > 1 && photos.length <= 10 && fits) {
       return post('sendMediaGroup', {
-        chat_id: T.chatId,
         media: photos.map(function (x, i) {
           return i === 0
             ? { type: 'photo', media: x.url, caption: text, parse_mode: 'HTML' }
@@ -616,7 +621,6 @@
         })
       }).catch(function () {
         return post('sendMediaGroup', {
-          chat_id: T.chatId,
           media: photos.map(function (x, i) { return i === 0 ? { type: 'photo', media: x.url, caption: plain } : { type: 'photo', media: x.url }; })
         });
       });
@@ -630,27 +634,26 @@
       photoStep = chunks.reduce(function (pr, ch) {
         return pr.then(function () {
           return (ch.length === 1
-            ? post('sendPhoto', { chat_id: T.chatId, photo: ch[0].url, caption: ch[0].caption })
-            : post('sendMediaGroup', { chat_id: T.chatId, media: ch.map(function (x) { return { type: 'photo', media: x.url, caption: x.caption }; }) })
+            ? post('sendPhoto', { photo: ch[0].url, caption: ch[0].caption })
+            : post('sendMediaGroup', { media: ch.map(function (x) { return { type: 'photo', media: x.url, caption: x.caption }; }) })
           ).catch(function () {});
         });
       }, Promise.resolve());
     }
     return photoStep.then(function () {
-      return post('sendMessage', { chat_id: T.chatId, text: text, parse_mode: 'HTML', disable_web_page_preview: true })
-        .catch(function () { return post('sendMessage', { chat_id: T.chatId, text: plain }); });
+      return post('sendMessage', { text: text, parse_mode: 'HTML', disable_web_page_preview: true })
+        .catch(function () { return post('sendMessage', { text: plain }); });
     });
   }
 
   // the transfer screenshot is uploaded straight to Telegram (no public link needed)
   function sendReceiptToTelegram(order) {
     var T = D.CONFIG.telegram;
-    if (!receiptFile || !T.botToken) return Promise.resolve();
+    if (!receiptFile || !T.relay) return Promise.resolve();
     var fd = new FormData();
-    fd.append('chat_id', T.chatId);
     fd.append('caption', '🧾 إيصال تحويل الطلب ' + order.orderCode + ' — ' + order.name + ' — ' + order.total + ' ج (' + (order.transferMethod || '') + ')');
     fd.append('photo', receiptFile, 'receipt-' + order.orderCode + '.jpg');
-    return fetch('https://api.telegram.org/bot' + T.botToken + '/sendPhoto', { method: 'POST', body: fd })
+    return fetch(T.relay, { method: 'POST', body: fd })
       .then(function (r) { return r.json(); })
       .then(function (j) { if (!j.ok) throw new Error(j.description || 'receipt failed'); });
   }
