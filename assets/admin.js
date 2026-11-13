@@ -838,7 +838,10 @@
      move either date if a future outage ever needs the same treatment.      */
   var OUTAGE_FROM = '2026-10-26';          // the day the token came out of the site
   var OUTAGE_TO   = '2026-11-13';          // the day the relay went live
-  var RESEND_GAP_MS = 4000;                // the relay allows 20/minute; stay under it
+  // Telegram counts each photo in an album as its own message against the
+  // per-chat limit, so an order with three photos is three messages, not one.
+  // Six seconds keeps a batch of albums comfortably under that ceiling.
+  var RESEND_GAP_MS = 6000;
   var resendState = { running: false, stop: false };
 
   function dateValue(sel, fallback, endOfDay) {
@@ -854,21 +857,27 @@
       .filter(function (o) { return o.notified !== true && o._ts && o._ts >= from && o._ts <= to; })
       .sort(function (a, b) { return a._ts - b._ts; });
   }
+  function sentInWindow() {
+    var from = dateValue('#resendFrom', OUTAGE_FROM, false);
+    var to = dateValue('#resendTo', OUTAGE_TO, true);
+    return (S.orders || []).filter(function (o) { return o.notified === true && o._ts >= from && o._ts <= to; });
+  }
   function renderResendBar() {
     var bar = $('#resendBar'); if (!bar) return;
     var from = $('#resendFrom'); if (from && !from.value) from.value = OUTAGE_FROM;
     var to = $('#resendTo'); if (to && !to.value) to.value = OUTAGE_TO;
     if (!S.ordersLoaded || !D.CONFIG.telegram.relay) { bar.hidden = true; return; }
     var list = missedOrders();
-    // nothing to do, and nothing running: keep the panel out of the way
-    if (!list.length && !resendState.running) { bar.hidden = true; return; }
+    var sent = sentInWindow();
+    // no order of any kind in the window, and nothing running: stay out of the way
+    if (!list.length && !sent.length && !resendState.running) { bar.hidden = true; return; }
     bar.hidden = false;
-    $('#resendCount').textContent = list.length
-      ? list.length + ' أوردر لسه ماوصلش'
-      : 'كله وصل ✅';
+    $('#resendCount').textContent = (list.length ? list.length + ' لسه ماوصلش' : 'كله وصل ✅') +
+      (sent.length ? ' · ' + sent.length + ' اتبعتوا' : '');
     $('#resendBtn').disabled = resendState.running || !list.length;
     $('#resendBtn').textContent = resendState.running ? 'بيتبعت...' : 'ابعتهم دلوقتي';
     $('#resendStop').hidden = !resendState.running;
+    $('#resendReset').disabled = resendState.running || !sent.length;
   }
   function resendLog(html) {
     var box = $('#resendProgress'); if (!box) return;
@@ -953,8 +962,48 @@
       }).then(function (r) { return r.json(); })
         .then(function (j) { if (!j.ok) throw new Error(j.description || j.error || 'telegram error'); return j; });
     }
-    return post('sendMessage', { text: text, parse_mode: 'HTML', disable_web_page_preview: true })
-      .catch(function () { return post('sendMessage', { text: plain }); });
+
+    // Same shape a live order arrives in: the product photos with the details
+    // as the caption, so the chat reads the same whether the order came through
+    // at the time or is being caught up now. Telegram fetches these URLs
+    // itself, so a photo that 404s would sink the whole message — hence the
+    // fall back to text, which still gets the order into the chat.
+    var photos = (o.items || []).map(function (i) {
+      return { url: D.absoluteUrl(i.img), caption: (i.name || '') + ' × ' + num(i.qty, 1) };
+    }).filter(function (x) { return x.url && !/^https?:\/\/(localhost|127\.)/.test(x.url); });
+    var fits = plain.length <= 1000;
+
+    function textOnly() {
+      return post('sendMessage', { text: text, parse_mode: 'HTML', disable_web_page_preview: true })
+        .catch(function () { return post('sendMessage', { text: plain }); });
+    }
+    if (!photos.length || !fits) return textOnly();
+    if (photos.length === 1) {
+      return post('sendPhoto', { photo: photos[0].url, caption: text, parse_mode: 'HTML' })
+        .catch(function () { return textOnly(); });
+    }
+    return post('sendMediaGroup', {
+      media: photos.slice(0, 10).map(function (x, i) {
+        return i === 0
+          ? { type: 'photo', media: x.url, caption: text, parse_mode: 'HTML' }
+          : { type: 'photo', media: x.url };
+      })
+    }).catch(function () { return textOnly(); });
+  }
+
+  // Clears the sent mark across the window, so the whole batch can be sent
+  // again from scratch — for when the messages were deleted from the chat and
+  // the owner wants them back in a different shape.
+  function resendReset() {
+    var sent = sentInWindow();
+    if (!sent.length) { toast('مفيش أوردرات اتبعت في الفترة دي', 'error'); return; }
+    if (!confirm('هيتشال العلامة عن ' + sent.length + ' أوردر، يعني هيتبعتوا تاني من الأول.\nامسح رسايلهم من الشات الأول عشان ميتكرروش. تمام؟')) return;
+    var ops = sent.map(function (o) { return { type: 'set', col: 'orders', id: o.id, merge: true, data: { notified: false } }; });
+    commitOps(ops).then(function () {
+      sent.forEach(function (o) { o.notified = false; });
+      renderResendBar();
+      toast('✅ اترجّعوا ' + sent.length + ' أوردر — دوس ابعتهم دلوقتي');
+    }).catch(function (e) { toast('تعذر: ' + errMsg(e), 'error'); });
   }
 
   function renderOrders() {
@@ -2146,6 +2195,7 @@
     var rs = $('#resendStop'); if (rs) rs.addEventListener('click', function () { resendState.stop = true; });
     var rf = $('#resendFrom'); if (rf) rf.addEventListener('change', renderResendBar);
     var rt = $('#resendTo'); if (rt) rt.addEventListener('change', renderResendBar);
+    var rr = $('#resendReset'); if (rr) rr.addEventListener('click', resendReset);
     $('#exportFeedBtn').addEventListener('click', exportFeed);
     $('#scanImagesBtn').addEventListener('click', scanImages);
     $('#repairImagesBtn').addEventListener('click', repairImages);
