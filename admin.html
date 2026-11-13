@@ -1372,27 +1372,6 @@
               <button class="btn-ghost" type="button" id="exportCsvBtn">⬇️ تصدير Excel</button>
             </div>
           </div>
-          <!-- The bot token was pulled out of the site on 26 Oct after it leaked,
-               and until the relay went up the orders only reached the database.
-               This resends those to Telegram, oldest first, and marks each one
-               so the same order can never be sent twice. -->
-          <div class="resend-bar" id="resendBar" hidden>
-            <div class="resend-head">
-              <span class="resend-title">📤 أوردرات ماوصلتش على تليجرام</span>
-              <span class="resend-count" id="resendCount"></span>
-            </div>
-            <div class="resend-row">
-              <label for="resendFrom">من</label>
-              <input type="date" id="resendFrom" class="setting-input">
-              <label for="resendTo">لحد</label>
-              <input type="date" id="resendTo" class="setting-input">
-              <button class="btn-ghost" type="button" id="resendBtn">ابعتهم دلوقتي</button>
-              <button class="btn-ghost" type="button" id="resendStop" hidden>وقّف</button>
-              <button class="btn-ghost" type="button" id="resendReset">↺ رجّع اللي اتبعت</button>
-            </div>
-            <div class="resend-progress" id="resendProgress" hidden></div>
-            <p class="hint">الفترة دي هي اللي البوت كان واقف فيها — من يوم ما التوكن اتشال من السايت لحد ما الوسيط اشتغل — فمفيش أوردر فيها وصل. بيتبعتوا بصور المنتجات والتفاصيل تحتها، زي أي أوردر عادي، واحد كل ٦ ثواني عشان تليجرام ميوقفهمش. كل أوردر بيوصل بيتعلّم، فلو وقفت وكمّلت بعدين مش هيتكرر. والرسالة بتيجي مكتوب عليها إنها أوردر قديم وتاريخه الأصلي.<br><b>↺ رجّع اللي اتبعت</b> بيشيل العلامة عن اللي اتبعتوا خلاص عشان يتبعتوا من الأول — استخدمه بعد ما تمسح رسايلهم من الشات.</p>
-          </div>
           <div class="route-bar" id="routeBar" hidden></div>
           <div class="table-scroll"><table class="orders-table">
             <thead><tr><th>الكود</th><th>العميل</th><th>المنتجات</th><th>العنوان</th><th>الإجمالي</th><th>الدفع</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr></thead>
@@ -1551,6 +1530,27 @@
             </div>
           </form>
 
+          <!-- The bot token was pulled out of the site on 26 Oct after it leaked,
+               and until the relay went up the orders only reached the database.
+               This resends those to Telegram, oldest first, and marks each one
+               so the same order can never be sent twice. -->
+          <div class="settings-card resend-bar" id="resendBar" hidden>
+            <div class="resend-head">
+              <h3 style="margin:0">📤 أوردرات ماوصلتش على تليجرام</h3>
+              <span class="resend-count" id="resendCount"></span>
+            </div>
+            <div class="resend-row">
+              <label for="resendFrom">من</label>
+              <input type="date" id="resendFrom" class="setting-input">
+              <label for="resendTo">لحد</label>
+              <input type="date" id="resendTo" class="setting-input">
+              <button class="btn-ghost" type="button" id="resendBtn">ابعتهم دلوقتي</button>
+              <button class="btn-ghost" type="button" id="resendStop" hidden>وقّف</button>
+              <button class="btn-ghost" type="button" id="resendReset">↺ رجّع اللي اتبعت</button>
+            </div>
+            <div class="resend-progress" id="resendProgress" hidden></div>
+            <p class="hint">الفترة دي هي اللي البوت كان واقف فيها — من يوم ما التوكن اتشال من السايت لحد ما الوسيط اشتغل — فمفيش أوردر فيها وصل. بيتبعتوا بصور المنتجات والتفاصيل تحتها، زي أي أوردر عادي، واحد كل ٦ ثواني عشان تليجرام ميوقفهمش. كل أوردر بيوصل بيتعلّم، فلو وقفت وكمّلت بعدين مش هيتكرر. والرسالة بتيجي مكتوب عليها إنها أوردر قديم وتاريخه الأصلي.<br><b>↺ رجّع اللي اتبعت</b> بيشيل العلامة عن اللي اتبعتوا خلاص عشان يتبعتوا من الأول — استخدمه بعد ما تمسح رسايلهم من الشات.</p>
+          </div>
           <div class="settings-card">
             <h3>📸 رفع الصور</h3>
             <div class="setting-row">

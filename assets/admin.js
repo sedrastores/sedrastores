@@ -443,17 +443,37 @@
     clearTimeout(snapTimer);
     snapTimer = setTimeout(publishSnapshot, 1500);
   }
+  // The store document, ready to be read by anyone: the snapshot is public, so
+  // anything that must stay private is dropped here rather than relied on not
+  // to exist. Nothing secret belongs on this document in the first place — the
+  // bot token lives in the relay's secrets — and this keeps it that way even if
+  // something is added by hand in the Firebase console one day.
+  var PRIVATE_STORE_FIELDS = /token|secret|password|apikey|api_key|privatekey|credential/i;
+  function publicStoreFields() {
+    var out = {};
+    Object.keys(S.store || {}).forEach(function (k) {
+      if (PRIVATE_STORE_FIELDS.test(k)) return;
+      if (S.store[k] !== undefined) out[k] = S.store[k];
+    });
+    return out;
+  }
   function publishSnapshot(manual) {
     if (!db || !S.catsLoaded || !S.prodsLoaded) return Promise.resolve();
     var data = {
       version: D.CONFIG.catalogVersion,
       categories: S.categories.map(function (c) { return JSON.parse(JSON.stringify(c)); }),
       products: S.products.map(function (p) { return JSON.parse(JSON.stringify(p)); }),
-      settings: {
+      // Everything on the store document goes to the site, not a hand-picked
+      // list of fields. A list has to be remembered: add a setting to the admin,
+      // forget to add it here, and the owner changes it, sees it saved, and the
+      // shop never hears about it. Copying the document means a new setting is
+      // live the moment it is saved. The few fields below are then pinned to a
+      // definite value so the site never has to guess at a missing one.
+      settings: Object.assign({}, publicStoreFields(), {
         name: S.store.name || '', whatsapp: S.store.whatsapp || '', shippingCompany: S.store.shippingCompany || '',
         allowTransfer: S.store.allowTransfer === true, paymentV2: S.store.paymentV2 === true, pixelId: S.store.pixelId === undefined ? null : S.store.pixelId,
         instapayLink: S.store.instapayLink || '', instapayHandle: S.store.instapayHandle || '', walletNumber: S.store.walletNumber || ''
-      },
+      }),
       theme: S.theme || {},
       shipping: S.shipping || null,
       updatedAt: serverTs()
@@ -1963,6 +1983,7 @@
     $('#settingWallet').value = s.walletNumber || d.walletNumber || '';
     if (S.shipping) renderShippingEditor();
     $('#settingShipCo').value = s.shippingCompany || '';
+    renderResendBar();          // the panel lives on this tab now
     setColor('Gold', t.gold || DEFAULT_THEME.gold);
     setColor('Bg', t.bg || DEFAULT_THEME.bg);
     setColor('Header', t.header || DEFAULT_THEME.header);
@@ -2051,7 +2072,10 @@
     $('#settingPixel').classList.remove('invalid');
     var data = { name: $('#settingName').value.trim(), whatsapp: $('#settingWA').value.trim(), allowTransfer: $('#settingTransfer').checked, paymentV2: true, pixelId: pixRaw ? pixel : null,
       instapayLink: $('#settingInstapay').value.trim(), instapayHandle: $('#settingInstapayHandle').value.trim(), walletNumber: $('#settingWallet').value.trim(), shippingCompany: $('#settingShipCo').value.trim(), updatedAt: serverTs() };
-    db.collection('settings').doc('store').set(data, { merge: true }).then(function () { S.store = data; publishSnapshot(); toast('✅ تم حفظ بيانات المتجر'); })
+    // merge, not replace: the document may carry settings this form does not
+    // show, and dropping them here would quietly take them off the site on the
+    // next publish even though they are still in the database
+    db.collection('settings').doc('store').set(data, { merge: true }).then(function () { S.store = Object.assign({}, S.store, data); publishSnapshot(); toast('✅ تم حفظ بيانات المتجر'); })
       .catch(function (err) { toast('تعذر الحفظ: ' + errMsg(err), 'error'); });
   }
   function saveTheme(e) {
