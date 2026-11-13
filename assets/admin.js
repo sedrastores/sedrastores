@@ -818,9 +818,149 @@
       ' · المطلوب تحصيله: <b>' + money(cash) + '</b>' +
       ' <button class="btn-ghost" type="button" id="routeCsvBtn" style="padding:5px 12px">⬇️ تصدير القائمة</button>';
   }
+  /* ---------------- Resending the orders the bot never got ---------------
+     The bot token was taken out of the site on 26 Oct 2026, after it leaked
+     and somebody renamed the bot. From then until the relay went up, orders
+     still saved to the database but no message ever reached Telegram.
+
+     This sends those, oldest first, through the same relay the site uses, and
+     writes `notified: true` on each one the moment Telegram accepts it. That
+     flag is what stops an order being sent twice — stop halfway, close the
+     page, come back tomorrow, and it picks up where it left off.
+
+     Nothing here invents an order or an order's contents: every message is
+     built from the stored order, by the same builder the storefront uses.
+
+     Which orders were missed is decided by the window, not by a flag the
+     storefront would have to write: between the two moments below, no order
+     could have reached Telegram, because there was no working bot for the
+     site to reach. Outside the window the site sends normally. The owner can
+     move either date if a future outage ever needs the same treatment.      */
+  var OUTAGE_FROM = '2026-10-26';          // the day the token came out of the site
+  var OUTAGE_TO   = '2026-11-13';          // the day the relay went live
+  var RESEND_GAP_MS = 4000;                // the relay allows 20/minute; stay under it
+  var resendState = { running: false, stop: false };
+
+  function dateValue(sel, fallback, endOfDay) {
+    var el = $(sel);
+    var v = el && el.value ? el.value : fallback;
+    var ms = Date.parse(v + (endOfDay ? 'T23:59:59' : 'T00:00:00'));
+    return isFinite(ms) ? ms : Date.parse(fallback + (endOfDay ? 'T23:59:59' : 'T00:00:00'));
+  }
+  function missedOrders() {
+    var from = dateValue('#resendFrom', OUTAGE_FROM, false);
+    var to = dateValue('#resendTo', OUTAGE_TO, true);
+    return (S.orders || [])
+      .filter(function (o) { return o.notified !== true && o._ts && o._ts >= from && o._ts <= to; })
+      .sort(function (a, b) { return a._ts - b._ts; });
+  }
+  function renderResendBar() {
+    var bar = $('#resendBar'); if (!bar) return;
+    var from = $('#resendFrom'); if (from && !from.value) from.value = OUTAGE_FROM;
+    var to = $('#resendTo'); if (to && !to.value) to.value = OUTAGE_TO;
+    if (!S.ordersLoaded || !D.CONFIG.telegram.relay) { bar.hidden = true; return; }
+    var list = missedOrders();
+    // nothing to do, and nothing running: keep the panel out of the way
+    if (!list.length && !resendState.running) { bar.hidden = true; return; }
+    bar.hidden = false;
+    $('#resendCount').textContent = list.length
+      ? list.length + ' أوردر لسه ماوصلش'
+      : 'كله وصل ✅';
+    $('#resendBtn').disabled = resendState.running || !list.length;
+    $('#resendBtn').textContent = resendState.running ? 'بيتبعت...' : 'ابعتهم دلوقتي';
+    $('#resendStop').hidden = !resendState.running;
+  }
+  function resendLog(html) {
+    var box = $('#resendProgress'); if (!box) return;
+    box.hidden = false;
+    box.innerHTML = html;
+  }
+  function resendMissed() {
+    if (resendState.running) return;
+    var list = missedOrders();
+    if (!list.length) return;
+    if (!confirm('هيتبعت ' + list.length + ' أوردر على تليجرام، واحد كل ' + (RESEND_GAP_MS / 1000) + ' ثواني.\nيعني حوالي ' + Math.ceil(list.length * RESEND_GAP_MS / 60000) + ' دقيقة. تمام؟')) return;
+    resendState.running = true; resendState.stop = false;
+    renderResendBar();
+    var done = 0, failed = 0, i = 0;
+    function report(extra) {
+      resendLog('<span class="ok">وصل: ' + done + '</span> · ' +
+        (failed ? '<span class="bad">فشل: ' + failed + '</span> · ' : '') +
+        'فاضل: ' + (list.length - i) + (extra ? ' — ' + extra : ''));
+    }
+    function next() {
+      if (resendState.stop || i >= list.length) {
+        resendState.running = false;
+        renderResendBar();
+        report(resendState.stop ? 'اتوقف — اضغط ابعتهم تاني تكمّل من مكانك' : 'خلصت');
+        return;
+      }
+      var o = list[i];
+      report('بيبعت ' + (o.orderCode || o.id));
+      sendOldOrder(o)
+        .then(function () {
+          done++;
+          // mark it the moment Telegram took it, so it can never go twice
+          return db.collection('orders').doc(o.id).set({ notified: true }, { merge: true })
+            .then(function () { o.notified = true; });
+        })
+        .catch(function (e) { failed++; report('فشل ' + (o.orderCode || o.id) + ': ' + errMsg(e)); })
+        .then(function () { i++; setTimeout(next, RESEND_GAP_MS); });
+    }
+    next();
+  }
+  // Builds the message from the stored order and posts it through the relay.
+  // Marked as an old order so a two-week-old order is not read as a new one.
+  function sendOldOrder(o) {
+    var relay = D.CONFIG.telegram.relay;
+    if (!relay) return Promise.reject(new Error('مفيش وسيط متظبط'));
+    var when = o._ts ? new Date(o._ts).toLocaleString('ar-EG') : '—';
+    var lines = [
+      '⏪ <b>أوردر قديم ماوصلش وقته</b>',
+      '🗓️ اتعمل: ' + esc(when), '',
+      '🛍️ <b>طلب — سيدرا ستور</b>', '',
+      '🆔 رقم الطلب: <b>' + esc(o.orderCode || '—') + '</b>', '',
+      '👤 الاسم: ' + esc(o.name || ''),
+      '📱 الموبايل: <code>' + esc(o.phone || '') + '</code>',
+      o.phone2 ? '📱 موبايل تاني: <code>' + esc(o.phone2) + '</code>' : null, '',
+      '🎁 <b>المنتجات:</b>'
+    ];
+    (o.items || []).forEach(function (i) {
+      lines.push('• [' + esc(i.categoryName || '') + '] ' + esc(i.name || '') + ' × ' + i.qty + ' = ' + (num(i.price, 0) * num(i.qty, 1)) + ' ج');
+    });
+    if (num(o.offerDiscount, 0) > 0) lines.push('🎁 خصم العرض: −' + num(o.offerDiscount, 0) + ' ج');
+    if (o.promoCode) lines.push('🎟️ كود ' + esc(o.promoCode) + ': −' + num(o.promoDiscount, 0) + ' ج');
+    lines.push('', '📦 عدد القطع: ' + num(o.itemsCount, 0),
+      '💰 المنتجات: ' + num(o.subtotal, 0) + ' ج',
+      '🚚 الشحن: ' + num(o.shipping, 0) + ' ج' + (o.shippingZone ? ' (' + esc(o.shippingZone) + ')' : ''),
+      '💵 <b>الإجمالي: ' + orderTotal(o) + ' ج</b>', '',
+      '📍 <b>العنوان</b>',
+      '🏙️ ' + esc(o.governorate || '') + ' — ' + esc(o.city || ''),
+      '🏠 ' + esc(o.address || ''),
+      o.gps ? '🗺️ ' + esc(o.gps) : null,
+      o.notes ? '📝 ملاحظات: ' + esc(o.notes) : null, '',
+      o.paidOnline
+        ? '💳 الدفع: <b>تحويل إلكتروني (' + esc(o.transferMethod || '') + ')</b>' + (o.hasReceipt ? ' — كان مرفق صورة تحويل' : '')
+        : '💳 الدفع: عند الاستلام',
+      '📋 الحالة في الأدمن: ' + esc(o.status || 'جديد'));
+    var text = lines.filter(function (l) { return l !== null; }).join('\n');
+    var plain = text.replace(/<[^>]+>/g, '');
+
+    function post(method, payload) {
+      return fetch(relay, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: method, payload: payload })
+      }).then(function (r) { return r.json(); })
+        .then(function (j) { if (!j.ok) throw new Error(j.description || j.error || 'telegram error'); return j; });
+    }
+    return post('sendMessage', { text: text, parse_mode: 'HTML', disable_web_page_preview: true })
+      .catch(function () { return post('sendMessage', { text: plain }); });
+  }
+
   function renderOrders() {
     if (!S.ordersLoaded) return;
     yRender();
+    renderResendBar();
     fillAreaFilters();
     var list = filteredOrders();
     renderRouteBar(list);
@@ -2002,6 +2142,10 @@
       if (e.target && e.target.id === 'routeCsvBtn') exportCsv();
     });
     $('#exportCsvBtn').addEventListener('click', exportCsv);
+    var rb = $('#resendBtn'); if (rb) rb.addEventListener('click', resendMissed);
+    var rs = $('#resendStop'); if (rs) rs.addEventListener('click', function () { resendState.stop = true; });
+    var rf = $('#resendFrom'); if (rf) rf.addEventListener('change', renderResendBar);
+    var rt = $('#resendTo'); if (rt) rt.addEventListener('change', renderResendBar);
     $('#exportFeedBtn').addEventListener('click', exportFeed);
     $('#scanImagesBtn').addEventListener('click', scanImages);
     $('#repairImagesBtn').addEventListener('click', repairImages);

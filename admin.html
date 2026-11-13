@@ -1245,6 +1245,17 @@
   .bundle-row input { width: 92px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; }
   .route-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #f3f9f4; border: 1px solid #bfe3c7; color: #166534; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; font-weight: 800; }
   .route-bar b { font-size: 15px; }
+  .resend-bar { background: #fff8ec; border: 1px solid #f0cf96; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+  .resend-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .resend-title { font-size: 14px; font-weight: 900; color: #8a5a10; }
+  .resend-count { font-size: 13px; font-weight: 800; color: #b4700f; }
+  .resend-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .resend-row label { font-size: 13px; font-weight: 700; color: #8a5a10; }
+  .resend-row .setting-input { width: auto; min-width: 160px; }
+  .resend-progress { margin-top: 10px; font-size: 13px; font-weight: 700; color: #8a5a10; line-height: 1.8; }
+  .resend-progress .ok { color: #166534; }
+  .resend-progress .bad { color: #b3261e; }
+  .resend-bar .hint { margin-top: 10px; }
 
   .lock-screen { display: flex; align-items: center; justify-content: center; padding: 60px 20px; }
   .lock-screen[hidden], #yousefBody[hidden] { display: none; }
@@ -1360,6 +1371,26 @@
               <select class="filter-select" id="orderCityFilter"><option value="">كل المناطق</option></select>
               <button class="btn-ghost" type="button" id="exportCsvBtn">⬇️ تصدير Excel</button>
             </div>
+          </div>
+          <!-- The bot token was pulled out of the site on 26 Oct after it leaked,
+               and until the relay went up the orders only reached the database.
+               This resends those to Telegram, oldest first, and marks each one
+               so the same order can never be sent twice. -->
+          <div class="resend-bar" id="resendBar" hidden>
+            <div class="resend-head">
+              <span class="resend-title">📤 أوردرات ماوصلتش على تليجرام</span>
+              <span class="resend-count" id="resendCount"></span>
+            </div>
+            <div class="resend-row">
+              <label for="resendFrom">من</label>
+              <input type="date" id="resendFrom" class="setting-input">
+              <label for="resendTo">لحد</label>
+              <input type="date" id="resendTo" class="setting-input">
+              <button class="btn-ghost" type="button" id="resendBtn">ابعتهم دلوقتي</button>
+              <button class="btn-ghost" type="button" id="resendStop" hidden>وقّف</button>
+            </div>
+            <div class="resend-progress" id="resendProgress" hidden></div>
+            <p class="hint">الفترة دي هي اللي البوت كان واقف فيها — من يوم ما التوكن اتشال من السايت لحد ما الوسيط اشتغل — فمفيش أوردر فيها وصل. بيتبعتوا واحد كل ٤ ثواني عشان تليجرام ميوقفهمش. كل أوردر بيوصل بيتعلّم، فلو وقفت وكمّلت بعدين مش هيتكرر. والرسالة بتيجي مكتوب عليها إنها أوردر قديم.</p>
           </div>
           <div class="route-bar" id="routeBar" hidden></div>
           <div class="table-scroll"><table class="orders-table">

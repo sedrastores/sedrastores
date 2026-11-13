@@ -754,9 +754,9 @@
         source: state.page
       };
       return Promise.all([
-        timeout(saveOrderToFirestore(order), 12000).then(function () { return true; }, function (e) { console.warn('Order save failed', e); return false; }),
+        timeout(saveOrderToFirestore(order), 12000).then(function (id) { return id; }, function (e) { console.warn('Order save failed', e); return null; }),
         timeout(sendTelegram(order).then(function () { return sendReceiptToTelegram(order); }), 25000).then(function () { return true; }, function (e) { console.warn('Telegram failed', e); return false; })
-      ]).then(function (res) { return { order: order, saved: res[0], notified: res[1] }; });
+      ]).then(function (res) { return { order: order, saved: !!res[0], notified: res[1] }; });
     }).then(function (r) {
       var o = r.order;
       var summary = 'السلام عليكم، أنا ' + o.name + ' وعندي طلب رقم ' + o.orderCode + ':\n' +
