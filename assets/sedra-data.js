@@ -23,7 +23,7 @@
     // anyone can take — which is exactly what happened. The relay below holds
     // it instead; see relay/worker.js.
     telegram: {
-      relay: 'https://sedra-orders.REPLACE-ME.workers.dev'
+      relay: 'https://sedra-orders.sedrastores4u.workers.dev'
     },
     defaults: {
       storeName: 'سيدرا ستور',
