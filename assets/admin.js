@@ -1257,8 +1257,10 @@
 
   function exportFeed() {
     if (!S.catsLoaded || !S.prodsLoaded) return toast('استنى لحد ما المنتجات تحمّل', 'error');
-    var base = 'https://sedrastores.com/';
-    var abs = function (u) { return !u ? '' : (/^https?:\/\//i.test(u) ? u : (D.isMedia(u) ? '' : base + String(u).replace(/^\//, ''))); };
+    // Built from wherever the shop is actually served, not a domain written
+    // here: the feed goes to Facebook, and a link in it that points at a domain
+    // the shop has moved off is an ad that leads nowhere.
+    var abs = function (u) { return !u ? '' : (/^https?:\/\//i.test(u) ? u : (D.isMedia(u) ? '' : D.absoluteUrl(u))); };
     var head = ['id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand', 'item_group_id', 'product_type', 'quantity_to_sell_on_facebook'];
     var rows = [head], skipped = 0;
     S.products.forEach(function (p) {
@@ -1272,7 +1274,7 @@
         (p.description || c.description || p.name).replace(/\s+/g, ' ').slice(0, 900),
         'in stock', 'new',
         ((D.num(p.price, 0) || c.price) || 0).toFixed(2) + ' EGP',
-        base + 'product.html?id=' + encodeURIComponent(p.id),
+        D.absoluteUrl('product.html?id=' + encodeURIComponent(p.id)),
         img, 'Sedra Store', c.id, c.name, 100
       ]);
     });
